@@ -8,8 +8,9 @@ import { AppTextInput } from "./ui/AppTextInput";
 
 export const EditModal = ({
   visible,
-  toggleModal,
-  onSave,
+  onClose,
+  addPerson,
+  editPerson,
   editMode,
   personData,
   offEditMode,
@@ -20,25 +21,34 @@ export const EditModal = ({
   useEffect(() => {
     setIinValue(personData.iin);
     setNameValue(personData.name);
-  }, [editMode, personData]); // хз как синхронизировать
+  }, [editMode, personData]); 
 
   const closeModal = () => {
     setIinValue("");
     setNameValue("");
-    toggleModal();
+    onClose();
     offEditMode();
   };
 
-  const handlePressOk = () => {
+  const handleAddPerson = () => {
     const newObj = {
       id: toString(Math.random()),
-      relationship: "Сын",
       name: nameValue,
       iin: iinValue,
     };
-    onSave(newObj);
+    addPerson(newObj);
     closeModal();
   };
+
+  const handleEditPerson = () => {
+    const newObj = {
+      id: toString(Math.random()),
+      name: nameValue,
+      iin: iinValue,
+    };
+    editPerson(newObj);
+    closeModal();
+  }
 
   return (
     <View style={styles.centeredView}>
@@ -62,9 +72,15 @@ export const EditModal = ({
             />
             <View style={styles.actions}>
               <View>
-                <AppButton onPress={() => {}} onPress={handlePressOk}>
-                  {editMode ? "Сохранить изменения" : "Добавить"}
-                </AppButton>
+                {editMode ? (
+                  <AppButton onPress={() => {}} onPress={handleEditPerson}>
+                    Сохранить изменения
+                  </AppButton>
+                ) : (
+                  <AppButton onPress={() => {}} onPress={handleAddPerson}>
+                    Добавить
+                  </AppButton>
+                )}
               </View>
               <View>
                 <AppButton
@@ -98,6 +114,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 35,
     alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

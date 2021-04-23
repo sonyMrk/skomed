@@ -9,7 +9,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 
 import { AppButton } from "../components/ui/AppButton";
-import { AppText } from "../components/ui/AppText";
 import { THEME } from "../theme";
 import { AppBoldText } from "./../components/ui/AppBoldText";
 import { ProfileInfoItem } from "../components/ProfileInfoItem";
@@ -43,20 +42,20 @@ const infoData = [
 
 const familyData = [
   {
-    name: "Иванов Олег Васильевич",
+    name: "Пупкин Олег Иванович",
     iin: "910414360902",
   },
   {
-    name: "Иванов Олег Васильевич",
-    iin: "9104143609123",
+    name: "Иванов Иван Васильевич",
+    iin: "910414360903",
   },
   {
-    name: "Иванов Олег Васильевич",
-    iin: "910414360902asd",
+    name: "Букин Геннадий Батькович",
+    iin: "910414360904",
   },
   {
-    name: "Иванов Олег Васильевич",
-    iin: "adsgasdf",
+    name: "Сидоров Василий Петрович",
+    iin: "910414360906",
   },
 ];
 
@@ -77,31 +76,56 @@ export const ProfileScreen = ({ navigation }) => {
     setIsReady(true);
   }, []);
 
+  // добавляем нового члена семьи
   const addFamilyPerson = (newMan) => {
     setFamily((prev) => [...prev, newMan]);
   };
 
-  const toggleModal = () => {
-    setModalVisible(!modalVisible);
-  };
+  // редактирование члена семьи
+  const editFamilyPerson = (newMan) => {
+    setFamily((prev) => prev.map((item) => {
+      if (item.iin === newMan.iin) {
+        return newMan
+      }
+      return item
+    }))
+  }
 
-  const turnOffEditMode = () => {
-    setEditMode(false);
-  };
+  const closeModal = () => {
+    setModalVisible(false)
+  }
 
-  const handlePressEdit = (iin) => {
+  // открыть модальное окно в режиме добавления
+  const openModalForAdd = () => {
+    setFamilyPersonData({
+      iin: "",
+      name: "",
+    })
+    setModalVisible(true);
+  }
+
+  // открыть модальное окно в режиме редактирования
+  const openModalForEdit = (iin) => {
     const person = family.find((item) => item.iin === iin);
     if (person) {
       setEditMode(true);
       setFamilyPersonData(person);
-      toggleModal();
+      setModalVisible(true);
     }
   };
 
+  // отключаем режим редактирования члена семьи, чтобы в модальном окне
+  // настройки стали обычными
+  const turnOffEditMode = () => {
+    setEditMode(false);
+  };
+
+  // удаление члена семьи
   const deleteFamilyPerson = (iin) => {
     setFamily((prev) => prev.filter((item) => item.iin !== iin));
   };
-
+ 
+  // 
   const handlePressDelete = (iin) => {
     Alert.alert("Удаление члена семьи", "Вы уверены?", [
       {
@@ -112,10 +136,12 @@ export const ProfileScreen = ({ navigation }) => {
     ]);
   };
 
+  // вернуться назад
   const goToMain = () => {
     navigation.navigate("Main");
   };
 
+  // выйти из учетной записи
   const logout = () => {
     Alert.alert("Выйти из учетной записи", "Вы уверены?", [
       {
@@ -141,8 +167,9 @@ export const ProfileScreen = ({ navigation }) => {
             ))}
             <EditModal
               visible={modalVisible}
-              toggleModal={toggleModal}
-              onSave={addFamilyPerson}
+              onClose={closeModal}
+              addPerson={addFamilyPerson}
+              editPerson={editFamilyPerson}
               editMode={editMode}
               personData={familyPersonData}
               offEditMode={turnOffEditMode}
@@ -156,7 +183,7 @@ export const ProfileScreen = ({ navigation }) => {
                 <AppButton
                   color="#0066ff"
                   style={styles.btn}
-                  onPress={toggleModal}
+                  onPress={openModalForAdd}
                 >
                   <Ionicons name="add" size={24} color="white" />
                 </AppButton>
@@ -167,7 +194,7 @@ export const ProfileScreen = ({ navigation }) => {
               <FamilyItem
                 {...item}
                 key={item.iin}
-                onEdit={handlePressEdit}
+                onEdit={openModalForEdit}
                 onDelete={handlePressDelete}
               />
             ))}

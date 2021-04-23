@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { AppButton } from "./ui/AppButton";
-import { AppText } from "./ui/AppText";
+// import { AppText } from "./ui/AppText";
 import { THEME } from "../theme";
 import { AppBoldText } from "./ui/AppBoldText";
 

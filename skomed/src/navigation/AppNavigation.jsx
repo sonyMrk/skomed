@@ -1,7 +1,7 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, CommonActions } from "@react-navigation/native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
@@ -10,6 +10,12 @@ import { ProfileScreen } from "../screens/ProfileScreen";
 import { MainScreen } from "../screens/MainScreen";
 import { NotificationScreen } from "../screens/NotificationScreen";
 import { THEME } from "../theme";
+import { AppointmentScreen } from "../screens/AppointmentScreen";
+import { HouseCallScreen } from "../screens/HouseCallScreen";
+import { DrugSearchScreen } from "../screens/DrugSearchScreen";
+import { HospitalDirectoryScreen } from "../screens/HospitalDirectoryScreen";
+import { ScheduleScreen } from "../screens/ScheduleScreen";
+import { DocumentScannedScreen } from "../screens/DocumentScannedScreen";
 
 const MainStack = createStackNavigator();
 
@@ -20,11 +26,118 @@ const MainStackScreen = ({ navigation }) => {
         headerStyle: {
           backgroundColor: THEME.MAIN_COLOR,
         },
-        title: "Главная",
         headerTintColor: "#fff",
       }}
     >
-      <MainStack.Screen name="Main" component={MainScreen} />
+      <MainStack.Screen
+        name="Main"
+        component={MainScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Главная",
+        })}
+      />
+      <MainStack.Screen
+        name="Appointment"
+        component={AppointmentScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Запись на прием",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <MainStack.Screen
+        name="HouseCallScreen"
+        component={HouseCallScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Вызов врача на дом",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <MainStack.Screen
+        name="DrugSearchScreen"
+        component={DrugSearchScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Поиск лекарств",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <MainStack.Screen
+        name="HospitalDirectoryScreen"
+        component={HospitalDirectoryScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Справочник мед. организаций",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <MainStack.Screen
+        name="ScheduleScreen"
+        component={ScheduleScreen}
+        options={({ navigation }) => ({
+          headerTitle: "График работы врачей",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <MainStack.Screen
+        name="DocumentScannedScreen"
+        component={DocumentScannedScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Проверка мед. документа",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
     </MainStack.Navigator>
   );
 };
@@ -49,9 +162,19 @@ const ProfileStackScreen = () => {
           headerTitle: "Профиль",
           headerLeft: () => (
             <TouchableOpacity
-              style={{padding: 10}}
+              style={{ padding: 10 }}
               onPress={() => {
-                navigation.goBack();
+                navigation.navigate("Main");         
+                // navigation.dispatch(
+                //   CommonActions.reset({
+                //     index: 1,
+                //     routes: [
+                //       {
+                //         name: "Main",
+                //       },
+                //     ],
+                //   })
+                // );
               }}
             >
               <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
@@ -79,6 +202,19 @@ const NotificationStackScreen = () => {
       <NotificationStack.Screen
         name="Notification"
         component={NotificationScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Уведомления",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.navigate("Main");
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
       />
     </NotificationStack.Navigator>
   );

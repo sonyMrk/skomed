@@ -8,37 +8,37 @@ const mainMenuItems = [
     id: "1",
     title: "Запись на прием",
     icon: "ios-call-outline",
-    navigateTo: "Profile",
+    navigateTo: "Appointment",
   },
   {
     id: "2",
     title: "Вызов врача на дом",
     icon: "business-outline",
-    navigateTo: "Profile",
+    navigateTo: "HouseCallScreen",
   },
   {
     id: "3",
     title: "Поиск лекарств",
     icon: "search",
-    navigateTo: "Profile",
+    navigateTo: "DrugSearchScreen",
   },
   {
     id: "4",
     title: "Справочник мед организаций",
     icon: "ios-book-outline",
-    navigateTo: "Profile",
+    navigateTo: "HospitalDirectoryScreen",
   },
   {
     id: "5",
     title: "График работы врачей",
     icon: "calendar-outline",
-    navigateTo: "Profile",
+    navigateTo: "ScheduleScreen",
   },
   {
     id: "6",
     title: "Проверка мед. документа",
     icon: "scan-circle-outline",
-    navigateTo: "Profile",
+    navigateTo: "DocumentScannedScreen",
   },
 ];
 
