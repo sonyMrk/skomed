@@ -21,7 +21,7 @@ export const EditModal = ({
   useEffect(() => {
     setIinValue(personData.iin);
     setNameValue(personData.name);
-  }, [editMode, personData]); 
+  }, [editMode, personData]);
 
   const closeModal = () => {
     setIinValue("");
@@ -48,7 +48,7 @@ export const EditModal = ({
     };
     editPerson(newObj);
     closeModal();
-  }
+  };
 
   return (
     <View style={styles.centeredView}>
@@ -63,6 +63,7 @@ export const EditModal = ({
               value={iinValue}
               onChange={setIinValue}
               type="numeric"
+              style={{ marginBottom: 12 }}
             />
             <AppTextInput
               placeholder="ФИО"

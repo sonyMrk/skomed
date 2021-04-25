@@ -164,7 +164,8 @@ const ProfileStackScreen = () => {
             <TouchableOpacity
               style={{ padding: 10 }}
               onPress={() => {
-                navigation.navigate("Main");         
+                navigation.navigate("Main");
+                // сброс состояния
                 // navigation.dispatch(
                 //   CommonActions.reset({
                 //     index: 1,

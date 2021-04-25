@@ -15,12 +15,19 @@ export const AppButton = ({
   onPress,
   color = THEME.MAIN_COLOR,
   style,
+  disabled = false,
 }) => {
   const Wrapper =
     Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity;
   return (
-    <Wrapper onPress={onPress}>
-      <View style={{ ...styles.button, backgroundColor: color, ...style }}>
+    <Wrapper onPress={onPress} disabled={disabled}>
+      <View
+        style={{
+          ...styles.button,
+          backgroundColor: disabled ? "#b3e4e5" : color,
+          ...style,
+        }}
+      >
         <AppText style={{ color: "#fff" }}>{children}</AppText>
       </View>
     </Wrapper>

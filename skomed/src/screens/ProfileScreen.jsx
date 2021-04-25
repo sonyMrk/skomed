@@ -60,15 +60,16 @@ const familyData = [
 ];
 
 export const ProfileScreen = ({ navigation }) => {
-  const [isReady, setIsReady] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+  const [isReady, setIsReady] = useState(false); // загружены ли данные
+  const [editMode, setEditMode] = useState(false); // в каком режиме открывается модальное окно
   const [familyPersonData, setFamilyPersonData] = useState({
     iin: "",
     name: "",
-  });
-  const [family, setFamily] = useState([]);
-  const [info, setInfo] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  }); // если редактирование, то устанавливаем значение нужного члена семьи,
+  // пустые значения при создании НОВОГО члена семьи
+  const [family, setFamily] = useState([]); // установка членов семьи
+  const [info, setInfo] = useState([]); // установка информации о текущем пользователе
+  const [modalVisible, setModalVisible] = useState(false); // открыто ли модальное окно
 
   useEffect(() => {
     setInfo(infoData);
@@ -81,28 +82,38 @@ export const ProfileScreen = ({ navigation }) => {
     setFamily((prev) => [...prev, newMan]);
   };
 
+  const goToAppointment = (iin, name) => {
+    // записать члена семьи на прием
+  };
+
+  const goToHouseCall = (iin, name) => {
+    // вызвать врача для члена семьи
+  };
+
   // редактирование члена семьи
   const editFamilyPerson = (newMan) => {
-    setFamily((prev) => prev.map((item) => {
-      if (item.iin === newMan.iin) {
-        return newMan
-      }
-      return item
-    }))
-  }
+    setFamily((prev) =>
+      prev.map((item) => {
+        if (item.iin === newMan.iin) {
+          return newMan;
+        }
+        return item;
+      })
+    );
+  };
 
   const closeModal = () => {
-    setModalVisible(false)
-  }
+    setModalVisible(false);
+  };
 
   // открыть модальное окно в режиме добавления
   const openModalForAdd = () => {
     setFamilyPersonData({
       iin: "",
       name: "",
-    })
+    });
     setModalVisible(true);
-  }
+  };
 
   // открыть модальное окно в режиме редактирования
   const openModalForEdit = (iin) => {
@@ -124,8 +135,8 @@ export const ProfileScreen = ({ navigation }) => {
   const deleteFamilyPerson = (iin) => {
     setFamily((prev) => prev.filter((item) => item.iin !== iin));
   };
- 
-  // 
+
+  //
   const handlePressDelete = (iin) => {
     Alert.alert("Удаление члена семьи", "Вы уверены?", [
       {
