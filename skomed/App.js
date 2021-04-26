@@ -1,9 +1,11 @@
 import "react-native-gesture-handler";
 import React, { useState } from "react";
+import { Provider } from "react-redux";
 import { StatusBar } from "expo-status-bar";
 import AppLoading from "expo-app-loading";
-import AppNavigation from "./src/navigation/AppNavigation";
 
+import AppNavigation from "./src/navigation/AppNavigation";
+import store from "./src/store/store";
 
 import { bootstrap } from "./src/bootstrap";
 
@@ -21,7 +23,9 @@ export default function App() {
   }
 
   return (
-        <AppNavigation />
+    <Provider store={store}>
+      <StatusBar style="light" />
+      <AppNavigation />
+    </Provider>
   );
 }
-

@@ -7,75 +7,60 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useSelector, useDispatch } from "react-redux";
 
 import { AppButton } from "../components/ui/AppButton";
 import { THEME } from "../theme";
 import { AppBoldText } from "./../components/ui/AppBoldText";
-import { ProfileInfoItem } from "../components/ProfileInfoItem";
 import { Preloader } from "../components/ui/Preloader";
 import { FamilyItem } from "../components/FamilyItem";
 import { EditModal } from "../components/EditModal";
-
-const infoData = [
-  {
-    id: "1",
-    title: "Ф.И.О",
-    value: "Пупкин Иван Вячеславович",
-  },
-  {
-    id: "2",
-    title: "Мед организация прикрепления",
-    value: `КГП на ПХВ "Городская поликлиника №3 КГУ "УЗ акимата СКО"`,
-  },
-  {
-    id: "3",
-    title: "Адрес",
-    value: `Казахстан, Обл.СЕВЕРО-КАЗАХСТАНСКАЯ, г.ПЕТРОПАВЛОВСК, ул.РИЖСКАЯ,
-    д. 108, кв 40`,
-  },
-  {
-    id: "4",
-    title: "Участок",
-    value: "Общей практики участок 2",
-  },
-];
-
-const familyData = [
-  {
-    name: "Пупкин Олег Иванович",
-    iin: "910414360902",
-  },
-  {
-    name: "Иванов Иван Васильевич",
-    iin: "910414360903",
-  },
-  {
-    name: "Букин Геннадий Батькович",
-    iin: "910414360904",
-  },
-  {
-    name: "Сидоров Василий Петрович",
-    iin: "910414360906",
-  },
-];
+import { InfoBlock } from "../components/InfoBlock";
+import { AppTextInput } from "../components/ui/AppTextInput";
+import { createUserProfile, loadUserData, logout } from "../store/actions/user";
 
 export const ProfileScreen = ({ navigation }) => {
-  const [isReady, setIsReady] = useState(false); // загружены ли данные
   const [editMode, setEditMode] = useState(false); // в каком режиме открывается модальное окно
+  const [iin, setIin] = useState("");
+  const [phone, setPhone] = useState("");
   const [familyPersonData, setFamilyPersonData] = useState({
     iin: "",
     name: "",
   }); // если редактирование, то устанавливаем значение нужного члена семьи,
   // пустые значения при создании НОВОГО члена семьи
-  const [family, setFamily] = useState([]); // установка членов семьи
-  const [info, setInfo] = useState([]); // установка информации о текущем пользователе
+  // const [family, setFamily] = useState([]); // установка членов семьи
+  // const [info, setInfo] = useState(null); // установка информации о текущем пользователе
   const [modalVisible, setModalVisible] = useState(false); // открыто ли модальное окно
 
+  const userProfile = useSelector((state) => state.user.profile);
+  const isLoading = useSelector((state) => state.user.isLoading);
+  const info = useSelector((state) => state.user.userData);
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    setInfo(infoData);
-    setFamily(familyData);
-    setIsReady(true);
+    if (userProfile) {
+      dispatch(loadUserData(userProfile.iin));
+    }
   }, []);
+
+  const createProfile = () => {
+    if (iin.trim().length !== 12 || isNaN(iin)) {
+      return Alert.alert(
+        "Не корректный ИИН",
+        "Значение ИИН должно быть 12 цифр"
+      );
+    }
+    if (phone.length !== 10 || isNaN(phone)) {
+      return Alert.alert(
+        "Не корректный номер телефона",
+        "Значение телефона должно быть 10 цифр"
+      );
+    }
+    dispatch(createUserProfile({ iin, phone }));
+    setIin("");
+    setPhone("");
+  };
 
   // добавляем нового члена семьи
   const addFamilyPerson = (newMan) => {
@@ -153,76 +138,107 @@ export const ProfileScreen = ({ navigation }) => {
   };
 
   // выйти из учетной записи
-  const logout = () => {
+  const handleLogout = () => {
     Alert.alert("Выйти из учетной записи", "Вы уверены?", [
       {
         text: "Отмена",
         style: "cancel",
       },
-      { text: "OK", onPress: () => goToMain() },
+      {
+        text: "OK",
+        onPress: () => {
+          dispatch(logout());
+        },
+      },
     ]);
   };
 
-  if (!isReady) {
+  console.log("isLoading====", isLoading);
+
+  if (isLoading) {
     return <Preloader />;
   }
 
   return (
     <SafeAreaView style={styles.wrapper}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={styles.container}>
-          <AppBoldText style={styles.title}>Данные пользователя</AppBoldText>
-          <View style={styles.info}>
-            {info.map((item) => (
-              <ProfileInfoItem {...item} key={item.id} />
-            ))}
-            <EditModal
-              visible={modalVisible}
-              onClose={closeModal}
-              addPerson={addFamilyPerson}
-              editPerson={editFamilyPerson}
-              editMode={editMode}
-              personData={familyPersonData}
-              offEditMode={turnOffEditMode}
+        {userProfile ? (
+          <View style={styles.container}>
+            <AppBoldText style={styles.title}>Данные пользователя</AppBoldText>
+            {info && (
+              <InfoBlock infoData={info}>
+                <EditModal
+                  visible={modalVisible}
+                  onClose={closeModal}
+                  addPerson={addFamilyPerson}
+                  editPerson={editFamilyPerson}
+                  editMode={editMode}
+                  personData={familyPersonData}
+                  offEditMode={turnOffEditMode}
+                />
+              </InfoBlock>
+            )}
+            <View style={styles.family}>
+              <View style={styles.addPerson}>
+                <AppBoldText style={styles.title}>Семья</AppBoldText>
+                <View>
+                  <AppButton
+                    color="#0066ff"
+                    style={styles.btn}
+                    onPress={openModalForAdd}
+                  >
+                    <Ionicons name="add" size={24} color="white" />
+                  </AppButton>
+                </View>
+              </View>
+
+              {/* {userProfile &&
+                userProfile.family.map((item) => (
+                  <FamilyItem
+                    {...item}
+                    key={item.iin}
+                    onEdit={openModalForEdit}
+                    onDelete={handlePressDelete}
+                  />
+                ))} */}
+            </View>
+            <View style={styles.footer}>
+              <View style={styles.actions}>
+                <View>
+                  <AppButton color="#ff4d4d" onPress={handleLogout}>
+                    Выйти из учетной записи
+                  </AppButton>
+                </View>
+                <View>
+                  <AppButton onPress={goToMain}>На главную</AppButton>
+                </View>
+              </View>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.loginContainer}>
+            <AppTextInput
+              placeholder="ИИН"
+              value={iin}
+              onChange={setIin}
+              type="numeric"
+              style={{ marginBottom: 20 }}
             />
+            <AppTextInput
+              placeholder="Номер телефона без первой цифры"
+              value={phone}
+              onChange={setPhone}
+              type="numeric"
+              style={{ marginBottom: 20 }}
+            />
+            <AppButton
+              style={{ width: "100%" }}
+              onPress={() => createProfile()}
+            >
+              Далее
+            </AppButton>
           </View>
-
-          <View style={styles.family}>
-            <View style={styles.addPerson}>
-              <AppBoldText style={styles.title}>Семья</AppBoldText>
-              <View>
-                <AppButton
-                  color="#0066ff"
-                  style={styles.btn}
-                  onPress={openModalForAdd}
-                >
-                  <Ionicons name="add" size={24} color="white" />
-                </AppButton>
-              </View>
-            </View>
-
-            {family.map((item) => (
-              <FamilyItem
-                {...item}
-                key={item.iin}
-                onEdit={openModalForEdit}
-                onDelete={handlePressDelete}
-              />
-            ))}
-          </View>
-          <View style={styles.footer}>
-            <View style={styles.actions}>
-              <View>
-                <AppButton color="#ff4d4d" onPress={logout}>
-                  Выйти из учетной записи
-                </AppButton>
-              </View>
-              <View>
-                <AppButton onPress={goToMain}>На главную</AppButton>
-              </View>
-            </View>
-          </View>
-        </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -237,18 +253,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: THEME.MAIN_COLOR,
   },
+  loginContainer: {
+    backgroundColor: "white",
+    padding: 30,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   title: {
     textAlign: "center",
     textTransform: "uppercase",
     paddingVertical: 20,
     backgroundColor: "#fff",
-  },
-  info: {
-    alignItems: "center",
-    justifyContent: "flex-start",
-    backgroundColor: "#fff",
-    paddingHorizontal: 10,
-    paddingVertical: 20,
   },
   footer: {
     flexGrow: 1,

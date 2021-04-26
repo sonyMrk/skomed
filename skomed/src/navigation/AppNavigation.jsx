@@ -10,12 +10,13 @@ import { ProfileScreen } from "../screens/ProfileScreen";
 import { MainScreen } from "../screens/MainScreen";
 import { NotificationScreen } from "../screens/NotificationScreen";
 import { THEME } from "../theme";
-import { AppointmentScreen } from "../screens/AppointmentScreen";
-import { HouseCallScreen } from "../screens/HouseCallScreen";
+import { HospitalSelectionScreen } from "../screens/HospitalSelectionScreen/HospitalSelectionScreen";
 import { DrugSearchScreen } from "../screens/DrugSearchScreen";
 import { HospitalDirectoryScreen } from "../screens/HospitalDirectoryScreen";
 import { ScheduleScreen } from "../screens/ScheduleScreen";
 import { DocumentScannedScreen } from "../screens/DocumentScannedScreen";
+import { ConfirmHouseCallScreen } from "../screens/HospitalSelectionScreen/ConfirmHouseCallScreen";
+import { ConfirmAppointmentScreen } from "../screens/HospitalSelectionScreen/ConfirmAppointmentScreen";
 
 const MainStack = createStackNavigator();
 
@@ -36,9 +37,9 @@ const MainStackScreen = ({ navigation }) => {
           headerTitle: "Главная",
         })}
       />
+
       <MainStack.Screen
         name="Appointment"
-        component={AppointmentScreen}
         options={({ navigation }) => ({
           headerTitle: "Запись на прием",
           headerLeft: () => (
@@ -52,10 +53,42 @@ const MainStackScreen = ({ navigation }) => {
             </TouchableOpacity>
           ),
         })}
-      />
+      >
+        {(props) => (
+          <HospitalSelectionScreen
+            navigateTo="ConfirmAppointmentScreen"
+            {...props}
+          />
+        )}
+      </MainStack.Screen>
+
       <MainStack.Screen
         name="HouseCallScreen"
-        component={HouseCallScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Вызов врача на дом",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      >
+        {(props) => (
+          <HospitalSelectionScreen
+            navigateTo="ConfirmHouseCallScreen"
+            {...props}
+          />
+        )}
+      </MainStack.Screen>
+
+      <MainStack.Screen
+        name="ConfirmHouseCallScreen"
+        component={ConfirmHouseCallScreen}
         options={({ navigation }) => ({
           headerTitle: "Вызов врача на дом",
           headerLeft: () => (
@@ -70,6 +103,25 @@ const MainStackScreen = ({ navigation }) => {
           ),
         })}
       />
+
+      <MainStack.Screen
+        name="ConfirmAppointmentScreen"
+        component={ConfirmAppointmentScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Запись на прием",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+
       <MainStack.Screen
         name="DrugSearchScreen"
         component={DrugSearchScreen}
@@ -87,6 +139,7 @@ const MainStackScreen = ({ navigation }) => {
           ),
         })}
       />
+
       <MainStack.Screen
         name="HospitalDirectoryScreen"
         component={HospitalDirectoryScreen}
@@ -104,6 +157,7 @@ const MainStackScreen = ({ navigation }) => {
           ),
         })}
       />
+
       <MainStack.Screen
         name="ScheduleScreen"
         component={ScheduleScreen}
@@ -121,6 +175,7 @@ const MainStackScreen = ({ navigation }) => {
           ),
         })}
       />
+
       <MainStack.Screen
         name="DocumentScannedScreen"
         component={DocumentScannedScreen}
@@ -144,7 +199,7 @@ const MainStackScreen = ({ navigation }) => {
 
 const ProfileStack = createStackNavigator();
 
-const ProfileStackScreen = () => {
+const ProfileStackScreen = ({ navigation }) => {
   return (
     <ProfileStack.Navigator
       screenOptions={{
@@ -189,7 +244,7 @@ const ProfileStackScreen = () => {
 
 const NotificationStack = createStackNavigator();
 
-const NotificationStackScreen = () => {
+const NotificationStackScreen = ({ navigation }) => {
   return (
     <NotificationStack.Navigator
       screenOptions={{
