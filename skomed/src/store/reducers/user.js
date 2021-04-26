@@ -14,7 +14,7 @@ const initialState = {
   userData: null,
   profile: null,
   isLoading: false,
-  errorMessage: null
+  errorMessage: null,
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -61,10 +61,10 @@ export const userReducer = (state = initialState, action) => {
     }
 
     case SET_ERROR: {
-        return {
-            ...state,
-            errorMessage: action.payload
-        }
+      return {
+        ...state,
+        errorMessage: action.payload,
+      };
     }
 
     case REMOVE_PERSON_FAMILY: {
@@ -87,7 +87,6 @@ export const userReducer = (state = initialState, action) => {
     }
 
     case SET_USER_LOADING: {
-        console.log("action.payload====", action.payload)
       return {
         ...state,
         isLoading: action.payload,

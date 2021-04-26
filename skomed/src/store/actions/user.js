@@ -59,9 +59,8 @@ export const setUserError = (payload) => ({
 });
 
 export const createUserProfile = (userData) => async (dispatch) => {
-  
   try {
-    setUserLoading(true);
+    dispatch(setUserLoading(true));
     await AsyncStorage.setItem(
       "profile",
       JSON.stringify({ ...userData, family: [] })
@@ -71,7 +70,7 @@ export const createUserProfile = (userData) => async (dispatch) => {
     dispatch(setUserError("Ошибка при создании пользователя"));
     console.log(error);
   } finally {
-    setUserLoading(false);
+    dispatch(setUserLoading(false));
   }
 };
 
@@ -90,14 +89,34 @@ export const loadUserProfile = () => async (dispatch) => {
 
 export const loadUserData = (iin) => async (dispatch) => {
   try {
-    setUserLoading(true); // TODO: не переключается
+    dispatch(setUserLoading(true)); // TODO: не переключается
     const userData = await userApi.GetPatientByIIN(iin);
     dispatch(setUserData(userData));
   } catch (error) {
     dispatch(setUserError("Ошибка загрузки данных"));
     console.log(error);
   } finally {
-    setUserLoading(false);
+    dispatch(setUserLoading(false));
+  }
+};
+
+export const createFamilyPerson = (personData) => async (dispatch) => {
+  try {
+    dispatch(setUserLoading(true));
+    const userData = await AsyncStorage.getItem("profile");
+    const userProfile = JSON.parse(userData);
+    await AsyncStorage.setItem(
+      "profile",
+      JSON.stringify({
+        ...userProfile,
+        family: [...userProfile.family, personData],
+      })
+    );
+  } catch (error) {
+    dispatch(setUserError("Ошибка при создании члена семьи"));
+    console.log(error);
+  } finally {
+    dispatch(setUserLoading(false));
   }
 };
 
@@ -108,6 +127,6 @@ export const logout = () => async (dispatch) => {
     dispatch(setUserData(null));
     dispatch(setUserError(null));
   } catch (error) {
-      console.log(error)
+    console.log(error);
   }
 };

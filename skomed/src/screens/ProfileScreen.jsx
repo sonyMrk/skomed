@@ -18,6 +18,7 @@ import { EditModal } from "../components/EditModal";
 import { InfoBlock } from "../components/InfoBlock";
 import { AppTextInput } from "../components/ui/AppTextInput";
 import { createUserProfile, loadUserData, logout } from "../store/actions/user";
+import { createFamilyPerson } from "./../store/actions/user";
 
 export const ProfileScreen = ({ navigation }) => {
   const [editMode, setEditMode] = useState(false); // в каком режиме открывается модальное окно
@@ -28,8 +29,6 @@ export const ProfileScreen = ({ navigation }) => {
     name: "",
   }); // если редактирование, то устанавливаем значение нужного члена семьи,
   // пустые значения при создании НОВОГО члена семьи
-  // const [family, setFamily] = useState([]); // установка членов семьи
-  // const [info, setInfo] = useState(null); // установка информации о текущем пользователе
   const [modalVisible, setModalVisible] = useState(false); // открыто ли модальное окно
 
   const userProfile = useSelector((state) => state.user.profile);
@@ -64,7 +63,7 @@ export const ProfileScreen = ({ navigation }) => {
 
   // добавляем нового члена семьи
   const addFamilyPerson = (newMan) => {
-    setFamily((prev) => [...prev, newMan]);
+    dispatch(createFamilyPerson(newMan));
   };
 
   const goToAppointment = (iin, name) => {
@@ -153,8 +152,6 @@ export const ProfileScreen = ({ navigation }) => {
     ]);
   };
 
-  console.log("isLoading====", isLoading);
-
   if (isLoading) {
     return <Preloader />;
   }
@@ -192,7 +189,7 @@ export const ProfileScreen = ({ navigation }) => {
                 </View>
               </View>
 
-              {/* {userProfile &&
+              {userProfile &&
                 userProfile.family.map((item) => (
                   <FamilyItem
                     {...item}
@@ -200,7 +197,7 @@ export const ProfileScreen = ({ navigation }) => {
                     onEdit={openModalForEdit}
                     onDelete={handlePressDelete}
                   />
-                ))} */}
+                ))}
             </View>
             <View style={styles.footer}>
               <View style={styles.actions}>
