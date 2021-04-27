@@ -17,7 +17,13 @@ import { FamilyItem } from "../components/FamilyItem";
 import { EditModal } from "../components/EditModal";
 import { InfoBlock } from "../components/InfoBlock";
 import { AppTextInput } from "../components/ui/AppTextInput";
-import { createUserProfile, loadUserData, logout } from "../store/actions/user";
+import {
+  createUserProfile,
+  logout,
+  loadUserProfile,
+  editFamilyPerson,
+  removeFamilyPerson,
+} from "../store/actions/user";
 import { createFamilyPerson } from "./../store/actions/user";
 
 export const ProfileScreen = ({ navigation }) => {
@@ -34,13 +40,12 @@ export const ProfileScreen = ({ navigation }) => {
   const userProfile = useSelector((state) => state.user.profile);
   const isLoading = useSelector((state) => state.user.isLoading);
   const info = useSelector((state) => state.user.userData);
+  const profileError = useSelector((state) => state.user.errorMessage);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (userProfile) {
-      dispatch(loadUserData(userProfile.iin));
-    }
+    // dispatch(loadUserProfile());
   }, []);
 
   const createProfile = () => {
@@ -66,24 +71,17 @@ export const ProfileScreen = ({ navigation }) => {
     dispatch(createFamilyPerson(newMan));
   };
 
-  const goToAppointment = (iin, name) => {
-    // записать члена семьи на прием
-  };
+  // const goToAppointment = (iin, name) => {
+  //   // записать члена семьи на прием
+  // };
 
-  const goToHouseCall = (iin, name) => {
-    // вызвать врача для члена семьи
-  };
+  // const goToHouseCall = (iin, name) => {
+  //   // вызвать врача для члена семьи
+  // };
 
   // редактирование члена семьи
-  const editFamilyPerson = (newMan) => {
-    setFamily((prev) =>
-      prev.map((item) => {
-        if (item.iin === newMan.iin) {
-          return newMan;
-        }
-        return item;
-      })
-    );
+  const handleEditFamilyPerson = (newMan) => {
+    dispatch(editFamilyPerson(newMan))
   };
 
   const closeModal = () => {
@@ -100,8 +98,8 @@ export const ProfileScreen = ({ navigation }) => {
   };
 
   // открыть модальное окно в режиме редактирования
-  const openModalForEdit = (iin) => {
-    const person = family.find((item) => item.iin === iin);
+  const openModalForEdit = (id) => {
+    const person = userProfile.family.find((item) => item.id === id);
     if (person) {
       setEditMode(true);
       setFamilyPersonData(person);
@@ -116,8 +114,8 @@ export const ProfileScreen = ({ navigation }) => {
   };
 
   // удаление члена семьи
-  const deleteFamilyPerson = (iin) => {
-    setFamily((prev) => prev.filter((item) => item.iin !== iin));
+  const handleRemoveFamilyPerson = (id) => {
+      dispatch(removeFamilyPerson(id))
   };
 
   //
@@ -127,7 +125,7 @@ export const ProfileScreen = ({ navigation }) => {
         text: "Отмена",
         style: "cancel",
       },
-      { text: "OK", onPress: () => deleteFamilyPerson(iin) },
+      { text: "OK", onPress: () => handleRemoveFamilyPerson(iin) },
     ]);
   };
 
@@ -138,7 +136,7 @@ export const ProfileScreen = ({ navigation }) => {
 
   // выйти из учетной записи
   const handleLogout = () => {
-    Alert.alert("Выйти из учетной записи", "Вы уверены?", [
+    Alert.alert("Выйти из учетной записи", "Вы уверены? Все данные будут удалены", [
       {
         text: "Отмена",
         style: "cancel",
@@ -168,7 +166,7 @@ export const ProfileScreen = ({ navigation }) => {
                   visible={modalVisible}
                   onClose={closeModal}
                   addPerson={addFamilyPerson}
-                  editPerson={editFamilyPerson}
+                  editPerson={handleEditFamilyPerson}
                   editMode={editMode}
                   personData={familyPersonData}
                   offEditMode={turnOffEditMode}
@@ -193,7 +191,7 @@ export const ProfileScreen = ({ navigation }) => {
                 userProfile.family.map((item) => (
                   <FamilyItem
                     {...item}
-                    key={item.iin}
+                    key={item.id}
                     onEdit={openModalForEdit}
                     onDelete={handlePressDelete}
                   />
@@ -214,6 +212,13 @@ export const ProfileScreen = ({ navigation }) => {
           </View>
         ) : (
           <View style={styles.loginContainer}>
+            {profileError && (
+              <AppBoldText
+                style={{ color: THEME.DANGER_COLOR, marginBottom: 15 }}
+              >
+                {profileError}
+              </AppBoldText>
+            )}
             <AppTextInput
               placeholder="ИИН"
               value={iin}

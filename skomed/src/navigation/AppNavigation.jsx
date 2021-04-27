@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer, CommonActions } from "@react-navigation/native";
+
+import { useSelector } from "react-redux";
 
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
@@ -17,6 +19,9 @@ import { ScheduleScreen } from "../screens/ScheduleScreen";
 import { DocumentScannedScreen } from "../screens/DocumentScannedScreen";
 import { ConfirmHouseCallScreen } from "../screens/HospitalSelectionScreen/ConfirmHouseCallScreen";
 import { ConfirmAppointmentScreen } from "../screens/HospitalSelectionScreen/ConfirmAppointmentScreen";
+import { Preloader } from "../components/ui/Preloader";
+import { useDispatch } from "react-redux";
+import { loadUserProfile } from "../store/actions/user";
 
 const MainStack = createStackNavigator();
 
@@ -281,6 +286,17 @@ const NotificationStackScreen = ({ navigation }) => {
 const BottonmTabNavigation = createBottomTabNavigator();
 
 const AppNavigation = () => {
+  const isInit = useSelector((state) => state.app.isInitApp);
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(loadUserProfile())
+  })
+
+  if (!isInit) {
+    return <Preloader />
+  }
+
   return (
     <NavigationContainer>
       <BottonmTabNavigation.Navigator

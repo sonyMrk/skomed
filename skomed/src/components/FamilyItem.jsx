@@ -3,24 +3,20 @@ import { StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { AppButton } from "./ui/AppButton";
-// import { AppText } from "./ui/AppText";
 import { THEME } from "../theme";
 import { AppBoldText } from "./ui/AppBoldText";
 
-export const FamilyItem = ({ name, iin, onDelete, onEdit }) => {
+export const FamilyItem = ({ name, iin, id, onDelete, onEdit }) => {
   const handlePressDel = () => {
-    onDelete(iin);
+    onDelete(id);
   };
 
   const handlePressEdit = () => {
-    onEdit(iin);
+    onEdit(id);
   };
 
   return (
     <View style={styles.item}>
-      {/* <View>
-        <AppText style={{ color: THEME.GRAY_COLOR }}>{relationship}</AppText>
-      </View> */}
       <View style={styles.family__row}>
         <AppBoldText>{name}</AppBoldText>
         <View style={styles.family__actions}>

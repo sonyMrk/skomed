@@ -11,6 +11,7 @@ import { bootstrap } from "./src/bootstrap";
 
 export default function App() {
   const [isReady, setIsReady] = useState(false);
+  
 
   if (!isReady) {
     return (
@@ -21,7 +22,6 @@ export default function App() {
       />
     );
   }
-
   return (
     <Provider store={store}>
       <StatusBar style="light" />

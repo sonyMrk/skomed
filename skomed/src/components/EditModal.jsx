@@ -32,7 +32,6 @@ export const EditModal = ({
 
   const handleAddPerson = () => {
     const newObj = {
-      id: toString(Math.random()),
       name: nameValue,
       iin: iinValue,
     };
@@ -42,9 +41,9 @@ export const EditModal = ({
 
   const handleEditPerson = () => {
     const newObj = {
-      id: toString(Math.random()),
       name: nameValue,
       iin: iinValue,
+      id: personData.id
     };
     editPerson(newObj);
     closeModal();

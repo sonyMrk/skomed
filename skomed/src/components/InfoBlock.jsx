@@ -19,6 +19,8 @@ const ProfileInfoItem = ({ title, value }) => {
 };
 
 export const InfoBlock = ({ infoData, children }) => {
+
+  console.log(infoData)
   return (
     <View style={styles.info}>
       {infoData.FIO && <ProfileInfoItem title="Ф.И.О" value={infoData.FIO} />}
