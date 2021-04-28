@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Platform, Alert, ScrollView } from "react-native";
+import CheckBox from "@react-native-community/checkbox";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,35 +28,25 @@ import { Preloader } from "../../components/ui/Preloader";
 // 2 - казахский
 
 export const ConfirmAppointmentScreen = ({ navigation, route }) => {
+  const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const iin = route.params.iin;
   const organization = route.params.organization;
   const appointmentUserData = route.params.appointmentUserData;
-  const profilePhone = route.params.profilePhone
+  const profilePhone = route.params.profilePhone;
 
-  console.log("organization===", organization)
-  console.log("appointmentUserData", appointmentUserData)
-
+  console.log("toggleCheckBox", toggleCheckBox);
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
           <AppBoldText style={styles.title}>Тип специалиста</AppBoldText>
         </View>
-        <View style={styles.select}>
-          <RNPickerSelect
-            placeholder={{}}
-            onValueChange={(value) => console.log(value)}
-            items={[
-              { label: "Участковый врач", value: "football" },
-              { label: "Baseball", value: "baseball" },
-            ]}
-            useNativeAndroidPickerStyle={false}
-            style={{
-              ...pickerSelectStyles,
-            }}
-            Icon={() => (
-              <AntDesign name="medicinebox" size={20} color="white" />
-            )}
+        <View style={styles.checkbox}>
+          <CheckBox
+            style={styles.checkboxInput}
+            disabled={false}
+            value={toggleCheckBox}
+            onValueChange={(newValue) => setToggleCheckBox(newValue)}
           />
         </View>
       </View>
@@ -75,16 +66,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
   },
-  select: {
+  checkbox: {
     marginBottom: 15,
   },
-  input: {
-    marginBottom: 15,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
+  checkboxInput: {
+    borderColor: THEME.DANGER_COLOR,
   },
 });
 
