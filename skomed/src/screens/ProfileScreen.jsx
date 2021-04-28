@@ -40,13 +40,9 @@ export const ProfileScreen = ({ navigation }) => {
   const userProfile = useSelector((state) => state.user.profile);
   const isLoading = useSelector((state) => state.user.isLoading);
   const info = useSelector((state) => state.user.userData);
-  const profileError = useSelector((state) => state.user.errorMessage);
+  const profileLoadError = useSelector((state) => state.user.errorMessage);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    // dispatch(loadUserProfile());
-  }, []);
 
   const createProfile = () => {
     if (iin.trim().length !== 12 || isNaN(iin)) {
@@ -71,17 +67,10 @@ export const ProfileScreen = ({ navigation }) => {
     dispatch(createFamilyPerson(newMan));
   };
 
-  // const goToAppointment = (iin, name) => {
-  //   // записать члена семьи на прием
-  // };
-
-  // const goToHouseCall = (iin, name) => {
-  //   // вызвать врача для члена семьи
-  // };
 
   // редактирование члена семьи
   const handleEditFamilyPerson = (newMan) => {
-    dispatch(editFamilyPerson(newMan))
+    dispatch(editFamilyPerson(newMan));
   };
 
   const closeModal = () => {
@@ -115,7 +104,7 @@ export const ProfileScreen = ({ navigation }) => {
 
   // удаление члена семьи
   const handleRemoveFamilyPerson = (id) => {
-      dispatch(removeFamilyPerson(id))
+    dispatch(removeFamilyPerson(id));
   };
 
   //
@@ -136,18 +125,22 @@ export const ProfileScreen = ({ navigation }) => {
 
   // выйти из учетной записи
   const handleLogout = () => {
-    Alert.alert("Выйти из учетной записи", "Вы уверены? Все данные будут удалены", [
-      {
-        text: "Отмена",
-        style: "cancel",
-      },
-      {
-        text: "OK",
-        onPress: () => {
-          dispatch(logout());
+    Alert.alert(
+      "Выйти из учетной записи",
+      "Вы уверены? Все данные будут удалены",
+      [
+        {
+          text: "Отмена",
+          style: "cancel",
         },
-      },
-    ]);
+        {
+          text: "OK",
+          onPress: () => {
+            dispatch(logout());
+          },
+        },
+      ]
+    );
   };
 
   if (isLoading) {
@@ -160,6 +153,11 @@ export const ProfileScreen = ({ navigation }) => {
         {userProfile ? (
           <View style={styles.container}>
             <AppBoldText style={styles.title}>Данные пользователя</AppBoldText>
+            {profileLoadError && (
+              <AppBoldText style={{ color: THEME.DANGER_COLOR, fontSize: 18 }}>
+                {profileLoadError}
+              </AppBoldText>
+            )}
             {info && (
               <InfoBlock infoData={info}>
                 <EditModal
@@ -212,11 +210,11 @@ export const ProfileScreen = ({ navigation }) => {
           </View>
         ) : (
           <View style={styles.loginContainer}>
-            {profileError && (
+            {profileLoadError && (
               <AppBoldText
                 style={{ color: THEME.DANGER_COLOR, marginBottom: 15 }}
               >
-                {profileError}
+                {profileLoadError}
               </AppBoldText>
             )}
             <AppTextInput

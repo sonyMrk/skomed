@@ -71,7 +71,7 @@ export const loadUserProfile = () => async (dispatch) => {
     }
   } catch (error) {
     dispatch(setUserError("Ошибка загрузки данных"));
-    console.log(error);
+    console.log("loadUserProfile", error);
   } finally {
     dispatch(setInitApp())
   }
@@ -85,7 +85,7 @@ export const loadUserData = (iin) => async (dispatch) => {
     dispatch(setUserData(userData));
   } catch (error) {
     dispatch(setUserError("Ошибка загрузки данных"));
-    console.log(error);
+    console.log("loadUserData", error);
   } finally {
     dispatch(setUserLoading(false));
   }

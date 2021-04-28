@@ -2,6 +2,7 @@ import {
   SET_APPOINTMENT_USER_DATA,
   SET_APPOINTMENT_LOADING,
   SET_APPOINTMENT_ERROR,
+  CLEAR_APPOINTMENT_USER_DATA,
 } from "../types";
 
 const initialState = {
@@ -17,6 +18,12 @@ export const appointmentReducer = (state = initialState, action) => {
         ...state,
         userData: action.payload,
       };
+    }
+    case CLEAR_APPOINTMENT_USER_DATA: {
+      return {
+        ...state,
+        userData: null
+      }
     }
 
     case SET_APPOINTMENT_LOADING: {

@@ -13,79 +13,36 @@ import { AppButton } from "../../components/ui/AppButton";
 import { InfoBlock } from "../../components/InfoBlock";
 import { Preloader } from "../../components/ui/Preloader";
 import { getHospitals } from "../../store/actions/hospitals";
-import { getAppointmentUserData } from "../../store/actions/appointment";
-
-// const infoUserData = {
-//   FIO: "Печёнкин Александр Сергеевич",
-//   Territory: "Участок №1 общей практики",
-//   TerritoryID: "100500",
-//   Attachment: "КГП на ПХВ Третья поликлиника УЗ СКО",
-//   AttachmentID: "350750",
-//   AttachmentAddress: "г. Петропавловск. ул. Больничная д. 34",
-//   Doctor: "Айболитов Доктор Докторович",
-//   DoctorID: 654789654123,
-//   ErrorCode: 0,
-//   ErrorDesc: "",
-// };
-
-// const organizations = {
-//   ErrorDesc: "",
-//   ErrorCode: 0,
-//   Orgs: [
-//     {
-//       OrgID: 1,
-//       Name: "Поликлиника прикрепления",
-//       ShowMessage: true,
-//       MessageText: "MessageText",
-//       DisableDoctorSelection: true,
-//     },
-//     {
-//       OrgID: 2,
-//       Name: "Взрослая областная",
-//       ShowMessage: true,
-//       MessageText: "MessageText",
-//       DisableDoctorSelection: true,
-//     },
-//     {
-//       OrgID: 3,
-//       Name: "Есиль-диагностик(офтальм.центр)",
-//       ShowMessage: true,
-//       MessageText: "MessageText",
-//       DisableDoctorSelection: true,
-//     },
-//     {
-//       OrgID: 4,
-//       Name: "Областная стоматологическая поликлиника",
-//       ShowMessage: true,
-//       MessageText: "MessageText",
-//       DisableDoctorSelection: false,
-//     },
-//   ],
-// };
-
-// const family = [
-//   // { label: "Пупкин Иван Вячеславович", value: "12345678asdasdas" },
-//   // { label: "Иванов Иван Васильевич", value: "910414360903" },
-//   // { label: "Букин Геннадий Батькович", value: "910414360904" },
-//   // { label: "Сидоров Василий Петрович", value: "910414360906" },
-// ];
+import {
+  getAppointmentUserData,
+  clearUserData,
+} from "../../store/actions/appointment";
 
 export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
-  const [access, setAccess] = useState(false); // Найден ли нужный ИИН
+  const isHouseCall = navigateTo === "ConfirmHouseCallScreen"; // запись на прием или вызов врача на дом
+
+  const [access, setAccess] = useState(false);
   const [organization, setOrganization] = useState(null); // ID мед. организации
   const [iin, setIin] = useState(userIin); // Значение ИИН в форме
-  const [infoData, setInfoData] = useState(null);
 
   const dispatch = useDispatch();
 
   const userIin = useSelector((state) => state.user.profile?.iin);
   const profileFamily = useSelector((state) => state.user.profile?.family);
+  const profilePhone = useSelector((state) => state.user.profile?.phone);
 
   const isHospitalLoading = useSelector((state) => state.hospitals.isLoading);
-  const hospitalsResp = useSelector((state) => state.hospitals.hospitals);
+  const hospitalsList = useSelector((state) => state.hospitals.hospitals);
+  const hospitalsLoadError = useSelector(
+    (state) => state.hospitals.errorMessage
+  );
 
-  const appointmentUserData = useSelector((state) => state.appointment.userData)
-  const appointmentLoading = useSelector((state) => state.appointment.isLoading)
+  const appointmentUserData = useSelector(
+    (state) => state.appointment.userData
+  );
+  const appointmentLoading = useSelector(
+    (state) => state.appointment.isLoading
+  );
 
   // преобразуем данные в нужный формат
   const family = profileFamily
@@ -96,22 +53,65 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
     : [];
 
   // преобразуем данные в нужный формат
-  const hospitals = hospitalsResp.Orgs
-    ? hospitalsResp.Orgs.reduce(
+  const hospitals = hospitalsList.Orgs
+    ? hospitalsList.Orgs.reduce(
         (prev, org) => [...prev, { label: org.Name, value: org }],
         []
       )
     : [];
-
-
+  // действия при первом рэндеринге
   useEffect(() => {
     setIin(userIin);
-    dispatch(getHospitals());
-    setOrganization(hospitals[0])
+    dispatch(getHospitals()); // получаем список организаций где разрешена запись
+    return () => {
+      // действия при анмаунте
+      dispatch(clearUserData());
+      setAccess(false);
+    };
   }, []);
+
+  useEffect(() => {
+    // если выбрана организация и получены данные о пациенте:
+    if (organization && appointmentUserData) {
+      // Проверяем, если запись в поликлинику прикрепления:
+      if (organization.OrgID === "0") {
+        appointmentUserData.ErrorCode !== 0 // проверяем есть ли ошибки
+          ? showError(
+              // иначе выводим ошибку
+              "Запись недоступна",
+              appointmentUserData.ErrorDesc
+            )
+          : appointmentUserData.RegAvailable !== 1 || appointmentUserData.HomeCallAvailable !== 1 // Если запись запрещена:
+          ? showError(
+              //  выводим ошибку
+              "Запись недоступна",
+              "В настоящий момент запись в МО прикрепления пациента не возможна!"
+            )
+          : setAccess(true); // иначе устанавливаем флаг
+      } else {
+        // Проверяем, если ли запреты на запись
+        const errorUser = appointmentUserData.OrgErrors.find(
+          (orgError) => orgError.OrgID === organization.OrgID
+        );
+
+        if (errorUser) {
+          showError(
+            "Запись недоступна по следующим причинам:",
+            errorUser.ErrorText
+          );
+        } else {
+          setAccess(true);
+        }
+      }
+    }
+  }, [appointmentUserData, organization, iin]);
 
   // TODO: Попробовать сделать сброс выбора члена семьи,
   // если после выбора члена семьи изменяется ИИН
+
+  const showError = (title, errorMessage) => {
+    return Alert.alert(title, errorMessage);
+  };
 
   const fetchData = () => {
     if (!iin) {
@@ -123,29 +123,48 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
         "Значение ИИН должно быть 12 цифр"
       );
     }
-    dispatch(getAppointmentUserData(iin))
-    console.log("appointmentUserData===", appointmentUserData)
+    dispatch(getAppointmentUserData(iin));
+  };
+
+  const changeIin = (iin) => {
+    dispatch(clearUserData());
+    setIin(iin);
+    setAccess(false);
+  };
+
+  const changeOrganization = (org) => {
+    setOrganization(org);
+    if (org.ShowMessage) {
+      showError("Кабинет пациента", org.MessageText);
+    }
+    setAccess(false);
   };
 
   if (isHospitalLoading) {
     return <Preloader />;
   }
 
-
-  // ОШИБКА С ДЕДОМ!
-
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
           <AppBoldText style={styles.title}>Выбор мед организации</AppBoldText>
+          {hospitalsLoadError && (
+            <AppBoldText style={{ color: THEME.DANGER_COLOR, fontSize: 18 }}>
+              {hospitalsLoadError}
+            </AppBoldText>
+          )}
         </View>
         <View style={styles.select}>
           <RNPickerSelect
-            placeholder={{}}
+            placeholder={{
+              label: "Выбрать мед. учреждение",
+              value: null,
+              color: THEME.MAIN_COLOR,
+            }}
             value={organization}
-            onValueChange={(value) => setOrganization(value)}
-            items={hospitals}
+            onValueChange={changeOrganization}
+            items={isHouseCall ? hospitals.slice(0, 1) : hospitals}
             useNativeAndroidPickerStyle={false}
             style={{
               ...pickerSelectStyles,
@@ -171,7 +190,7 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
                 value: null,
                 color: THEME.MAIN_COLOR,
               }}
-              onValueChange={(value) => setIin(value)}
+              onValueChange={changeIin}
               items={[{ label: "Вы", value: userIin }, ...family]}
               useNativeAndroidPickerStyle={false}
               style={{
@@ -183,16 +202,33 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
         )}
         {appointmentLoading ? (
           <Preloader />
-        ) : appointmentUserData && <InfoBlock infoData={appointmentUserData} />}
+        ) : (
+          appointmentUserData && <InfoBlock infoData={appointmentUserData} />
+        )}
         <View style={styles.footer}>
-          <AppButton onPress={fetchData}>Проверить</AppButton>
+          <AppButton onPress={fetchData} disabled={appointmentLoading}>
+            Проверить
+          </AppButton>
           <AppButton
             onPress={() => {
-              navigation.navigate(navigateTo, { iin, organization });
+              navigation.navigate(navigateTo, {
+                iin,
+                organization,
+                profilePhone,
+                appointmentUserData: isHouseCall ? {} : appointmentUserData    // если вызов на дом то данные о пациенте не нужны
+              });
             }}
             disabled={!access}
           >
             Далее
+          </AppButton>
+        </View>
+        <View style={styles.footer}>
+          <AppButton
+            onPress={() => navigation.navigate("SupportedHospitals")}
+            style={{ width: "100%" }}
+          >
+            Посмотреть список доступных организаций
           </AppButton>
         </View>
       </View>

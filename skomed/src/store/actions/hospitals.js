@@ -26,7 +26,7 @@ export const getHospitals = () => async (dispatch) => {
     const hospitals = await hospitalApi.GetOrgListForAppointment();
     dispatch(setHospitals(hospitals));
   } catch (error) {
-    console.log(error);
+    dispatch(setHospitalsError("Ошибка при загрузки списка организаций"))
   } finally {
     dispatch(setHospitalsLoading(false));
   }

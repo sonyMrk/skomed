@@ -2,6 +2,7 @@ import {
   SET_APPOINTMENT_USER_DATA,
   SET_APPOINTMENT_LOADING,
   SET_APPOINTMENT_ERROR,
+  CLEAR_APPOINTMENT_USER_DATA,
 } from "../types";
 import { userApi } from "../../services/userApi";
 
@@ -19,6 +20,10 @@ export const setAppointmentError = (payload) => ({
   type: SET_APPOINTMENT_ERROR,
   payload,
 });
+
+export const clearUserData = () => ({
+  type: CLEAR_APPOINTMENT_USER_DATA
+})
 
 export const getAppointmentUserData = (iin) => async (dispatch) => {
   try {

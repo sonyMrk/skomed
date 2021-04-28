@@ -9,6 +9,9 @@ export const AppTextInput = ({
   value,
   type = "default",
   autoCapitalize = "none",
+  multiline=false,
+  numberOfLines=1,
+  textAlign="left"
 }) => {
   return (
     <TextInput
@@ -18,6 +21,9 @@ export const AppTextInput = ({
       placeholder={placeholder}
       keyboardType={type}
       autoCapitalize={autoCapitalize}
+      multiline={multiline}
+      numberOfLines={numberOfLines}
+      textAlign={textAlign}
     />
   );
 };

@@ -22,6 +22,7 @@ import { ConfirmAppointmentScreen } from "../screens/HospitalSelectionScreen/Con
 import { Preloader } from "../components/ui/Preloader";
 import { useDispatch } from "react-redux";
 import { loadUserProfile } from "../store/actions/user";
+import { SupportedHospitals } from "../screens/SupportedHospitals";
 
 const MainStack = createStackNavigator();
 
@@ -114,6 +115,24 @@ const MainStackScreen = ({ navigation }) => {
         component={ConfirmAppointmentScreen}
         options={({ navigation }) => ({
           headerTitle: "Запись на прием",
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPress={() => {
+                navigation.goBack();
+              }}
+            >
+              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+
+      <MainStack.Screen
+        name="SupportedHospitals"
+        component={SupportedHospitals}
+        options={({ navigation }) => ({
+          headerTitle: "Список доступных организций",
           headerLeft: () => (
             <TouchableOpacity
               style={{ padding: 10 }}
@@ -287,14 +306,14 @@ const BottonmTabNavigation = createBottomTabNavigator();
 
 const AppNavigation = () => {
   const isInit = useSelector((state) => state.app.isInitApp);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(loadUserProfile())
-  })
+    dispatch(loadUserProfile());
+  });
 
   if (!isInit) {
-    return <Preloader />
+    return <Preloader />;
   }
 
   return (

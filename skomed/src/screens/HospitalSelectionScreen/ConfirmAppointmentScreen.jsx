@@ -29,6 +29,11 @@ import { Preloader } from "../../components/ui/Preloader";
 export const ConfirmAppointmentScreen = ({ navigation, route }) => {
   const iin = route.params.iin;
   const organization = route.params.organization;
+  const appointmentUserData = route.params.appointmentUserData;
+  const profilePhone = route.params.profilePhone
+
+  console.log("organization===", organization)
+  console.log("appointmentUserData", appointmentUserData)
 
   return (
     <ScrollView>
@@ -41,7 +46,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
             placeholder={{}}
             onValueChange={(value) => console.log(value)}
             items={[
-              { label: "Football", value: "football" },
+              { label: "Участковый врач", value: "football" },
               { label: "Baseball", value: "baseball" },
             ]}
             useNativeAndroidPickerStyle={false}
