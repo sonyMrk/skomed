@@ -19,8 +19,8 @@ export const EditModal = ({
   const [nameValue, setNameValue] = useState("");
 
   useEffect(() => {
-    setIinValue(personData.iin);
-    setNameValue(personData.name);
+    setIinValue(personData.value);
+    setNameValue(personData.label);
   }, [editMode, personData]);
 
   const closeModal = () => {
@@ -32,8 +32,8 @@ export const EditModal = ({
 
   const handleAddPerson = () => {
     const newObj = {
-      name: nameValue,
-      iin: iinValue,
+      label: nameValue,
+      value: iinValue,
     };
     addPerson(newObj);
     closeModal();
@@ -41,8 +41,8 @@ export const EditModal = ({
 
   const handleEditPerson = () => {
     const newObj = {
-      name: nameValue,
-      iin: iinValue,
+      label: nameValue,
+      value: iinValue,
       id: personData.id
     };
     editPerson(newObj);

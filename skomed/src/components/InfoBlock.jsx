@@ -5,7 +5,7 @@ import { AppText } from "./ui/AppText";
 import { THEME } from "../theme";
 import { AppBoldText } from "./ui/AppBoldText";
 
-const ProfileInfoItem = ({ title, value, color="#000" }) => {
+export const ProfileInfoItem = ({ title, value, color="#000" }) => {
   return (
     <View style={styles.item}>
       <View>

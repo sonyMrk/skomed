@@ -31,8 +31,8 @@ export const ProfileScreen = ({ navigation }) => {
   const [iin, setIin] = useState("");
   const [phone, setPhone] = useState("");
   const [familyPersonData, setFamilyPersonData] = useState({
-    iin: "",
-    name: "",
+    value: "",
+    label: "",
   }); // если редактирование, то устанавливаем значение нужного члена семьи,
   // пустые значения при создании НОВОГО члена семьи
   const [modalVisible, setModalVisible] = useState(false); // открыто ли модальное окно
@@ -232,7 +232,7 @@ export const ProfileScreen = ({ navigation }) => {
               style={{ marginBottom: 20 }}
             />
             <AppButton
-              style={{ width: "100%" }}
+              style={{ paddingHorizontal: 55 }}
               onPress={() => createProfile()}
             >
               Далее

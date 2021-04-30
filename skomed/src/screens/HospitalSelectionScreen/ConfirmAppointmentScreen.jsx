@@ -1,54 +1,296 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Platform, Alert, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Platform,
+  Alert,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import RNPickerSelect from "react-native-picker-select";
-import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import { EvilIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { AppBoldText } from "../../components/ui/AppBoldText";
 import { THEME } from "../../theme";
 import { AppTextInput } from "../../components/ui/AppTextInput";
 import { AppButton } from "../../components/ui/AppButton";
-import { InfoBlock } from "../../components/InfoBlock";
+import { InfoBlock, ProfileInfoItem } from "../../components/InfoBlock";
 import { Preloader } from "../../components/ui/Preloader";
-
-// "IIN" - строка, ИИН записываемого пациента.
-// "OrgID" - строка, ИД организации (значение поля "AttachmentID" из метода "GetPatientByIIN")
-// "DoctorID" - строка, идентификатор участкового врача
-// "CabinetID" - строка, идентификатор кабинета, в котором врач ведет прием
-// "Date" - строка, дата приема в формате "yyyyMMdd"
-// "TimeStart" - строка, время начала приема в формате "HH:mm"
-// "TimeEnd" - строка, время окончания приема в формате "HH:mm"
-// "RecordingMethod" - число, значения
-// 1 - запись через мобильное приложение,
-// 2 - запись через сайт,
-// 3 - запись через терминал,
-// "Language" - число, флаг языка в сообщениях от сервера
-// 1 - русский,
-// 2 - казахский
+import { AppText } from "../../components/ui/AppText";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getShedule,
+  clearShedule,
+  getProfileSpecsData,
+  clearProfileSpecs,
+} from "../../store/actions/appointment";
 
 export const ConfirmAppointmentScreen = ({ navigation, route }) => {
-  const [toggleCheckBox, setToggleCheckBox] = useState(false);
+  const [profileSpecialistCheckbox, setProfileSpecialistCheckbox] = useState(
+    false
+  );
+  const [appointmentTime, setAppointmentTime] = useState(null); // время приема
+  const [appointmentData, setAppointmentData] = useState(null); // данные (id кабинета, массив свободныч часов, даты и т.д)
+  const [reason, setReason] = useState(""); // причина визита
+
+  const [specialization, setSpecialization] = useState(null); // специализация обьект с массивом врачей, id, name, коды ошибок
+  const [doctor, setDoctor] = useState(null); // обьект с доктором {"Doctor" : "", "DoctorID"}
+
   const iin = route.params.iin;
   const organization = route.params.organization;
   const appointmentUserData = route.params.appointmentUserData;
   const profilePhone = route.params.profilePhone;
 
-  console.log("toggleCheckBox", toggleCheckBox);
+  const dispatch = useDispatch();
+
+  const shedule = useSelector((state) => state.appointment.shedule);
+  const profileSpecsData = useSelector(
+    (state) => state.appointment.profileSpecsData
+  );
+
+  const isLoadingShedule = useSelector(
+    (state) => state.appointment.isLoadingShedule
+  );
+  const isLoadingProfileSpecs = useSelector(
+    (state) => state.appointment.isLoadingProfileSpecs
+  );
+
+  const handleChangeProfileSpecialist = () => {
+    setProfileSpecialistCheckbox(!profileSpecialistCheckbox);
+    setAppointmentTime(null)
+  };
+
+  const handleChangeSpecialization = (value) => {
+    setSpecialization(value);
+  };
+
+  const handleChangeDoctor = (value) => {
+    setDoctor(value);
+    const orgId =
+      organization.OrgID === "0"
+        ? appointmentUserData.AttachmentID
+        : organization.OrgID;
+    const doctorId = value?.DoctorID;
+    const profileId = specialization.GUID;
+    if (doctorId) {
+      dispatch(getShedule(orgId, doctorId, profileId));
+    }
+  };
+
+  const handleChangeDate = (data) => {
+    setAppointmentTime(null);
+    setAppointmentData(data);
+  };
+
+  const saveAppointment = () => {
+    console.log("Запись на прием сохранена...");
+  };
+
+  useEffect(() => {
+    // const profileId = appointmentData?.CabinetID;
+    let orgId;
+    let doctorId;
+
+    if (organization.OrgID === "0") {
+      // если выбрана поликлиника прикрепления
+      orgId = appointmentUserData.AttachmentID;
+      if (!profileSpecialistCheckbox) {
+        // если в поликлинике прикрепления не выбраны узкие специалисты
+        doctorId = appointmentUserData.DoctorID;
+        dispatch(getShedule(orgId, doctorId));
+      } else {
+        dispatch(getProfileSpecsData(orgId));
+      }
+    } else {
+      orgId = organization.OrgID;
+      if (organization.DisableDoctorSelection) {
+        dispatch(getShedule(orgId));
+      } else {
+        dispatch(getProfileSpecsData(orgId));
+      }
+      // если другая мед организация
+    }
+
+    return () => {
+      dispatch(clearShedule());
+      dispatch(clearProfileSpecs());
+    };
+  }, [profileSpecialistCheckbox]);
+
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
-          <AppBoldText style={styles.title}>Тип специалиста</AppBoldText>
+          <AppBoldText style={styles.title}>
+            Запись на прием к врачу
+          </AppBoldText>
         </View>
-        <View style={styles.checkbox}>
-          <CheckBox
-            style={styles.checkboxInput}
-            disabled={false}
-            value={toggleCheckBox}
-            onValueChange={(newValue) => setToggleCheckBox(newValue)}
-          />
+        {/* Если в организации не стоит запрет на выбор врача при записи */}
+        {!organization.DisableDoctorSelection && organization.OrgID === "0" && (
+          <View>
+            {/* Если в организации доступна запись к узким специалистам */}
+            {appointmentUserData.RegToProfileSpecs && (
+              <TouchableOpacity
+                onPress={handleChangeProfileSpecialist}
+                activeOpacity={0.8}
+              >
+                <View style={styles.checkbox}>
+                  <CheckBox value={profileSpecialistCheckbox} />
+                  <AppText>Запись к узким специалистам</AppText>
+                </View>
+              </TouchableOpacity>
+            )}
+            {/* Если не выбран пункт к узким специалистам */}
+            {!profileSpecialistCheckbox && (
+              <View style={styles.info}>
+                <ProfileInfoItem
+                  title="Ф.И.О"
+                  value={appointmentUserData.FIO}
+                />
+                <ProfileInfoItem
+                  title="Участковый врач"
+                  value={appointmentUserData.Doctor}
+                />
+              </View>
+            )}
+          </View>
+        )}
+        {/* Если загружается профили специализаций показываем прелоадер */}
+        {isLoadingProfileSpecs ? (
+          <Preloader />
+        ) : (
+          // иначе, если данные специализаций загружены то показываем селекты с выбором специализаций и врача
+          profileSpecsData && (
+            <View style={styles.profileActions}>
+              <View style={styles.header}>
+                <AppText style={styles.subtitle}>
+                  Выберите специализацию
+                </AppText>
+              </View>
+              <RNPickerSelect
+                placeholder={{
+                  label: "Выберите специализацию:",
+                  value: null,
+                  color: THEME.MAIN_COLOR,
+                }}
+                value={specialization}
+                onValueChange={handleChangeSpecialization}
+                items={
+                  profileSpecsData?.Profiles ? profileSpecsData?.Profiles : []
+                }
+                useNativeAndroidPickerStyle={false}
+                style={{
+                  ...pickerSelectStyles,
+                }}
+                Icon={() => <EvilIcons name="gear" size={20} color="white" />}
+              />
+              <View style={styles.header}>
+                <AppText style={styles.subtitle}>Выберите врача</AppText>
+              </View>
+              <RNPickerSelect
+                placeholder={{
+                  label: "Выберите врача:",
+                  value: null,
+                  color: THEME.MAIN_COLOR,
+                }}
+                value={doctor}
+                onValueChange={handleChangeDoctor}
+                items={
+                  specialization?.Specialists ? specialization?.Specialists : []
+                }
+                useNativeAndroidPickerStyle={false}
+                style={{
+                  ...pickerSelectStyles,
+                }}
+                Icon={() => (
+                  <MaterialCommunityIcons
+                    name="doctor"
+                    size={20}
+                    color="white"
+                  />
+                )}
+              />
+            </View>
+          )
+        )}
+        {/* Если загружается расписание врача то показываем прелоадер, иначе, если уже есть расписание то селекты с выбором даты и времени */}
+        {isLoadingShedule ? (
+          <Preloader />
+        ) : (
+          shedule && (
+            <View>
+              <View style={styles.header}>
+                <AppBoldText style={styles.title}>
+                  Выберите дату и время приема
+                </AppBoldText>
+                <AppText style={styles.subtitle}>
+                  *Выводятся только доступные для записи дата и время
+                </AppText>
+              </View>
+
+              <View style={styles.select}>
+                <RNPickerSelect
+                  placeholder={{
+                    label: "Дата приема",
+                    value: null,
+                    color: THEME.MAIN_COLOR,
+                  }}
+                  value={appointmentData}
+                  onValueChange={handleChangeDate}
+                  items={shedule?.Dates ? shedule.Dates : []}
+                  useNativeAndroidPickerStyle={false}
+                  style={{
+                    ...pickerSelectStyles,
+                  }}
+                  Icon={() => (
+                    <Ionicons name="calendar-outline" size={20} color="white" />
+                  )}
+                />
+              </View>
+              <View style={styles.select}>
+                <RNPickerSelect
+                  placeholder={{
+                    label: "Время приема",
+                    value: null,
+                    color: THEME.MAIN_COLOR,
+                  }}
+                  value={appointmentTime}
+                  onValueChange={setAppointmentTime}
+                  items={appointmentData?.Times ? appointmentData.Times : []}
+                  useNativeAndroidPickerStyle={false}
+                  style={{
+                    ...pickerSelectStyles,
+                  }}
+                  Icon={() => (
+                    <Ionicons name="time-outline" size={20} color="white" />
+                  )}
+                />
+              </View>
+            </View>
+          )
+        )}
+        <View>
+          <View style={styles.header}>
+            <AppBoldText style={styles.title}>Причина визита</AppBoldText>
+          </View>
+          <View style={styles.input}>
+            <AppTextInput
+              placeholder="Причина вызова"
+              value={reason}
+              onChange={setReason}
+              multiline={true}
+              numberOfLines={4}
+              autoCapitalize="sentences"
+              style={{ height: 90, marginTop: 10 }}
+            />
+          </View>
         </View>
+        <AppButton onPress={saveAppointment} disabled={!appointmentTime}>
+          Записаться на прием
+        </AppButton>
       </View>
     </ScrollView>
   );
@@ -68,10 +310,32 @@ const styles = StyleSheet.create({
   },
   checkbox: {
     marginBottom: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: THEME.MAIN_COLOR,
+    borderRadius: 10,
+    padding: 10,
   },
-  checkboxInput: {
-    borderColor: THEME.DANGER_COLOR,
+  info: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "#fff",
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    borderRadius: 10,
   },
+  select: {
+    marginVertical: 10,
+  },
+  input: {
+    marginBottom: 15,
+  },
+  subtitle: {
+    textAlign: "center",
+    color: THEME.GRAY_COLOR,
+  },
+  profileActions: {},
 });
 
 const pickerSelectStyles = StyleSheet.create({

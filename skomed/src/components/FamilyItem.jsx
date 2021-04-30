@@ -6,7 +6,7 @@ import { AppButton } from "./ui/AppButton";
 import { THEME } from "../theme";
 import { AppBoldText } from "./ui/AppBoldText";
 
-export const FamilyItem = ({ name, iin, id, onDelete, onEdit }) => {
+export const FamilyItem = ({ label, iin, id, onDelete, onEdit }) => {
   const handlePressDel = () => {
     onDelete(id);
   };
@@ -18,7 +18,7 @@ export const FamilyItem = ({ name, iin, id, onDelete, onEdit }) => {
   return (
     <View style={styles.item}>
       <View style={styles.family__row}>
-        <AppBoldText>{name}</AppBoldText>
+        <AppBoldText>{label}</AppBoldText>
         <View style={styles.family__actions}>
           <View>
             <AppButton style={styles.btn} onPress={handlePressEdit}>
