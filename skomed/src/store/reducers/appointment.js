@@ -1,6 +1,5 @@
 import {
   SET_APPOINTMENT_USER_DATA,
-  SET_APPOINTMENT_LOADING,
   SET_APPOINTMENT_ERROR,
   CLEAR_APPOINTMENT_USER_DATA,
   SET_APPOINTMENT_SHEDULE,
@@ -9,7 +8,8 @@ import {
   CLEAR_APPOINTMENT_PROFILE_SPECS,
   SET_APPOINTMENT_LOADING_USER_DATA,
   SET_APPOINTMENT_LOADING_SHEDULE,
-  SET_APPOINTMENT_LOADING_PROFILE_SPECS
+  SET_APPOINTMENT_LOADING_PROFILE_SPECS,
+  CLEAR_APPOINTMENT_ERROR,
 } from "../types";
 
 const initialState = {
@@ -19,7 +19,7 @@ const initialState = {
   userData: null,
   errorMessage: null,
   shedule: null,
-  profileSpecsData: null
+  profileSpecsData: null,
 };
 
 export const appointmentReducer = (state = initialState, action) => {
@@ -33,8 +33,8 @@ export const appointmentReducer = (state = initialState, action) => {
     case CLEAR_APPOINTMENT_USER_DATA: {
       return {
         ...state,
-        userData: null
-      }
+        userData: null,
+      };
     }
 
     case SET_APPOINTMENT_LOADING_USER_DATA: {
@@ -75,23 +75,31 @@ export const appointmentReducer = (state = initialState, action) => {
     case CLEAR_APPOINTMENT_SHEDULE: {
       return {
         ...state,
-        shedule: null
-      }
+        shedule: null,
+      };
     }
 
     case SET_APPOINTMENT_PROFILE_SPECS: {
       return {
         ...state,
-        profileSpecsData: action.payload
-      }
+        profileSpecsData: action.payload,
+      };
     }
 
     case CLEAR_APPOINTMENT_PROFILE_SPECS: {
       return {
         ...state,
-        profileSpecsData: null
-      }
+        profileSpecsData: null,
+      };
     }
+
+    case CLEAR_APPOINTMENT_ERROR: {
+      return {
+        ...state,
+        errorMessage: null,
+      };
+    }
+
     default:
       return state;
   }

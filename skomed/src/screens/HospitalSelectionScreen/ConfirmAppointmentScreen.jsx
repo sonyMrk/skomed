@@ -2,25 +2,23 @@ import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
-  Platform,
-  Alert,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import CheckBox from "@react-native-community/checkbox";
 import RNPickerSelect from "react-native-picker-select";
 import { Ionicons } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import { AppBoldText } from "../../components/ui/AppBoldText";
 import { THEME } from "../../theme";
 import { AppTextInput } from "../../components/ui/AppTextInput";
 import { AppButton } from "../../components/ui/AppButton";
-import { InfoBlock, ProfileInfoItem } from "../../components/InfoBlock";
+import { ProfileInfoItem } from "../../components/InfoBlock";
 import { Preloader } from "../../components/ui/Preloader";
 import { AppText } from "../../components/ui/AppText";
-import { useDispatch, useSelector } from "react-redux";
 import {
   getShedule,
   clearShedule,
@@ -58,9 +56,9 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
     (state) => state.appointment.isLoadingProfileSpecs
   );
 
-  const handleChangeProfileSpecialist = () => {
-    setProfileSpecialistCheckbox(!profileSpecialistCheckbox);
-    setAppointmentTime(null)
+  const handleChangeProfileSpecialist = (value) => {
+    setProfileSpecialistCheckbox(value);
+    setAppointmentTime(null);
   };
 
   const handleChangeSpecialization = (value) => {
@@ -90,7 +88,6 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    // const profileId = appointmentData?.CabinetID;
     let orgId;
     let doctorId;
 
@@ -133,15 +130,52 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
           <View>
             {/* Если в организации доступна запись к узким специалистам */}
             {appointmentUserData.RegToProfileSpecs && (
-              <TouchableOpacity
-                onPress={handleChangeProfileSpecialist}
-                activeOpacity={0.8}
-              >
-                <View style={styles.checkbox}>
-                  <CheckBox value={profileSpecialistCheckbox} />
-                  <AppText>Запись к узким специалистам</AppText>
+              <View style={styles.toggleProfile}>
+                <View style={styles.checkboxWrapper}>
+                  <TouchableOpacity
+                    onPress={() => handleChangeProfileSpecialist(false)}
+                    activeOpacity={0.5}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        !profileSpecialistCheckbox ? styles.activeCheckbox : {},
+                      ]}
+                    >
+                      <AppText
+                        style={{
+                          textAlign: "center",
+                          color: !profileSpecialistCheckbox ? "#fff" : "#000",
+                        }}
+                      >
+                        Запись к участковому
+                      </AppText>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              </TouchableOpacity>
+                <View style={styles.checkboxWrapper}>
+                  <TouchableOpacity
+                    onPress={() => handleChangeProfileSpecialist(true)}
+                    activeOpacity={0.5}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        profileSpecialistCheckbox ? styles.activeCheckbox : {},
+                      ]}
+                    >
+                      <AppText
+                        style={{
+                          textAlign: "center",
+                          color: profileSpecialistCheckbox ? "#fff" : "#000",
+                        }}
+                      >
+                        Запись к узким специалистам
+                      </AppText>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
             )}
             {/* Если не выбран пункт к узким специалистам */}
             {!profileSpecialistCheckbox && (
@@ -308,14 +342,28 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
   },
+  toggleProfile: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  checkboxWrapper: {
+    flexBasis: "48%",
+  },
   checkbox: {
     marginBottom: 15,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: THEME.MAIN_COLOR,
     borderRadius: 10,
-    padding: 10,
+    height: 50,
+  },
+  activeCheckbox: {
+    backgroundColor: THEME.MAIN_COLOR,
+  },
+  activeText: {
+    color: "#fff",
   },
   info: {
     alignItems: "center",
@@ -330,6 +378,9 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 15,
+  },
+  text: {
+    textAlign: "center",
   },
   subtitle: {
     textAlign: "center",

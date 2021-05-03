@@ -3,8 +3,8 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  TouchableOpacity,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import RNPickerSelect from "react-native-picker-select";
@@ -20,19 +20,24 @@ import { THEME } from "../theme";
 import { AppTextInput } from "../components/ui/AppTextInput";
 import { AppButton } from "../components/ui/AppButton";
 import { AppText } from "../components/ui/AppText";
+
 import {
   getHospitalsLoadingState,
   getHospitalsErrorState,
   getHospitalsForSickListState,
 } from "../store/selectors/hospitals";
+import { BarScanner } from "../components/BarScanner";
 
 const sickListTypes = [
-  { label: "Больничный лист", value: "Больничный лист" },
-  { label: "Форма 086/у", value: "Форма 086/у" },
-  { label: "Форма 083/у", value: "Форма 083/у" },
+  { label: "Больничный лист", value: 1 },
+  { label: "Форма 086/у", value: 2 },
+  { label: "Форма 083/у", value: 3 },
 ];
 
 export const DocumentScannedScreen = ({ navigation }) => {
+  const [isScanScreen, setIsScanScreen] = useState(false);
+  const [showScanner, setShowScanner] = useState(true);
+
   const [organization, setOrganization] = useState(null); // выбранная мед. организация
   const [listValue, setListValue] = useState("");
   const [typeSickList, setTypeSickList] = useState("");
@@ -48,6 +53,17 @@ export const DocumentScannedScreen = ({ navigation }) => {
     console.log(organization.OrgId);
     console.log(listValue);
     console.log("Checking....");
+  };
+
+  const handleScannedQRCode = (data) => {
+    const searchParams = data.split("?")[1];
+    const query = {};
+    const pairs = searchParams.split("&");
+    for (let i = 0; i < pairs.length; i++) {
+      let pair = pairs[i].split("=");
+      query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
+    }
+    setShowScanner(false);
   };
 
   useEffect(() => {
@@ -78,67 +94,135 @@ export const DocumentScannedScreen = ({ navigation }) => {
             </AppBoldText>
           ) : null}
         </View>
-        {hospitals && (
-          <View style={styles.select}>
+        <View style={styles.toggleProfile}>
+          <View style={styles.checkboxWrapper}>
+            <TouchableOpacity
+              onPress={() => setIsScanScreen(false)}
+              activeOpacity={0.5}
+            >
+              <View
+                style={[
+                  styles.checkbox,
+                  !isScanScreen ? styles.activeCheckbox : {},
+                ]}
+              >
+                <AppText
+                  style={{
+                    textAlign: "center",
+                    color: !isScanScreen ? "#fff" : "#000",
+                  }}
+                >
+                  Ввести вручную
+                </AppText>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.checkboxWrapper}>
+            <TouchableOpacity
+              onPress={() => setIsScanScreen(true)}
+              activeOpacity={0.5}
+            >
+              <View
+                style={[
+                  styles.checkbox,
+                  isScanScreen ? styles.activeCheckbox : {},
+                ]}
+              >
+                <AppText
+                  style={{
+                    textAlign: "center",
+                    color: isScanScreen ? "#fff" : "#000",
+                  }}
+                >
+                  Сканировать QR-code
+                </AppText>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {isScanScreen ? (
+          <View style={{ flex: 1 }}>
+            {showScanner ? (
+              <BarScanner onScanned={handleScannedQRCode} />
+            ) : (
+              <View style={{ flex: 1 }}>
+                <AppBoldText>Информация о листе</AppBoldText>
+                {true && <Preloader />}
+                <AppButton
+                  onPress={() => {
+                    setShowScanner(true);
+                  }}
+                >
+                  Сканировать еще раз
+                </AppButton>
+              </View>
+            )}
+          </View>
+        ) : (
+          <View>
+            {hospitals && (
+              <View style={styles.select}>
+                <View style={styles.header}>
+                  <AppText style={styles.subtitle}>
+                    Выберите мед. учреждение
+                  </AppText>
+                </View>
+                <RNPickerSelect
+                  placeholder={{
+                    label: "Выбрать мед. учреждение",
+                    value: null,
+                    color: THEME.MAIN_COLOR,
+                  }}
+                  value={organization}
+                  onValueChange={setOrganization}
+                  items={hospitals.Orgs}
+                  useNativeAndroidPickerStyle={false}
+                  style={{
+                    ...pickerSelectStyles,
+                  }}
+                  Icon={() => (
+                    <AntDesign name="medicinebox" size={20} color="white" />
+                  )}
+                />
+              </View>
+            )}
             <View style={styles.header}>
-              <AppText style={styles.subtitle}>
-                Выберите мед. учреждение
-              </AppText>
+              <AppText style={styles.subtitle}>Выберите тип документа</AppText>
             </View>
-            <RNPickerSelect
-              placeholder={{
-                label: "Выбрать мед. учреждение",
-                value: null,
-                color: THEME.MAIN_COLOR,
-              }}
-              value={organization}
-              onValueChange={setOrganization}
-              items={hospitals.Orgs}
-              useNativeAndroidPickerStyle={false}
-              style={{
-                ...pickerSelectStyles,
-              }}
-              Icon={() => (
-                <AntDesign name="medicinebox" size={20} color="white" />
-              )}
+            <View style={styles.select}>
+              <RNPickerSelect
+                placeholder={{
+                  label: "Выбрать тип документа",
+                  value: null,
+                  color: THEME.MAIN_COLOR,
+                }}
+                value={typeSickList}
+                onValueChange={setTypeSickList}
+                items={sickListTypes}
+                useNativeAndroidPickerStyle={false}
+                style={{
+                  ...pickerSelectStyles,
+                }}
+                Icon={() => (
+                  <AntDesign name="medicinebox" size={20} color="white" />
+                )}
+              />
+            </View>
+            <AppTextInput
+              value={listValue}
+              onChange={setListValue}
+              placeholder="№ документа"
+              type="numeric"
+              style={{ marginBottom: 15 }}
             />
+            <AppButton
+              onPress={checkSickList}
+              disabled={!listValue || !organization || !typeSickList}
+            >
+              Проверить документ
+            </AppButton>
           </View>
         )}
-        <View style={styles.header}>
-          <AppText style={styles.subtitle}>Выберите тип документа</AppText>
-        </View>
-        <View style={styles.select}>
-          <RNPickerSelect
-            placeholder={{
-              label: "Выбрать тип документа",
-              value: null,
-              color: THEME.MAIN_COLOR,
-            }}
-            value={typeSickList}
-            onValueChange={setTypeSickList}
-            items={sickListTypes}
-            useNativeAndroidPickerStyle={false}
-            style={{
-              ...pickerSelectStyles,
-            }}
-            Icon={() => (
-              <AntDesign name="medicinebox" size={20} color="white" />
-            )}
-          />
-        </View>
-        <AppTextInput
-          value={listValue}
-          onChange={setListValue}
-          placeholder="№ документа"
-          type="numeric"
-          style={{ marginBottom: 15 }}
-        />
-        <AppButton
-          onPress={checkSickList}
-          disabled={!listValue || !organization || !typeSickList}
-        >
-          Проверить документ
-        </AppButton>
       </View>
     </ScrollView>
   );
@@ -176,6 +260,29 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 5,
     borderRadius: 10,
+  },
+  toggleProfile: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  checkboxWrapper: {
+    flexBasis: "48%",
+  },
+  checkbox: {
+    marginBottom: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: THEME.MAIN_COLOR,
+    borderRadius: 10,
+    height: 50,
+  },
+  activeCheckbox: {
+    backgroundColor: THEME.MAIN_COLOR,
+  },
+  activeText: {
+    color: "#fff",
   },
 });
 

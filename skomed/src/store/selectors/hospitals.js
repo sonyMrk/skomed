@@ -24,5 +24,9 @@ export const getHospitalsForSickListState = (state) => {
   return hospitalsState;
 };
 
+// для справочника организаций
 
 export const getAllMOState = (state) => getHospitalsState(state).allMo;
+export const getAllMoErrorDesc = (state) => getAllMOState(state)?.ErrorDesc;
+export const getAllMoLocals = () => (state) => getAllMOState(state)?.locals;
+export const getAllMoTypes = () => (state) => getAllMOState(state)?.types;

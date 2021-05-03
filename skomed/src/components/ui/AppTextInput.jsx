@@ -9,9 +9,11 @@ export const AppTextInput = ({
   value,
   type = "default",
   autoCapitalize = "none",
-  multiline=false,
-  numberOfLines=1,
-  textAlign="left"
+  multiline = false,
+  numberOfLines = 1,
+  textAlign = "left",
+  onEndEditing,
+  maxLength = 10000,
 }) => {
   return (
     <TextInput
@@ -24,6 +26,8 @@ export const AppTextInput = ({
       multiline={multiline}
       numberOfLines={numberOfLines}
       textAlign={textAlign}
+      onEndEditing={onEndEditing}
+      maxLength={maxLength}
     />
   );
 };

@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllHospitals, clearHospitalsError, clearAllHospitals } from "../store/actions/hospitals";
+import {
+  getAllHospitals,
+  clearHospitalsError,
+  clearAllHospitals,
+} from "../store/actions/hospitals";
 import { Preloader } from "../components/ui/Preloader";
 import { AppBoldText } from "../components/ui/AppBoldText";
 import { THEME } from "../theme";
@@ -15,15 +19,13 @@ export const SupportedHospitals = ({ navigation }) => {
 
   const dispatch = useDispatch();
 
-  console.log(allHospitals)
-
   useEffect(() => {
     dispatch(getAllHospitals());
 
     return () => {
-      dispatch(clearHospitalsError())
-      dispatch(clearAllHospitals())
-    }
+      dispatch(clearHospitalsError());
+      dispatch(clearAllHospitals());
+    };
   }, []);
 
   if (isHospitalLoading) {
@@ -42,16 +44,18 @@ export const SupportedHospitals = ({ navigation }) => {
           )}
         </View>
         <ScrollView>
-        <View style={styles.list}>
-          {allHospitals &&
-            allHospitals?.Orgs.map((org) => (
-              <TouchableOpacity key={org.value.OrgID}>
-              <View style={styles.item} >
-                <AppBoldText>{org.label}</AppBoldText>
-              </View>
-              </TouchableOpacity>
-            ))}
-        </View>
+          <View style={styles.list}>
+            {allHospitals &&
+              allHospitals?.Orgs.map((org) => (
+                // <TouchableOpacity >
+                <View style={styles.item} key={org.value.OrgID}>
+                  <AppBoldText style={{ textAlign: "center" }}>
+                    {org.label}
+                  </AppBoldText>
+                </View>
+                // </TouchableOpacity>
+              ))}
+          </View>
         </ScrollView>
       </View>
     </ScrollView>
@@ -64,6 +68,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingVertical: 10,
+    borderBottomColor: THEME.MAIN_COLOR,
+    borderBottomWidth: 2,
   },
   title: {
     textAlign: "center",
@@ -78,10 +84,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   item: {
-      padding: 20,
-      borderColor: THEME.MAIN_COLOR,
-      borderWidth: 1,
-      marginBottom: 5,
-      borderRadius: 10
+    padding: 10,
+    marginBottom: 5,
   },
 });

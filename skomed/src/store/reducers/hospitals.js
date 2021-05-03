@@ -7,7 +7,7 @@ import {
   CLEAR_ALL_HOSPITALS,
   CLEAR_HOSPITALS_FOR_APPOINTMENT,
   SET_ALL_MO,
-  CLEAR_ALL_MO
+  CLEAR_ALL_MO,
 } from "../types";
 
 const initialState = {
@@ -16,31 +16,22 @@ const initialState = {
   allMo: null,
   allHospitals: null,
   errorMessage: null,
-  // s: {
-  //   ErrorDesc: "",
-  //   data: {
-  //     locals: [{ label: "Петропавловск", value: "Петропавловск" }],
-  //     type: [{ label: "Больница", value: "Больница" }],
-  //     items: [{}, {}, {}]
-  //   }
-  // }
 };
 
 export const hospitalsReducer = (state = initialState, action) => {
   switch (action.type) {
-
     case SET_ALL_MO: {
       return {
         ...state,
-        allMo: action.payload
-      }
+        allMo: action.payload,
+      };
     }
 
     case CLEAR_ALL_MO: {
       return {
         ...state,
-        allMo: null
-      }
+        allMo: null,
+      };
     }
 
     case SET_HOSPITALS_LOADING: {
@@ -59,8 +50,8 @@ export const hospitalsReducer = (state = initialState, action) => {
     case SET_ALL_HOSPITALS: {
       return {
         ...state,
-        allHospitals: action.payload
-      }
+        allHospitals: action.payload,
+      };
     }
 
     case SET_HOSPITALS_ERROR: {
@@ -80,15 +71,15 @@ export const hospitalsReducer = (state = initialState, action) => {
     case CLEAR_ALL_HOSPITALS: {
       return {
         ...state,
-        allHospitals: null
-      }
+        allHospitals: null,
+      };
     }
 
     case CLEAR_HOSPITALS_FOR_APPOINTMENT: {
       return {
-        ...state, 
-        hospitalsForAppointment: null
-      }
+        ...state,
+        hospitalsForAppointment: null,
+      };
     }
 
     default:

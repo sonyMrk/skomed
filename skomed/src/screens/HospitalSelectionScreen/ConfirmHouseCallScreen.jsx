@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Platform, Alert, ScrollView } from "react-native";
+import { StyleSheet, View, Alert, ScrollView } from "react-native";
 
 import { AppBoldText } from "../../components/ui/AppBoldText";
 import { THEME } from "../../theme";
@@ -10,24 +10,44 @@ import { defaultFormatDate } from "../../utils/formatDate";
 
 export const ConfirmHouseCallScreen = ({ navigation, route }) => {
   const iin = route.params.iin;
-  const organization = route.params.organization;
+  const appointmentUserData = route.params.appointmentUserData;
   const profilePhone = route.params.profilePhone;
 
   const [phone, setPhone] = useState(profilePhone);
   const [reason, setReason] = useState("");
 
-
   const callDoctor = () => {
-    
-      console.log({
-        IIN: iin,
-        OrgID: organization.OrgID,
-        PhoneNumber: phone,
-        Reason: reason,
-        RecordingMethod: 1,
-        Language: 1,
-      });
+    console.log({
+      IIN: iin,
+      OrgID: appointmentUserData.AttachmentID,
+      PhoneNumber: phone,
+      Reason: reason,
+      RecordingMethod: 1,
+      Language: 1,
+    });
   };
+
+  useEffect(() => {
+    Alert.alert(
+      "Справка",
+      `
+      Показания для обслуживания на дому участковой медицинской сестры или фельдшера:
+      1)	температура тела до 38⁰С
+      2)	повышение артериального давления
+      3) заболевание, травма (без резкого ухудшения состояния)
+
+    Показания для обслуживания на дому участковым врачом:
+      1)	контакт с инфекционным больным
+      2)	температура тела выше 38⁰С
+      3)	сыпь на теле без причины
+      4)	инфекционное заболевание
+      5)	ухудшение состояния после прививки
+      6)	ребенок до 5-ти лет
+      7)	ухудшение состояния при беременности
+      8)	ухудшение состояния у родильницы
+    `
+    );
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>

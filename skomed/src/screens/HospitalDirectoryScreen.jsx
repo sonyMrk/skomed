@@ -9,12 +9,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import {
-  getAllHospitals,
   clearHospitalsError,
-  clearAllHospitals,
   getAllMO,
   clearAllMo,
 } from "../store/actions/hospitals";
@@ -27,25 +25,29 @@ import { AppText } from "../components/ui/AppText";
 import {
   getHospitalsLoadingState,
   getHospitalsErrorState,
+  getAllMoTypes,
+  getAllMoErrorDesc,
+  getAllMoLocals,
   getAllMOState,
 } from "../store/selectors/hospitals";
 
-const sickListTypes = [
-  { label: "Больничный лист", value: "Больничный лист" },
-  { label: "Форма 086/у", value: "Форма 086/у" },
-  { label: "Форма 083/у", value: "Форма 083/у" },
-];
-
 export const HospitalDirectoryScreen = ({ navigation }) => {
   const [searchInput, setSearchInput] = useState("");
+  const [localityValue, setLocalityValue] = useState(null);
+  const [typeValue, setTypeValue] = useState(null);
 
+  const allmo = useSelector(getAllMOState);
   const isHospitalLoading = useSelector(getHospitalsLoadingState);
-  const allMo = useSelector(getAllMOState);
+  const ErrorDesc = useSelector(getAllMoErrorDesc);
+  const locals = useSelector(getAllMoLocals());
+  const types = useSelector(getAllMoTypes());
   const hospitalsLoadError = useSelector(getHospitalsErrorState);
 
   const dispatch = useDispatch();
 
   const searchOrganizations = () => {
+    console.log("localityValue", localityValue);
+    console.log("typeValue", typeValue);
     Alert.alert("Пока не доступно", "Скоро заработает");
   };
 
@@ -58,6 +60,18 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (locals) {
+      setLocalityValue(locals[0].value);
+    }
+  }, [locals]);
+
+  // useEffect(() => {
+  //   if (types) {
+  //     setTypeValue(types[0].value);
+  //   }
+  // }, [types]);
+
   if (isHospitalLoading) {
     return <Preloader />;
   }
@@ -69,60 +83,56 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
           {/* Выводим ошибки */}
           {hospitalsLoadError ? (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-          ) : allMo?.ErrorDesc ? (
-            <AppBoldText style={styles.error}>
-              {allMo.ErrorDesc}
-            </AppBoldText>
+          ) : ErrorDesc ? (
+            <AppBoldText style={styles.error}>{ErrorDesc}</AppBoldText>
           ) : null}
         </View>
-          {allMo && <View style={styles.select}>
+        {locals && (
+          <View style={styles.select}>
             <View style={styles.header}>
               <AppText style={styles.subtitle}>
                 Выберите населенный пункт
               </AppText>
             </View>
             <RNPickerSelect
-              placeholder={{
-                label: "Выбрать нас. пункт",
-                value: null,
-                color: THEME.MAIN_COLOR,
-              }}
-              // value={typeOrg}
-              onValueChange={() => {}}
-              items={allMo?.locals? allMo?.locals : []}
+              value={localityValue}
+              placeholder={{}}
+              onValueChange={setLocalityValue}
+              items={locals ? locals : []}
               useNativeAndroidPickerStyle={false}
               style={{
                 ...pickerSelectStyles,
               }}
-              Icon={() => (
-                <FontAwesome5 name="city" size={20} color="white" />
-              )}
+              Icon={() => <FontAwesome5 name="city" size={20} color="white" />}
             />
-          </View>}
+          </View>
+        )}
         <View style={styles.header}>
           <AppText style={styles.subtitle}>
             Выберите тип мед. организации
           </AppText>
         </View>
-        {allMo && <View style={styles.select}>
-          <RNPickerSelect
-            placeholder={{
-              label: "Выбрать тип организации",
-              value: null,
-              color: THEME.MAIN_COLOR,
-            }}
-            // value={typeOrg}
-            onValueChange={() => {}}
-            items={allMo?.types? allMo?.types : []}
-            useNativeAndroidPickerStyle={false}
-            style={{
-              ...pickerSelectStyles,
-            }}
-            Icon={() => (
-              <AntDesign name="medicinebox" size={20} color="white" />
-            )}
-          />
-        </View>}
+        {types && (
+          <View style={styles.select}>
+            <RNPickerSelect
+              value={typeValue}
+              placeholder={{
+                value: null,
+                label: "Выберите тип организации",
+                color: THEME.MAIN_COLOR,
+              }}
+              onValueChange={setTypeValue}
+              items={types ? types : []}
+              useNativeAndroidPickerStyle={false}
+              style={{
+                ...pickerSelectStyles,
+              }}
+              Icon={() => (
+                <AntDesign name="medicinebox" size={20} color="white" />
+              )}
+            />
+          </View>
+        )}
         <View style={styles.header}>
           <AppText style={styles.subtitle}>Найти по названию</AppText>
         </View>

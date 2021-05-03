@@ -8,7 +8,8 @@ import {
   CLEAR_APPOINTMENT_PROFILE_SPECS,
   SET_APPOINTMENT_LOADING_USER_DATA,
   SET_APPOINTMENT_LOADING_SHEDULE,
-  SET_APPOINTMENT_LOADING_PROFILE_SPECS
+  SET_APPOINTMENT_LOADING_PROFILE_SPECS,
+  CLEAR_APPOINTMENT_ERROR,
 } from "../types";
 import { userApi } from "../../services/userApi";
 import { hospitalApi } from "../../services/hospitalApi";
@@ -60,10 +61,18 @@ export const clearProfileSpecs = () => ({
   type: CLEAR_APPOINTMENT_PROFILE_SPECS,
 });
 
+export const clearAppointmentError = () => ({
+  type: CLEAR_APPOINTMENT_ERROR,
+});
+
 export const getAppointmentUserData = (iin) => async (dispatch) => {
   try {
+    dispatch(clearAppointmentError());
     dispatch(setAppointmentLoadingUserData(true));
     const userData = await userApi.GetPatientByIIN(iin);
+    if (userData.ErrorCode !== 0) {
+      dispatch(setAppointmentError(userData.ErrorDesc));
+    }
     dispatch(setAppointmentUserData(userData));
   } catch (error) {
     dispatch(setAppointmentError(error));
@@ -111,13 +120,13 @@ export const getProfileSpecsData = (orgId) => async (dispatch) => {
 
     const profiles = profileSpecs.Profiles.reduce((prev, profile) => {
       return [
-        ...prev,   // форматируем для выбора специализации
+        ...prev, // форматируем для выбора специализации
         {
           label: profile.Name,
           value: {
             ...profile,
             Specialists: profile.Specialists.reduce((prev, spec) => {
-              return [...prev, { label: spec.Doctor, value: spec }];         // форматируем для выбора врача
+              return [...prev, { label: spec.Doctor, value: spec }]; // форматируем для выбора врача
             }, []),
           },
         },

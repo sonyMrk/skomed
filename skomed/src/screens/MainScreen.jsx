@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, ImageBackground } from "react-native";
+import { StyleSheet, View, ImageBackground, ScrollView } from "react-native";
 
 import { MenuItem } from "../components/MenuItem";
 
@@ -53,11 +53,13 @@ export const MainScreen = ({ navigation }) => {
         source={require("../../assets/images/main_bg.jpeg")}
         style={styles.image}
       >
-        <View style={styles.menu}>
-          {mainMenuItems.map((item) => (
-            <MenuItem {...item} key={item.id} onPress={onMenuItemPress} />
-          ))}
-        </View>
+        <ScrollView>
+          <View style={styles.menu}>
+            {mainMenuItems.map((item) => (
+              <MenuItem {...item} key={item.id} onPress={onMenuItemPress} />
+            ))}
+          </View>
+        </ScrollView>
       </ImageBackground>
     </View>
   );

@@ -67,7 +67,6 @@ export const ProfileScreen = ({ navigation }) => {
     dispatch(createFamilyPerson(newMan));
   };
 
-
   // редактирование члена семьи
   const handleEditFamilyPerson = (newMan) => {
     dispatch(editFamilyPerson(newMan));
