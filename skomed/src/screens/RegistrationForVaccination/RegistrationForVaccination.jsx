@@ -30,10 +30,13 @@ import {
   getAppointmentUserDataState,
   getAppointmentUserDataLoadingState,
 } from "../../store/selectors/appointment";
-import { getUserIINState, getUserFamilyState, getUserPhoneState } from "../../store/selectors/user";
+import {
+  getUserIINState,
+  getUserFamilyState,
+  getUserPhoneState,
+} from "../../store/selectors/user";
 
 export const RegistrationForVaccination = ({ navigation }) => {
-
   const [access, setAccess] = useState(false);
   const [iinInputValue, setIinInputValue] = useState(userIin); // Значение ИИН в форме
 
@@ -67,30 +70,28 @@ export const RegistrationForVaccination = ({ navigation }) => {
     };
   }, []);
 
-
   useEffect(() => {
     // если получены данные о пациенте:
     if (appointmentUserData) {
-        if (appointmentUserData.ErrorCode !== 0) {
-          showError(
-            // выводим ошибку
-            "Запись недоступна",
-            appointmentUserData.ErrorDesc
-          );
-        } else if (
-          // если запрещен вызов врача на дом и запись на прием
-          appointmentUserData.RegAvailable !== 1 ||
-          appointmentUserData.HomeCallAvailable !== 1
-        ) {
-          showError(
-            //  выводим ошибку
-            "Запись недоступна",
-            "В настоящий момент запись в МО прикрепления пациента не возможна!"
-          );
-        } else {
-          setAccess(true); // иначе устанавливаем флаг
-        }
-      
+      if (appointmentUserData.ErrorCode !== 0) {
+        showError(
+          // выводим ошибку
+          "Запись недоступна",
+          appointmentUserData.ErrorDesc
+        );
+      } else if (
+        // если запрещен вызов врача на дом и запись на прием
+        appointmentUserData.RegAvailable !== 1 ||
+        appointmentUserData.HomeCallAvailable !== 1
+      ) {
+        showError(
+          //  выводим ошибку
+          "Запись недоступна",
+          "В настоящий момент запись в МО прикрепления пациента не возможна!"
+        );
+      } else {
+        setAccess(true); // иначе устанавливаем флаг
+      }
     }
   }, [appointmentUserData]);
 
@@ -136,13 +137,11 @@ export const RegistrationForVaccination = ({ navigation }) => {
           {/* Выводим ошибки */}
           {hospitalsLoadError ? (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-          ) :
-          hospitalsForAppointment?.ErrorDesc !== 0 ?  (
+          ) : hospitalsForAppointment?.ErrorDesc !== 0 ? (
             <AppBoldText style={styles.error}>
               {hospitalsForAppointment?.ErrorDesc}
             </AppBoldText>
-          ) :
-          appointmentError ? (
+          ) : appointmentError ? (
             <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
           ) : null}
         </View>
@@ -159,6 +158,7 @@ export const RegistrationForVaccination = ({ navigation }) => {
         {profileFamily && profileFamily.length > 0 && (
           <View style={styles.select}>
             <RNPickerSelect
+              fixAndroidTouchableBug={true}
               placeholder={{
                 label: "Выбрать из членов семьи",
                 value: null,
@@ -170,7 +170,7 @@ export const RegistrationForVaccination = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              Icon={() => <Ionicons name="people" size={20} color="white" />}
+              // Icon={() => <Ionicons name="people" size={20} color="white" />}
             />
           </View>
         )}
@@ -241,8 +241,9 @@ const pickerSelectStyles = StyleSheet.create({
   headlessAndroidContainer: {
     borderColor: THEME.MAIN_COLOR,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 15,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingLeft: 15,
     justifyContent: "center",
   },
   inputAndroid: {

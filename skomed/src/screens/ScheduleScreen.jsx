@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { StyleSheet, View, Alert, ScrollView } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-import { Table, Row, Rows } from 'react-native-table-component';
+import { Table, Row, Rows } from "react-native-table-component";
 import { AntDesign } from "@expo/vector-icons";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +18,7 @@ import {
   getDataListForTimetable,
   clearDataListForTimetable,
   getDoctorTimetable,
-  clearDoctorTimetable
+  clearDoctorTimetable,
 } from "../store/actions/hospitals";
 import {
   getHospitalsLoadingState,
@@ -41,7 +41,7 @@ export const ScheduleScreen = ({ navigation }) => {
 
   const isHospitalLoading = useSelector(getHospitalsLoadingState);
   const hospitals = useSelector(getAllHospitalsState);
-  const hospitalsErrorDesc = useSelector(getHospitalsErrorDesc)
+  const hospitalsErrorDesc = useSelector(getHospitalsErrorDesc);
   const hospitalsLoadError = useSelector(getHospitalsErrorState);
 
   const doctorsList = useSelector(getOrgDoctorsListState);
@@ -56,7 +56,7 @@ export const ScheduleScreen = ({ navigation }) => {
       // действия при анмаунте
       dispatch(clearHospitalsError());
       dispatch(clearAllHospitals());
-      dispatch(clearDoctorTimetable())
+      dispatch(clearDoctorTimetable());
     };
   }, []);
 
@@ -77,7 +77,13 @@ export const ScheduleScreen = ({ navigation }) => {
   useEffect(() => {
     // если выбрана организация и врач
     if (organization && doctor) {
-      dispatch(getDoctorTimetable(organization.OrgID, doctor.DoctorGUID, doctor.CabinetGUID))
+      dispatch(
+        getDoctorTimetable(
+          organization.OrgID,
+          doctor.DoctorGUID,
+          doctor.CabinetGUID
+        )
+      );
     }
   }, [organization, doctor]);
 
@@ -87,12 +93,14 @@ export const ScheduleScreen = ({ navigation }) => {
     setDoctor(null);
     dispatch(clearHospitalsError());
     dispatch(clearDataListForTimetable());
-    dispatch(clearDoctorTimetable())
+    dispatch(clearDoctorTimetable());
   };
 
   // обработчик выбора врача
   const handleChangeDoctor = (doc) => {
-    setDoctor(doc);
+    if (doc) {
+      setDoctor(doc);
+    }
   };
 
   if (isHospitalLoading) {
@@ -107,9 +115,7 @@ export const ScheduleScreen = ({ navigation }) => {
           {hospitalsLoadError ? (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
           ) : hospitalsErrorDesc ? (
-            <AppBoldText style={styles.error}>
-              {hospitalsErrorDesc}
-            </AppBoldText>
+            <AppBoldText style={styles.error}>{hospitalsErrorDesc}</AppBoldText>
           ) : null}
         </View>
         {hospitals && (
@@ -120,6 +126,7 @@ export const ScheduleScreen = ({ navigation }) => {
               </AppText>
             </View>
             <RNPickerSelect
+              fixAndroidTouchableBug={true}
               placeholder={{}}
               value={organization}
               onValueChange={handleChangeOrganization}
@@ -128,9 +135,9 @@ export const ScheduleScreen = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              Icon={() => (
-                <AntDesign name="medicinebox" size={20} color="white" />
-              )}
+              // Icon={() => (
+              //   <AntDesign name="medicinebox" size={20} color="white" />
+              // )}
             />
           </View>
         )}
@@ -141,6 +148,7 @@ export const ScheduleScreen = ({ navigation }) => {
               <AppText style={styles.subtitle}>Выберите врача</AppText>
             </View>
             <RNPickerSelect
+              fixAndroidTouchableBug={true}
               placeholder={{
                 label: "Выберите врача",
                 value: null,
@@ -153,9 +161,9 @@ export const ScheduleScreen = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              Icon={() => (
-                <AntDesign name="medicinebox" size={20} color="white" />
-              )}
+              // Icon={() => (
+              //   <AntDesign name="medicinebox" size={20} color="white" />
+              // )}
             />
           </View>
         )}
@@ -169,10 +177,19 @@ export const ScheduleScreen = ({ navigation }) => {
           <AppBoldText style={styles.title}>Расписание:</AppBoldText>
           {doctorTimetableLoading && <Preloader />}
         </View>
-        <Table borderStyle={styles.table}>
-          <Row data={timetableHead} style={styles.head} textStyle={styles.text}/>
-          <Rows data={doctorTimetable ? doctorTimetable : []} textStyle={styles.text}/>
-        </Table>
+        {!doctorTimetableLoading && (
+          <Table borderStyle={styles.table}>
+            <Row
+              data={timetableHead}
+              style={styles.head}
+              textStyle={styles.text}
+            />
+            <Rows
+              data={doctorTimetable ? doctorTimetable : []}
+              textStyle={styles.text}
+            />
+          </Table>
+        )}
       </View>
     </ScrollView>
   );
@@ -212,30 +229,27 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   table: {
-    borderWidth: 1, 
-    borderColor: THEME.MAIN_COLOR
+    borderWidth: 1,
+    borderColor: THEME.MAIN_COLOR,
   },
-  head: { 
-    height: 40, 
+  head: {
+    height: 40,
     backgroundColor: "#e0ebeb",
   },
-  text: { 
-    margin: 6 
+  text: {
+    margin: 6,
   },
-  timetable: {
-
-  },
-  item: {
-
-  }
+  timetable: {},
+  item: {},
 });
 
 const pickerSelectStyles = StyleSheet.create({
   headlessAndroidContainer: {
     borderColor: THEME.MAIN_COLOR,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 15,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingLeft: 15,
     justifyContent: "center",
   },
   inputAndroid: {

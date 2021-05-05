@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import * as Linking from 'expo-linking';
+import * as Linking from "expo-linking";
 
 import {
   clearHospitalsError,
@@ -40,16 +40,16 @@ export const MOItem = ({ mo }) => {
   };
 
   const handlePressEmail = () => {
-    Linking.openURL(`mailto:${mo.Email}`)
+    Linking.openURL(`mailto:${mo.Email}`);
   };
 
   const handlePressPhone = (tel) => {
-    Linking.openURL(`tel:${tel}`)
-  }
+    Linking.openURL(`tel:${tel}`);
+  };
 
   const handlePressSite = () => {
-    Linking.openURL(`https://${mo.Site}`)
-  }
+    Linking.openURL(`https://${mo.Site}`);
+  };
 
   return (
     <View>
@@ -85,10 +85,13 @@ export const MOItem = ({ mo }) => {
             {mo.Phones && (
               <View>
                 {mo.Phones.split(";").map((phone) => (
-                  <TouchableOpacity onPress={() => { handlePressPhone(phone) }} key={phone} >
-                    <AppBoldText
-                      style={{ color: "#005ce6", marginTop: 10 }}
-                    >
+                  <TouchableOpacity
+                    onPress={() => {
+                      handlePressPhone(phone);
+                    }}
+                    key={phone}
+                  >
+                    <AppBoldText style={{ color: "#005ce6", marginTop: 10 }}>
                       {phone}
                     </AppBoldText>
                   </TouchableOpacity>
@@ -162,6 +165,7 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
               </AppText>
             </View>
             <RNPickerSelect
+              fixAndroidTouchableBug={true}
               value={localityValue}
               placeholder={{}}
               onValueChange={setLocalityValue}
@@ -170,7 +174,7 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              Icon={() => <FontAwesome5 name="city" size={20} color="white" />}
+              // Icon={() => <FontAwesome5 name="city" size={20} color="white" />}
             />
           </View>
         )}
@@ -182,6 +186,7 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
         {types && (
           <View style={styles.select}>
             <RNPickerSelect
+              fixAndroidTouchableBug={true}
               value={typeValue}
               placeholder={{
                 value: null,
@@ -194,9 +199,9 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              Icon={() => (
-                <AntDesign name="medicinebox" size={20} color="white" />
-              )}
+              // Icon={() => (
+              //   <AntDesign name="medicinebox" size={20} color="white" />
+              // )}
             />
           </View>
         )}
@@ -261,16 +266,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.MAIN_COLOR,
     padding: 10,
-    marginBottom: 5
-  }
+    marginBottom: 5,
+  },
 });
 
 const pickerSelectStyles = StyleSheet.create({
   headlessAndroidContainer: {
     borderColor: THEME.MAIN_COLOR,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 15,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingLeft: 15,
     justifyContent: "center",
   },
   inputAndroid: {

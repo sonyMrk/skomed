@@ -33,7 +33,6 @@ import {
 } from "../../store/selectors/appointment";
 
 export const ConfirtmRegForVaccination = ({ navigation, route }) => {
-
   const [appointmentTime, setAppointmentTime] = useState(null); // время приема
   const [appointmentData, setAppointmentData] = useState(null); // данные (id кабинета, массив свободныч часов, даты и т.д)
 
@@ -56,13 +55,13 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
 
   const handleChangeSpecialization = (value) => {
     setSpecialization(value);
-    setDoctor(null)
+    setDoctor(null);
   };
 
   const handleChangeDoctor = (value) => {
     setDoctor(value);
-    const orgId =  appointmentUserData.AttachmentID;
-    const doctorId = value?.DoctorID;  // может быть null если выбран placeholder
+    const orgId = appointmentUserData.AttachmentID;
+    const doctorId = value?.DoctorID; // может быть null если выбран placeholder
     const profileId = specialization.GUID;
     if (doctorId) {
       dispatch(getShedule(orgId, doctorId, profileId));
@@ -70,7 +69,7 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
   };
 
   const handleChangeDate = (data) => {
-    setAppointmentTime(null);  // сбрасывать время при изменении даты
+    setAppointmentTime(null); // сбрасывать время при изменении даты
     setAppointmentData(data);
   };
 
@@ -88,38 +87,34 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
 
   useEffect(() => {
     showAlert();
-  }, [])
+  }, []);
 
   const showAlert = () =>
-  Alert.alert(
-    "Какое то предупреждение",
-    "Если нажать ОК, то можно продолжать, если ОТМЕНА то вернемся на главную",
-    [
-      {
-        text: "Отмена",
-        onPress: () => {
-          navigation.navigate("Main")
+    Alert.alert(
+      "Какое то предупреждение",
+      "Если нажать ОК, то можно продолжать, если ОТМЕНА то вернемся на главную",
+      [
+        {
+          text: "Отмена",
+          onPress: () => {
+            navigation.navigate("Main");
+          },
+          style: "cancel",
         },
-        style: "cancel",
-      },
-      {
-        text: "Ок",
-        onPress: () => {
-          Alert.alert(
-            "Вы ознакомились со всеми предупреждениями"
-          )
+        {
+          text: "Ок",
+          onPress: () => {
+            Alert.alert("Вы ознакомились со всеми предупреждениями");
+          },
+          style: "default",
         },
-        style: "default",
-      },
-    ],
-    {
-      cancelable: true,
-      onDismiss: () =>
-        Alert.alert(
-          "Вы ознакомились со всеми предупреждениями"
-        ),
-    }
-  );
+      ],
+      {
+        cancelable: true,
+        onDismiss: () =>
+          Alert.alert("Вы ознакомились со всеми предупреждениями"),
+      }
+    );
 
   return (
     <ScrollView>
@@ -148,6 +143,7 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
                 </AppText>
               </View>
               <RNPickerSelect
+                fixAndroidTouchableBug={true}
                 placeholder={{
                   label: "Выберите специализацию:",
                   value: null,
@@ -162,12 +158,13 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
                 style={{
                   ...pickerSelectStyles,
                 }}
-                Icon={() => <EvilIcons name="gear" size={20} color="white" />}
+                // Icon={() => <EvilIcons name="gear" size={20} color="white" />}
               />
               <View style={styles.header}>
                 <AppText style={styles.subtitle}>Выберите врача</AppText>
               </View>
               <RNPickerSelect
+                fixAndroidTouchableBug={true}
                 placeholder={{
                   label: "Выберите врача:",
                   value: null,
@@ -182,13 +179,13 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
                 style={{
                   ...pickerSelectStyles,
                 }}
-                Icon={() => (
-                  <MaterialCommunityIcons
-                    name="doctor"
-                    size={20}
-                    color="white"
-                  />
-                )}
+                // Icon={() => (
+                //   <MaterialCommunityIcons
+                //     name="doctor"
+                //     size={20}
+                //     color="white"
+                //   />
+                // )}
               />
             </View>
           )
@@ -210,6 +207,7 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
 
               <View style={styles.select}>
                 <RNPickerSelect
+                  fixAndroidTouchableBug={true}
                   placeholder={{
                     label: "Дата приема",
                     value: null,
@@ -222,13 +220,14 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
                   style={{
                     ...pickerSelectStyles,
                   }}
-                  Icon={() => (
-                    <Ionicons name="calendar-outline" size={20} color="white" />
-                  )}
+                  // Icon={() => (
+                  //   <Ionicons name="calendar-outline" size={20} color="white" />
+                  // )}
                 />
               </View>
               <View style={styles.select}>
                 <RNPickerSelect
+                  fixAndroidTouchableBug={true}
                   placeholder={{
                     label: "Время приема",
                     value: null,
@@ -241,15 +240,19 @@ export const ConfirtmRegForVaccination = ({ navigation, route }) => {
                   style={{
                     ...pickerSelectStyles,
                   }}
-                  Icon={() => (
-                    <Ionicons name="time-outline" size={20} color="white" />
-                  )}
+                  // Icon={() => (
+                  //   <Ionicons name="time-outline" size={20} color="white" />
+                  // )}
                 />
               </View>
             </View>
           )
         )}
-        <AppButton onPress={saveAppointment} disabled={!appointmentTime} style={{ marginTop: 20 }}>
+        <AppButton
+          onPress={saveAppointment}
+          disabled={!appointmentTime}
+          style={{ marginTop: 20 }}
+        >
           Записаться на прием
         </AppButton>
       </View>
@@ -320,8 +323,9 @@ const pickerSelectStyles = StyleSheet.create({
   headlessAndroidContainer: {
     borderColor: THEME.MAIN_COLOR,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 15,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingLeft: 15,
     justifyContent: "center",
   },
   inputAndroid: {

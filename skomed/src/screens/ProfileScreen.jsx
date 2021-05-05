@@ -31,8 +31,6 @@ import {
   getUserErrorMessageState,
 } from "../store/selectors/user";
 
-
-
 export const ProfileScreen = ({ navigation }) => {
   const [editMode, setEditMode] = useState(false); // в каком режиме открывается модальное окно
   const [iin, setIin] = useState("");
@@ -53,21 +51,17 @@ export const ProfileScreen = ({ navigation }) => {
 
   const createProfile = () => {
     if (iin.trim().length !== 12 || isNaN(iin)) {
-      return Alert.alert(
-        "Не корректный ИИН",
-        "Значение ИИН должно быть 12 цифр"
-      );
-    }
-    if (phoneValue.length < 11 || isNaN(phoneValue)) {
-      return Alert.alert(
+      Alert.alert("Не корректный ИИН", "Значение ИИН должно быть 12 цифр");
+    } else if (phoneValue.length < 11 || isNaN(phoneValue)) {
+      Alert.alert(
         "Не корректный номер телефона",
         "Введите корректный номер телефона"
       );
+    } else {
+      dispatch(createUserProfile({ iin, phone: `+7${phoneValue.slice(-10)}` }));
+      setIin("");
+      setPhoneValue("");
     }
-
-    dispatch(createUserProfile({ iin, phone: `+7${phoneValue.slice(-10)}` }));
-    setIin("");
-    setPhoneValue("");
   };
   // добавляем нового члена семьи
   const addFamilyPerson = (newMan) => {

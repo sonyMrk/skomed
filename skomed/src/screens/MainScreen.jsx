@@ -48,8 +48,8 @@ const mainMenuItems = [
     navigateTo: "RegistrationForVaccination",
     style: {
       borderColor: THEME.DANGER_COLOR,
-      borderWidth: 2
-    }
+      borderWidth: 2,
+    },
   },
   {
     id: "8",
@@ -70,7 +70,7 @@ export const MainScreen = ({ navigation }) => {
         source={require("../../assets/images/main_bg.jpeg")}
         style={styles.image}
       >
-        <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <ScrollView>
           <View style={styles.menu}>
             {mainMenuItems.map((item) => (
               <MenuItem {...item} key={item.id} onPress={onMenuItemPress} />

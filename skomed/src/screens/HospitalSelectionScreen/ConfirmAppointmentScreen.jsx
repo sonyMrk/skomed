@@ -217,6 +217,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
                   value: null,
                   color: THEME.MAIN_COLOR,
                 }}
+                fixAndroidTouchableBug={true}
                 value={specialization}
                 onValueChange={handleChangeSpecialization}
                 items={
@@ -226,7 +227,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
                 style={{
                   ...pickerSelectStyles,
                 }}
-                Icon={() => <EvilIcons name="gear" size={20} color="white" />}
+                // Icon={() => <EvilIcons name="gear" size={20} color="white" />}
               />
               <View style={styles.header}>
                 <AppText style={styles.subtitle}>Выберите врача</AppText>
@@ -237,6 +238,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
                   value: null,
                   color: THEME.MAIN_COLOR,
                 }}
+                fixAndroidTouchableBug={true}
                 value={doctor}
                 onValueChange={handleChangeDoctor}
                 items={
@@ -246,13 +248,13 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
                 style={{
                   ...pickerSelectStyles,
                 }}
-                Icon={() => (
-                  <MaterialCommunityIcons
-                    name="doctor"
-                    size={20}
-                    color="white"
-                  />
-                )}
+                // Icon={() => (
+                //   <MaterialCommunityIcons
+                //     name="doctor"
+                //     size={20}
+                //     color="white"
+                //   />
+                // )}
               />
             </View>
           )
@@ -274,6 +276,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
 
               <View style={styles.select}>
                 <RNPickerSelect
+                  fixAndroidTouchableBug={true}
                   placeholder={{
                     label: "Дата приема",
                     value: null,
@@ -286,13 +289,14 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
                   style={{
                     ...pickerSelectStyles,
                   }}
-                  Icon={() => (
-                    <Ionicons name="calendar-outline" size={20} color="white" />
-                  )}
+                  // Icon={() => (
+                  //   <Ionicons name="calendar-outline" size={20} color="white" />
+                  // )}
                 />
               </View>
               <View style={styles.select}>
                 <RNPickerSelect
+                  fixAndroidTouchableBug={true}
                   placeholder={{
                     label: "Время приема",
                     value: null,
@@ -305,9 +309,9 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
                   style={{
                     ...pickerSelectStyles,
                   }}
-                  Icon={() => (
-                    <Ionicons name="time-outline" size={20} color="white" />
-                  )}
+                  // Icon={() => (
+                  //   <Ionicons name="time-outline" size={20} color="white" />
+                  // )}
                 />
               </View>
             </View>
@@ -400,8 +404,9 @@ const pickerSelectStyles = StyleSheet.create({
   headlessAndroidContainer: {
     borderColor: THEME.MAIN_COLOR,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 15,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingLeft: 15,
     justifyContent: "center",
   },
   inputAndroid: {

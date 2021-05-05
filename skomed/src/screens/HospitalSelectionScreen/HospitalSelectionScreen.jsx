@@ -31,7 +31,11 @@ import {
   getAppointmentUserDataState,
   getAppointmentUserDataLoadingState,
 } from "../../store/selectors/appointment";
-import { getUserIINState, getUserFamilyState, getUserPhoneState } from "../../store/selectors/user";
+import {
+  getUserIINState,
+  getUserFamilyState,
+  getUserPhoneState,
+} from "../../store/selectors/user";
 
 export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
   const isHouseCall = navigateTo === "ConfirmHouseCallScreen"; // запись на прием или вызов врача на дом
@@ -102,7 +106,7 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
           setAccess(true); // иначе устанавливаем флаг
         }
       } else {
-        if(organization.ShowMessage) {
+        if (organization.ShowMessage) {
           showError("Кабинет пациента", organization.MessageText);
         }
         // Проверяем, если ли запреты на запись
@@ -166,17 +170,19 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
-          {isHouseCall ? null : <AppBoldText style={styles.title}>Выбор мед организации</AppBoldText>}
+          {isHouseCall ? null : (
+            <AppBoldText style={styles.title}>
+              Выбор мед организации
+            </AppBoldText>
+          )}
           {/* Выводим ошибки */}
           {hospitalsLoadError ? (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-          ) :
-          hospitalsForAppointment?.ErrorDesc !== 0 ?  (
+          ) : hospitalsForAppointment?.ErrorDesc !== 0 ? (
             <AppBoldText style={styles.error}>
               {hospitalsForAppointment?.ErrorDesc}
             </AppBoldText>
-          ) :
-          appointmentError ? (
+          ) : appointmentError ? (
             <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
           ) : null}
         </View>
@@ -188,12 +194,13 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
               onValueChange={handleChangeOrganization}
               items={hospitalsForAppointment.Orgs}
               useNativeAndroidPickerStyle={false}
+              fixAndroidTouchableBug={true}
               style={{
                 ...pickerSelectStyles,
               }}
-              Icon={() => (
-                <AntDesign name="medicinebox" size={20} color="white" />
-              )}
+              // Icon={() => (
+              //   <AntDesign name="medicinebox" size={20} color="white" />
+              // )}
             />
           </View>
         )}
@@ -217,11 +224,12 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
               }}
               onValueChange={handleFamilyChangeIin}
               items={[{ label: "Вы", value: userIin }, ...profileFamily]}
+              fixAndroidTouchableBug={true}
               useNativeAndroidPickerStyle={false}
               style={{
                 ...pickerSelectStyles,
               }}
-              Icon={() => <Ionicons name="people" size={20} color="white" />}
+              // Icon={() => <Ionicons name="people" size={20} color="white" />}
             />
           </View>
         )}
@@ -293,8 +301,9 @@ const pickerSelectStyles = StyleSheet.create({
   headlessAndroidContainer: {
     borderColor: THEME.MAIN_COLOR,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 15,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingLeft: 15,
     justifyContent: "center",
   },
   inputAndroid: {

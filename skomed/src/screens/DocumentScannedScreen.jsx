@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
@@ -32,7 +27,11 @@ import {
   clearUserError,
 } from "../store/actions/user";
 import { InfoItem } from "../components/ui/InfoItem";
-import { getUserErrorMessageState, getUserLoadingState, getUserSickListState } from "../store/selectors/user";
+import {
+  getUserErrorMessageState,
+  getUserLoadingState,
+  getUserSickListState,
+} from "../store/selectors/user";
 
 const sickListTypes = [
   { label: "Больничный лист", value: 1 },
@@ -140,7 +139,7 @@ export const DocumentScannedScreen = ({ navigation }) => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.flex}>
+    <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
           <AppBoldText style={styles.title}>
@@ -206,14 +205,17 @@ export const DocumentScannedScreen = ({ navigation }) => {
         {/* Если включен режим сканирования: */}
         {isScanScreen ? (
           <View style={styles.flex}>
-
             {/* Показывать сканер? */}
-            
+
             {!userSickListInfo ? (
               // Если нет данных показываем сканнер
-              <BarScanner onScanned={handleScannedQRCode} />
-              // Если идет загрузка данных показываем прелоадером
-            ) : userSickListloading ? <Preloader /> : (
+              <View style={styles.scannerWrapper}>
+                <BarScanner onScanned={handleScannedQRCode} />
+              </View>
+            ) : // Если идет загрузка данных показываем прелоадером
+            userSickListloading ? (
+              <Preloader />
+            ) : (
               <View style={styles.flex}>
                 {/* Выводим данные */}
                 <SickListInfoBlock userSickListInfo={userSickListInfo} />
@@ -226,7 +228,6 @@ export const DocumentScannedScreen = ({ navigation }) => {
                 </AppButton>
               </View>
             )}
-
           </View>
         ) : // Если данные о листе не загружены:
         !userSickListInfo ? (
@@ -245,6 +246,7 @@ export const DocumentScannedScreen = ({ navigation }) => {
                       </AppText>
                     </View>
                     <RNPickerSelect
+                      fixAndroidTouchableBug={true}
                       placeholder={{}}
                       value={organization}
                       onValueChange={setOrganization}
@@ -253,9 +255,9 @@ export const DocumentScannedScreen = ({ navigation }) => {
                       style={{
                         ...pickerSelectStyles,
                       }}
-                      Icon={() => (
-                        <AntDesign name="medicinebox" size={20} color="white" />
-                      )}
+                      // Icon={() => (
+                      //   <AntDesign name="medicinebox" size={20} color="white" />
+                      // )}
                     />
                   </View>
                 )}
@@ -266,6 +268,7 @@ export const DocumentScannedScreen = ({ navigation }) => {
                 </View>
                 <View style={styles.select}>
                   <RNPickerSelect
+                    fixAndroidTouchableBug={true}
                     placeholder={{}}
                     value={typeSickList}
                     onValueChange={setTypeSickList}
@@ -274,9 +277,9 @@ export const DocumentScannedScreen = ({ navigation }) => {
                     style={{
                       ...pickerSelectStyles,
                     }}
-                    Icon={() => (
-                      <AntDesign name="medicinebox" size={20} color="white" />
-                    )}
+                    // Icon={() => (
+                    //   <AntDesign name="medicinebox" size={20} color="white" />
+                    // )}
                   />
                 </View>
                 <AppTextInput
@@ -376,14 +379,18 @@ const styles = StyleSheet.create({
   activeText: {
     color: "#fff",
   },
+  scannerWrapper: {
+    minHeight: 300,
+  },
 });
 
 const pickerSelectStyles = StyleSheet.create({
   headlessAndroidContainer: {
     borderColor: THEME.MAIN_COLOR,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 15,
+    borderRadius: 10,
+    paddingVertical: 15,
+    paddingLeft: 15,
     justifyContent: "center",
   },
   inputAndroid: {
