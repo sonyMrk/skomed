@@ -8,6 +8,8 @@ import {
   CLEAR_HOSPITALS_FOR_APPOINTMENT,
   SET_ALL_MO,
   CLEAR_ALL_MO,
+  SET_DATA_LIST_FOR_TIMETABLE,
+  CLEAR_DATA_LIST_FOR_TIMETABLE,
 } from "../types";
 import { hospitalApi } from "../../services/hospitalApi";
 
@@ -52,6 +54,15 @@ export const setAllMO = (payload) => ({
   payload,
 });
 
+export const setDataListForTimeTable = (payload) => ({
+  type: SET_DATA_LIST_FOR_TIMETABLE,
+  payload
+})
+
+export const clearDataListForTimetable = () => ({
+  type: CLEAR_DATA_LIST_FOR_TIMETABLE
+})
+
 export const getHospitalsForAppointment = () => async (dispatch) => {
   try {
     dispatch(setHospitalsLoading(true));
@@ -93,34 +104,53 @@ export const getAllMO = () => async (dispatch) => {
     dispatch(setHospitalsLoading(true));
     const MOList = await hospitalApi.GetMOList();
 
+    if (MOList.ErrorCode !== 0) {
+      dispatch(setHospitalsError(MOList.ErrorDesc));
+    }
+
     const localitysName = new Set();
-    const typesName = new Set();
-    
+
     // получаем названия населенных пунктов и типы организаций
     for (let org of MOList.DataList) {
       localitysName.add(org.City);
-      typesName.add(org.OrgType);
     }
 
-    const localitysArr = []
-    const typesApp = []
+    const localitysArr = [];
     // форматируем данные в нужный формат
     for (local of localitysName) {
-      localitysArr.push({ label: local, value: local })
+      localitysArr.push({ label: local, value: local });
     }
-    // форматируем данные в нужный формат
-    for (type of typesName) {
-      typesApp.push({ label: type, value: type })
-    }
-    
+
     MOList.locals = localitysArr;
-    MOList.types = typesApp;
 
     dispatch(setAllMO(MOList));
   } catch (error) {
-    console.log(error)
+    console.log(error);
     dispatch(setHospitalsError("Ошибка при загрузки списка организаций"));
   } finally {
     dispatch(setHospitalsLoading(false));
   }
 };
+
+export const getDataListForTimetable = (orgId) => async (dispatch) => {
+  try {
+    dispatch(setHospitalsLoading(true));
+    const dataForTimeTable = await hospitalApi.GetDataListsForTimetable(orgId);
+    if (dataForTimeTable.ErrorCode !== 0) {
+      dispatch(setHospitalsError(dataForTimeTable.ErrorDesc));
+    } else {
+
+      const doctorsList = dataForTimeTable.ListsMap.reduce((prev, doc) => {
+        return [...prev, { label: doc.Doctor, value: doc }] 
+      }, [])
+
+      dataForTimeTable.ListsMap = doctorsList
+      
+      dispatch(setDataListForTimeTable(dataForTimeTable));
+    }
+  } catch (error) {
+    dispatch(setHospitalsError("Ошибка при загрузки списка организаций"));
+  } finally {
+    dispatch(setHospitalsLoading(false));
+  }
+}

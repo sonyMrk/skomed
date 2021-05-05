@@ -26,7 +26,51 @@ export const getHospitalsForSickListState = (state) => {
 
 // для справочника организаций
 
-export const getAllMOState = (state) => getHospitalsState(state).allMo;
+export const getAllMOState = (state) => getHospitalsState(state)?.allMo;
 export const getAllMoErrorDesc = (state) => getAllMOState(state)?.ErrorDesc;
 export const getAllMoLocals = () => (state) => getAllMOState(state)?.locals;
-export const getAllMoTypes = () => (state) => getAllMOState(state)?.types;
+
+export const getAllMoTypes = (localityValue) => (state) => {
+  const moList = getAllMOState(state)?.DataList;
+  if (moList) {
+    const filterMOList = moList.filter((mo) => mo.City === localityValue);
+
+    const typesName = new Set();
+    const typesApp = [];
+
+    for (let org of filterMOList) {
+      typesName.add(org.OrgType);
+    }
+
+    for (type of typesName) {
+      typesApp.push({ label: type, value: type });
+    }
+
+    return typesApp;
+  } else {
+    return [];
+  }
+};
+
+export const getAllMoList = (localityValue, typeValue, searchInput) => (
+  state
+) => {
+  const moList = getAllMOState(state)?.DataList;
+  if (moList && (typeValue || searchInput)) {
+    const filterMOList = moList.filter((mo) => {
+      if (!typeValue) {
+        return mo.City === localityValue && mo.Name.toLowerCase().includes(searchInput.toLowerCase())
+      }
+      return mo.City === localityValue && mo.OrgType === typeValue && mo.Name.toLowerCase().includes(searchInput.toLowerCase())
+    })
+    return filterMOList;
+  } else {
+    return [];
+  }
+};
+
+// для расписания врачей
+
+export const getDataListForTimetable = (state) => getHospitalsState(state)?.dataListForTimetable;
+
+export const getDoctorsList = (state) => getDataListForTimetable(state)?.ListsMap;

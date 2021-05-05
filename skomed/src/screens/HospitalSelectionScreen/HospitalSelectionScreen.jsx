@@ -21,6 +21,11 @@ import {
   getAppointmentUserData,
   clearUserData,
 } from "../../store/actions/appointment";
+import {
+  getHospitalsLoadingState,
+  getHospitalsForAppointmentState,
+  getHospitalsErrorState,
+} from "../../store/selectors/hospitals";
 
 export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
   const isHouseCall = navigateTo === "ConfirmHouseCallScreen"; // запись на прием или вызов врача на дом
@@ -35,13 +40,9 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
   const profileFamily = useSelector((state) => state.user.profile?.family);
   const profilePhone = useSelector((state) => state.user.profile?.phone);
 
-  const isHospitalLoading = useSelector((state) => state.hospitals.isLoading);
-  const hospitalsForAppointment = useSelector(
-    (state) => state.hospitals.hospitalsForAppointment
-  );
-  const hospitalsLoadError = useSelector(
-    (state) => state.hospitals.errorMessage
-  );
+  const isHospitalLoading = useSelector(getHospitalsLoadingState);
+  const hospitalsForAppointment = useSelector(getHospitalsForAppointmentState);
+  const hospitalsLoadError = useSelector(getHospitalsErrorState);
 
   const appointmentUserData = useSelector(
     (state) => state.appointment.userData
@@ -169,6 +170,11 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
           {/* Выводим ошибки */}
           {hospitalsLoadError && (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
+          )}
+          {hospitalsForAppointment?.ErrorDesc !== 0 && (
+            <AppBoldText style={styles.error}>
+              {hospitalsForAppointment?.ErrorDesc}
+            </AppBoldText>
           )}
           {appointmentError && (
             <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>

@@ -9,13 +9,12 @@ import {
 import { Preloader } from "../components/ui/Preloader";
 import { AppBoldText } from "../components/ui/AppBoldText";
 import { THEME } from "../theme";
+import { getHospitalsLoadingState, getAllHospitalsState, getHospitalsErrorState } from "../store/selectors/hospitals";
 
 export const SupportedHospitals = ({ navigation }) => {
-  const isHospitalLoading = useSelector((state) => state.hospitals.isLoading);
-  const allHospitals = useSelector((state) => state.hospitals.allHospitals);
-  const hospitalsLoadError = useSelector(
-    (state) => state.hospitals.errorMessage
-  );
+  const isHospitalLoading = useSelector(getHospitalsLoadingState);
+  const allHospitals = useSelector(getAllHospitalsState);
+  const hospitalsLoadError = useSelector(getHospitalsErrorState);
 
   const dispatch = useDispatch();
 
@@ -41,6 +40,11 @@ export const SupportedHospitals = ({ navigation }) => {
           </AppBoldText>
           {hospitalsLoadError && (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
+          )}
+          {allHospitals?.ErrorDesc !== 0 && (
+            <AppBoldText style={styles.error}>
+              {allHospitals?.ErrorDesc}
+            </AppBoldText>
           )}
         </View>
         <ScrollView>

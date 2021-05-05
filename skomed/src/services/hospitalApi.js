@@ -32,5 +32,13 @@ export const hospitalApi = {
   GetMOList: async () => {
     const { data } = await axios.post("GetMOList");
     return data;
+  },
+
+  GetDataListsForTimetable: async (orgId) => {
+    const params = new URLSearchParams();
+    params.append("OrgID", orgId);
+    
+    const { data } = await axios.post("GetDataListsForTimetable", params);
+    return data;
   }
 };

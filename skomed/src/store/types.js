@@ -4,6 +4,9 @@ export const SET_USER_DATA = "user/SET_USER_DATA";
 export const SET_USER_PROFILE = "user/SET_USER_PROFILE";
 export const SET_USER_ERROR = "user/SET_ERROR";
 export const SET_USER_LOADING = "user/SET_USER_LOADING";
+export const SET_SICK_LIST_INFO = "user/SET_SICK_LIST_INFO";
+export const CLEAR_SICK_LIST_INFO = "user/CLEAR_SICK_LIST_INFO"
+export const CLEAR_USER_ERROR = "user/CLEAR_USER_ERROR"
 
 export const SET_ALL_MO = "hospitals/SET_ALL_MO";
 export const SET_HOSPITALS_FOR_APPOINTMENT =
@@ -16,6 +19,8 @@ export const CLEAR_ALL_HOSPITALS = "hospitals/CLEAR_ALL_HOSPITALS";
 export const CLEAR_HOSPITALS_FOR_APPOINTMENT =
   "hospitals/CLEAR_HOSPITALS_FOR_APPOINTMENT";
 export const CLEAR_ALL_MO = "hospitals/CLEAR_ALL_MO";
+export const SET_DATA_LIST_FOR_TIMETABLE = "hospitals/SET_DATA_LIST_FOR_TIMETABLE"
+export const CLEAR_DATA_LIST_FOR_TIMETABLE = "hospitals/CLEAR_DATA_LIST_FOR_TIMETABLE"
 
 export const SET_APPOINTMENT_USER_DATA =
   "appointment/SET_APPOINTMENT_USER_DATA";

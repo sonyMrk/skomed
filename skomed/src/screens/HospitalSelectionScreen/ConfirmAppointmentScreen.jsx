@@ -16,7 +16,7 @@ import { AppBoldText } from "../../components/ui/AppBoldText";
 import { THEME } from "../../theme";
 import { AppTextInput } from "../../components/ui/AppTextInput";
 import { AppButton } from "../../components/ui/AppButton";
-import { ProfileInfoItem } from "../../components/InfoBlock";
+import { InfoItem } from "../../components/ui/InfoItem";
 import { Preloader } from "../../components/ui/Preloader";
 import { AppText } from "../../components/ui/AppText";
 import {
@@ -124,6 +124,12 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
           <AppBoldText style={styles.title}>
             Запись на прием к врачу
           </AppBoldText>
+          {shedule?.ErrorCode !== 0 && (
+            <AppBoldText style={styles.error}>{shedule?.ErrorDesc}</AppBoldText>
+          )}
+          {profileSpecsData?.ErrorCode !== 0 && (
+            <AppBoldText style={styles.error}>{profileSpecsData?.ErrorDesc}</AppBoldText>
+          )}
         </View>
         {/* Если в организации не стоит запрет на выбор врача при записи */}
         {!organization.DisableDoctorSelection && organization.OrgID === "0" && (
@@ -180,11 +186,11 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
             {/* Если не выбран пункт к узким специалистам */}
             {!profileSpecialistCheckbox && (
               <View style={styles.info}>
-                <ProfileInfoItem
+                <InfoItem
                   title="Ф.И.О"
                   value={appointmentUserData.FIO}
                 />
-                <ProfileInfoItem
+                <InfoItem
                   title="Участковый врач"
                   value={appointmentUserData.Doctor}
                 />

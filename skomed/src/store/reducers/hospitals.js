@@ -8,6 +8,8 @@ import {
   CLEAR_HOSPITALS_FOR_APPOINTMENT,
   SET_ALL_MO,
   CLEAR_ALL_MO,
+  SET_DATA_LIST_FOR_TIMETABLE,
+  CLEAR_DATA_LIST_FOR_TIMETABLE,
 } from "../types";
 
 const initialState = {
@@ -16,6 +18,7 @@ const initialState = {
   allMo: null,
   allHospitals: null,
   errorMessage: null,
+  dataListForTimetable: null
 };
 
 export const hospitalsReducer = (state = initialState, action) => {
@@ -82,6 +85,20 @@ export const hospitalsReducer = (state = initialState, action) => {
       };
     }
 
+    case SET_DATA_LIST_FOR_TIMETABLE: {
+      return {
+        ...state,
+        dataListForTimetable: action.payload
+      }
+    }
+
+    case CLEAR_DATA_LIST_FOR_TIMETABLE: {
+      return {
+        ...state,
+        dataListForTimetable: null
+      }
+    }
+    
     default:
       return state;
   }

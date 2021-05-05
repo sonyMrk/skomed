@@ -3,6 +3,9 @@ import {
   SET_USER_PROFILE,
   SET_USER_LOADING,
   SET_USER_ERROR,
+  SET_SICK_LIST_INFO,
+  CLEAR_SICK_LIST_INFO,
+  CLEAR_USER_ERROR
 } from "../types";
 
 const initialState = {
@@ -10,10 +13,25 @@ const initialState = {
   profile: null,
   isLoading: false,
   errorMessage: null,
+  sickList: null
 };
 
 export const userReducer = (state = initialState, action) => {
   switch (action.type) {
+    case SET_SICK_LIST_INFO: {
+      return {
+        ...state,
+        sickList: action.payload
+      }
+    }
+
+    case CLEAR_SICK_LIST_INFO: {
+      return {
+        ...state,
+        sickList: null
+      }
+    }
+    
     case SET_USER_DATA: {
       return {
         ...state,
@@ -35,6 +53,13 @@ export const userReducer = (state = initialState, action) => {
         ...state,
         errorMessage: action.payload,
       };
+    }
+
+    case CLEAR_USER_ERROR: {
+      return {
+        ...state,
+        errorMessage: null
+      }
     }
 
     case SET_USER_LOADING: {

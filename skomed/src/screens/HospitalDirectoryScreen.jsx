@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
+import * as Linking from 'expo-linking';
 
 import {
   clearHospitalsError,
@@ -20,36 +21,102 @@ import { Preloader } from "../components/ui/Preloader";
 import { AppBoldText } from "../components/ui/AppBoldText";
 import { THEME } from "../theme";
 import { AppTextInput } from "../components/ui/AppTextInput";
-import { AppButton } from "../components/ui/AppButton";
 import { AppText } from "../components/ui/AppText";
+import { InfoItem } from "../components/ui/InfoItem";
 import {
   getHospitalsLoadingState,
   getHospitalsErrorState,
   getAllMoTypes,
   getAllMoErrorDesc,
   getAllMoLocals,
-  getAllMOState,
+  getAllMoList,
 } from "../store/selectors/hospitals";
+
+export const MOItem = ({ mo }) => {
+  const [visibleInfo, setVisibleInfo] = useState(false);
+
+  const toggleVisibleInfo = () => {
+    setVisibleInfo(!visibleInfo);
+  };
+
+  const handlePressEmail = () => {
+    Linking.openURL(`mailto:${mo.Email}`)
+  };
+
+  const handlePressPhone = (tel) => {
+    Linking.openURL(`tel:${tel}`)
+  }
+
+  const handlePressSite = () => {
+    Linking.openURL(`https://${mo.Site}`)
+  }
+
+  return (
+    <View>
+      <TouchableOpacity onPress={toggleVisibleInfo}>
+        <View style={styles.item}>
+          <AppText>{mo.Name}</AppText>
+        </View>
+      </TouchableOpacity>
+      {visibleInfo && (
+        <View style={styles.moInfo}>
+          <InfoItem title="Населенный пункт" value={mo.City} />
+          <InfoItem title="Адрес" value={mo.Address} />
+          <InfoItem title="Время работы" value={mo.WorkTime} />
+          <InfoItem title="Эл. почта" value={mo.Email}>
+            {mo.Email && (
+              <TouchableOpacity onPress={handlePressEmail}>
+                <AppBoldText style={{ color: "#005ce6" }}>
+                  {mo.Email}
+                </AppBoldText>
+              </TouchableOpacity>
+            )}
+          </InfoItem>
+          <InfoItem title="Сайт организации" value={mo.Site}>
+            {mo.Site && (
+              <TouchableOpacity onPress={handlePressSite}>
+                <AppBoldText style={{ color: "#005ce6" }}>
+                  {mo.Site}
+                </AppBoldText>
+              </TouchableOpacity>
+            )}
+          </InfoItem>
+          <InfoItem title="Сайт организации" value={mo.Site}>
+            {mo.Phones && (
+              <View>
+                {mo.Phones.split(";").map((phone) => (
+                  <TouchableOpacity onPress={() => { handlePressPhone(phone) }} key={phone} >
+                    <AppBoldText
+                      style={{ color: "#005ce6", marginTop: 10 }}
+                    >
+                      {phone}
+                    </AppBoldText>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </InfoItem>
+        </View>
+      )}
+    </View>
+  );
+};
 
 export const HospitalDirectoryScreen = ({ navigation }) => {
   const [searchInput, setSearchInput] = useState("");
   const [localityValue, setLocalityValue] = useState(null);
   const [typeValue, setTypeValue] = useState(null);
 
-  const allmo = useSelector(getAllMOState);
   const isHospitalLoading = useSelector(getHospitalsLoadingState);
   const ErrorDesc = useSelector(getAllMoErrorDesc);
   const locals = useSelector(getAllMoLocals());
-  const types = useSelector(getAllMoTypes());
+  const types = useSelector(getAllMoTypes(localityValue));
   const hospitalsLoadError = useSelector(getHospitalsErrorState);
+  const MOList = useSelector(
+    getAllMoList(localityValue, typeValue, searchInput)
+  );
 
   const dispatch = useDispatch();
-
-  const searchOrganizations = () => {
-    console.log("localityValue", localityValue);
-    console.log("typeValue", typeValue);
-    Alert.alert("Пока не доступно", "Скоро заработает");
-  };
 
   useEffect(() => {
     dispatch(getAllMO());
@@ -66,18 +133,18 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
     }
   }, [locals]);
 
-  // useEffect(() => {
-  //   if (types) {
-  //     setTypeValue(types[0].value);
-  //   }
-  // }, [types]);
+  useEffect(() => {
+    if (types.length === 1) {
+      setTypeValue(types[0].value);
+    }
+  }, [types]);
 
   if (isHospitalLoading) {
     return <Preloader />;
   }
 
   return (
-    <ScrollView contentContainerStyle={{ flex: 1 }}>
+    <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
           {/* Выводим ошибки */}
@@ -142,7 +209,12 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
           placeholder="Поиск по строке"
           style={{ marginBottom: 15 }}
         />
-        <AppButton onPress={searchOrganizations}>Поиск</AppButton>
+        <View style={styles.moList}>
+          <View style={styles.header}>
+            <AppBoldText style={styles.title}>Мед. организации:</AppBoldText>
+          </View>
+          {MOList && MOList.map((mo) => <MOItem key={mo.Name} mo={mo} />)}
+        </View>
       </View>
     </ScrollView>
   );
@@ -154,11 +226,15 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   header: {
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   title: {
     textAlign: "center",
     fontSize: 18,
+    borderBottomColor: THEME.MAIN_COLOR,
+    borderBottomWidth: 2,
+    paddingBottom: 15,
+    marginBottom: 10,
   },
   error: {
     color: THEME.DANGER_COLOR,
@@ -167,9 +243,10 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: "center",
+    color: THEME.GRAY_COLOR,
   },
   select: {
-    marginBottom: 15,
+    marginBottom: 5,
   },
   item: {
     padding: 20,
@@ -177,6 +254,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 5,
     borderRadius: 10,
+  },
+  moList: {
+    flex: 1,
+    marginTop: 20,
+  },
+  moInfo: {
+    marginBottom: 10,
+    paddingHorizontal: 20,
   },
 });
 

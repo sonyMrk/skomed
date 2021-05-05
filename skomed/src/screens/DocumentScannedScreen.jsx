@@ -27,6 +27,12 @@ import {
   getHospitalsForSickListState,
 } from "../store/selectors/hospitals";
 import { BarScanner } from "../components/BarScanner";
+import {
+  getSickListInfo,
+  clearSickListInfo,
+  clearUserError,
+} from "../store/actions/user";
+import { InfoItem } from "../components/ui/InfoItem";
 
 const sickListTypes = [
   { label: "Больничный лист", value: 1 },
@@ -34,9 +40,48 @@ const sickListTypes = [
   { label: "Форма 083/у", value: 3 },
 ];
 
+const formatDate = (value) => {
+  return `${value.substring(6, 8)}.${value.substring(4, 6)}.${value.substring(
+    0,
+    4
+  )}`;
+};
+
+const SickListInfoBlock = ({ userSickListInfo }) => {
+  return (
+    <View>
+      <AppBoldText style={styles.title}>Больничный лист</AppBoldText>
+      <View style={styles.infoBlock}>
+        <InfoItem title="Пациент" value={userSickListInfo.Patient} />
+        <InfoItem title="Статус" value={userSickListInfo.Status} />
+        <InfoItem
+          title="Дата выдачи"
+          value={formatDate(userSickListInfo.DateIssue)}
+        />
+        <InfoItem
+          title="Дата продления"
+          value={formatDate(userSickListInfo.DateRenewal)}
+        />
+        <InfoItem
+          title="Дата закрытия"
+          value={formatDate(userSickListInfo.DateClosing)}
+        />
+        <InfoItem
+          title="Действителен"
+          value={
+            userSickListInfo.IsValid
+              ? "Мед. документ действителен"
+              : "Мед. документ не действителен"
+          }
+          color={userSickListInfo.IsValid ? "#1f7a1f" : THEME.DANGER_COLOR}
+        />
+      </View>
+    </View>
+  );
+};
+
 export const DocumentScannedScreen = ({ navigation }) => {
   const [isScanScreen, setIsScanScreen] = useState(false);
-  const [showScanner, setShowScanner] = useState(true);
 
   const [organization, setOrganization] = useState(null); // выбранная мед. организация
   const [listValue, setListValue] = useState("");
@@ -46,40 +91,56 @@ export const DocumentScannedScreen = ({ navigation }) => {
   const hospitals = useSelector(getHospitalsForSickListState);
   const hospitalsLoadError = useSelector(getHospitalsErrorState);
 
+  const userSickListError = useSelector((state) => state.user.errorMessage);
+  const userSickListloading = useSelector((state) => state.user.isLoading);
+  const userSickListInfo = useSelector((state) => state.user.sickList);
+
   const dispatch = useDispatch();
 
   const checkSickList = () => {
-    Alert.alert("Пока не доступно", "Скоро заработает");
-    console.log(organization.OrgId);
-    console.log(listValue);
-    console.log("Checking....");
+    dispatch(clearSickListInfo());
+    dispatch(getSickListInfo(organization.OrgID, listValue, typeSickList));
   };
 
   const handleScannedQRCode = (data) => {
     const searchParams = data.split("?")[1];
     const query = {};
     const pairs = searchParams.split("&");
+
     for (let i = 0; i < pairs.length; i++) {
       let pair = pairs[i].split("=");
       query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
     }
-    setShowScanner(false);
+
+    const orgId = query.orgid ? query.orgid : organization.OrgID;
+    const listNumber = query.number;
+    const doctype = query.doctype ? query.doctype : typeSickList;
+
+    dispatch(getSickListInfo(orgId, listNumber, doctype));
   };
 
   useEffect(() => {
     dispatch(getAllHospitals());
-
+    setTypeSickList(sickListTypes[0].value);
     return () => {
       dispatch(clearHospitalsError());
+      dispatch(clearSickListInfo());
+      dispatch(clearUserError());
     };
   }, []);
+
+  useEffect(() => {
+    if (hospitals) {
+      setOrganization(hospitals.Orgs[0].value);
+    }
+  }, [hospitals]);
 
   if (isHospitalLoading) {
     return <Preloader />;
   }
 
   return (
-    <ScrollView contentContainerStyle={{ flex: 1 }}>
+    <ScrollView contentContainerStyle={styles.flex}>
       <View style={styles.container}>
         <View style={styles.header}>
           <AppBoldText style={styles.title}>
@@ -88,10 +149,12 @@ export const DocumentScannedScreen = ({ navigation }) => {
           {/* Выводим ошибки */}
           {hospitalsLoadError ? (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-          ) : hospitals?.ErrorDesc ? (
+          ) : hospitals?.ErrorCode !== 0 ? (
             <AppBoldText style={styles.error}>
               {hospitals.ErrorDesc}
             </AppBoldText>
+          ) : userSickListError ? (
+            <AppBoldText style={styles.error}>{userSickListError}</AppBoldText>
           ) : null}
         </View>
         <View style={styles.toggleProfile}>
@@ -140,86 +203,108 @@ export const DocumentScannedScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
+        {/* Если включен режим сканирования: */}
         {isScanScreen ? (
-          <View style={{ flex: 1 }}>
-            {showScanner ? (
+          <View style={styles.flex}>
+
+            {/* Показывать сканер? */}
+            
+            {!userSickListInfo ? (
+              // Если нет данных показываем сканнер
               <BarScanner onScanned={handleScannedQRCode} />
-            ) : (
-              <View style={{ flex: 1 }}>
-                <AppBoldText>Информация о листе</AppBoldText>
-                {true && <Preloader />}
+              // Если идет загрузка данных показываем прелоадером
+            ) : userSickListloading ? <Preloader /> : (
+              <View style={styles.flex}>
+                {/* Выводим данные */}
+                <SickListInfoBlock userSickListInfo={userSickListInfo} />
                 <AppButton
                   onPress={() => {
-                    setShowScanner(true);
+                    dispatch(clearSickListInfo());
                   }}
                 >
                   Сканировать еще раз
                 </AppButton>
               </View>
             )}
+
           </View>
-        ) : (
-          <View>
-            {hospitals && (
-              <View style={styles.select}>
+        ) : // Если данные о листе не загружены:
+        !userSickListInfo ? (
+          <View style={styles.flex}>
+            {/* Если идет загрузка */}
+            {userSickListloading ? (
+              <Preloader />
+            ) : (
+              <View>
+                {/* Если список организаций загружен */}
+                {hospitals && (
+                  <View style={styles.select}>
+                    <View style={styles.header}>
+                      <AppText style={styles.subtitle}>
+                        Выберите мед. учреждение
+                      </AppText>
+                    </View>
+                    <RNPickerSelect
+                      placeholder={{}}
+                      value={organization}
+                      onValueChange={setOrganization}
+                      items={hospitals.Orgs}
+                      useNativeAndroidPickerStyle={false}
+                      style={{
+                        ...pickerSelectStyles,
+                      }}
+                      Icon={() => (
+                        <AntDesign name="medicinebox" size={20} color="white" />
+                      )}
+                    />
+                  </View>
+                )}
                 <View style={styles.header}>
                   <AppText style={styles.subtitle}>
-                    Выберите мед. учреждение
+                    Выберите тип документа
                   </AppText>
                 </View>
-                <RNPickerSelect
-                  placeholder={{
-                    label: "Выбрать мед. учреждение",
-                    value: null,
-                    color: THEME.MAIN_COLOR,
-                  }}
-                  value={organization}
-                  onValueChange={setOrganization}
-                  items={hospitals.Orgs}
-                  useNativeAndroidPickerStyle={false}
-                  style={{
-                    ...pickerSelectStyles,
-                  }}
-                  Icon={() => (
-                    <AntDesign name="medicinebox" size={20} color="white" />
-                  )}
+                <View style={styles.select}>
+                  <RNPickerSelect
+                    placeholder={{}}
+                    value={typeSickList}
+                    onValueChange={setTypeSickList}
+                    items={sickListTypes}
+                    useNativeAndroidPickerStyle={false}
+                    style={{
+                      ...pickerSelectStyles,
+                    }}
+                    Icon={() => (
+                      <AntDesign name="medicinebox" size={20} color="white" />
+                    )}
+                  />
+                </View>
+                <AppTextInput
+                  value={listValue}
+                  onChange={setListValue}
+                  placeholder="№ документа"
+                  type="numeric"
+                  style={{ marginBottom: 15 }}
                 />
+                <AppButton
+                  onPress={checkSickList}
+                  disabled={!listValue || !organization || !typeSickList}
+                >
+                  Проверить документ
+                </AppButton>
               </View>
             )}
-            <View style={styles.header}>
-              <AppText style={styles.subtitle}>Выберите тип документа</AppText>
-            </View>
-            <View style={styles.select}>
-              <RNPickerSelect
-                placeholder={{
-                  label: "Выбрать тип документа",
-                  value: null,
-                  color: THEME.MAIN_COLOR,
-                }}
-                value={typeSickList}
-                onValueChange={setTypeSickList}
-                items={sickListTypes}
-                useNativeAndroidPickerStyle={false}
-                style={{
-                  ...pickerSelectStyles,
-                }}
-                Icon={() => (
-                  <AntDesign name="medicinebox" size={20} color="white" />
-                )}
-              />
-            </View>
-            <AppTextInput
-              value={listValue}
-              onChange={setListValue}
-              placeholder="№ документа"
-              type="numeric"
-              style={{ marginBottom: 15 }}
-            />
+          </View>
+        ) : (
+          // Иначе выводим данные
+          <View style={styles.flex}>
+            <SickListInfoBlock userSickListInfo={userSickListInfo} />
             <AppButton
-              onPress={checkSickList}
-              disabled={!listValue || !organization || !typeSickList}
+              onPress={() => {
+                dispatch(clearSickListInfo());
+              }}
             >
-              Проверить документ
+              Вернуться назад
             </AppButton>
           </View>
         )}
@@ -233,8 +318,14 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
   },
+  flex: {
+    flex: 1,
+  },
   header: {
     paddingVertical: 10,
+  },
+  infoBlock: {
+    padding: 10,
   },
   title: {
     textAlign: "center",
@@ -250,6 +341,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: "center",
+    color: THEME.GRAY_COLOR,
   },
   select: {
     marginBottom: 15,
