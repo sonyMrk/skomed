@@ -40,5 +40,16 @@ export const hospitalApi = {
     
     const { data } = await axios.post("GetDataListsForTimetable", params);
     return data;
-  }
+  },
+
+  GetDoctorsTimetable: async (orgId, doctorId, cabinetId) => {
+    const params = new URLSearchParams();
+    params.append("OrgID", orgId);
+    params.append("DoctorGUID", doctorId);
+    params.append("CabinetGUID", cabinetId);
+
+    const { data } = await axios.post("GetDoctorsTimetable", params);
+    return data;
+  },
+  
 };

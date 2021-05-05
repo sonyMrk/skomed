@@ -10,6 +10,10 @@ import {
   CLEAR_ALL_MO,
   SET_DATA_LIST_FOR_TIMETABLE,
   CLEAR_DATA_LIST_FOR_TIMETABLE,
+  SET_DOCTORS_LIST_LOADING,
+  SET_DOCTORS_TIMETABLE,
+  SET_DOCTORS_TIMETABLE_LOADING,
+  CLEAR_DOCTORS_TIMETABLE
 } from "../types";
 
 const initialState = {
@@ -18,7 +22,10 @@ const initialState = {
   allMo: null,
   allHospitals: null,
   errorMessage: null,
-  dataListForTimetable: null
+  dataListForTimetable: null,
+  doctorsListLoading: false,
+  doctorTimetable: null,
+  doctorTimetableLoading: false
 };
 
 export const hospitalsReducer = (state = initialState, action) => {
@@ -98,7 +105,35 @@ export const hospitalsReducer = (state = initialState, action) => {
         dataListForTimetable: null
       }
     }
+
+    case SET_DOCTORS_LIST_LOADING: {
+      return {
+        ...state,
+        doctorsListLoading: action.payload
+      }
+    }
     
+    case SET_DOCTORS_TIMETABLE: {
+      return {
+        ...state,
+        doctorTimetable: action.payload
+      }
+    }
+
+    case SET_DOCTORS_TIMETABLE_LOADING: {
+      return {
+        ...state,
+        doctorTimetableLoading: action.payload
+      }
+    }
+
+    case CLEAR_DOCTORS_TIMETABLE: {
+      return {
+        ...state,
+        doctorTimetable: null,
+      }
+    }
+
     default:
       return state;
   }

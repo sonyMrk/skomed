@@ -39,6 +39,7 @@ export const BarScanner = ({ onScanned }) => {
   return (
     <View style={styles.container}>
       <BarCodeScanner
+        barCodeTypes="qr"
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />

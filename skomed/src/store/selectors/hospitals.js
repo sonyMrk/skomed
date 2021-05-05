@@ -3,6 +3,8 @@ const getHospitalsState = (state) => state.hospitals;
 export const getHospitalsLoadingState = (state) =>
   getHospitalsState(state).isLoading;
 
+export const getHospitalsErrorDesc = (state) => getAllHospitalsState(state)?.ErrorDesc;
+
 export const getHospitalsForAppointmentState = (state) =>
   getHospitalsState(state).hospitalsForAppointment;
 
@@ -71,6 +73,12 @@ export const getAllMoList = (localityValue, typeValue, searchInput) => (
 
 // для расписания врачей
 
-export const getDataListForTimetable = (state) => getHospitalsState(state)?.dataListForTimetable;
+export const getDataListForTimetableState = (state) => getHospitalsState(state)?.dataListForTimetable;
 
-export const getDoctorsList = (state) => getDataListForTimetable(state)?.ListsMap;
+export const getOrgDoctorsListState = (state) => getDataListForTimetableState(state)?.ListsMap;
+
+export const getOrgDoctorsListLoadingState = (state) => getHospitalsState(state)?.doctorsListLoading;
+
+export const getDoctorTimetableState = (state) => getHospitalsState(state)?.doctorTimetable?.Timetable;
+
+export const getDoctorTimetableLoadingState = (state) => getHospitalsState(state)?.doctorTimetableLoading;

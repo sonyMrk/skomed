@@ -20,16 +20,23 @@ import { AppTextInput } from "../components/ui/AppTextInput";
 import {
   createUserProfile,
   logout,
-  loadUserProfile,
   editFamilyPerson,
   removeFamilyPerson,
 } from "../store/actions/user";
 import { createFamilyPerson } from "./../store/actions/user";
+import {
+  getUserProfileState,
+  getUserDataState,
+  getUserLoadingState,
+  getUserErrorMessageState,
+} from "../store/selectors/user";
+
+
 
 export const ProfileScreen = ({ navigation }) => {
   const [editMode, setEditMode] = useState(false); // в каком режиме открывается модальное окно
   const [iin, setIin] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneValue, setPhoneValue] = useState("");
   const [familyPersonData, setFamilyPersonData] = useState({
     value: "",
     label: "",
@@ -37,10 +44,10 @@ export const ProfileScreen = ({ navigation }) => {
   // пустые значения при создании НОВОГО члена семьи
   const [modalVisible, setModalVisible] = useState(false); // открыто ли модальное окно
 
-  const userProfile = useSelector((state) => state.user.profile);
-  const isLoading = useSelector((state) => state.user.isLoading);
-  const info = useSelector((state) => state.user.userData);
-  const profileLoadError = useSelector((state) => state.user.errorMessage);
+  const userProfile = useSelector(getUserProfileState);
+  const isLoading = useSelector(getUserLoadingState);
+  const info = useSelector(getUserDataState);
+  const profileLoadError = useSelector(getUserErrorMessageState);
 
   const dispatch = useDispatch();
 
@@ -51,17 +58,17 @@ export const ProfileScreen = ({ navigation }) => {
         "Значение ИИН должно быть 12 цифр"
       );
     }
-    if (phone.length !== 10 || isNaN(phone)) {
+    if (phoneValue.length < 11 || isNaN(phoneValue)) {
       return Alert.alert(
         "Не корректный номер телефона",
-        "Значение телефона должно быть 10 цифр"
+        "Введите корректный номер телефона"
       );
     }
-    dispatch(createUserProfile({ iin, phone }));
-    setIin("");
-    setPhone("");
-  };
 
+    dispatch(createUserProfile({ iin, phone: `+7${phoneValue.slice(-10)}` }));
+    setIin("");
+    setPhoneValue("");
+  };
   // добавляем нового члена семьи
   const addFamilyPerson = (newMan) => {
     dispatch(createFamilyPerson(newMan));
@@ -222,13 +229,15 @@ export const ProfileScreen = ({ navigation }) => {
               onChange={setIin}
               type="numeric"
               style={{ marginBottom: 20 }}
+              maxLength={12}
             />
             <AppTextInput
-              placeholder="Номер телефона без первой цифры"
-              value={phone}
-              onChange={setPhone}
-              type="numeric"
+              placeholder="Номер телефона"
+              value={phoneValue}
+              onChange={setPhoneValue}
+              type="phone-pad"
               style={{ marginBottom: 20 }}
+              maxLength={12}
             />
             <AppButton
               style={{ paddingHorizontal: 55 }}

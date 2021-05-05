@@ -23,6 +23,24 @@ import { Preloader } from "../components/ui/Preloader";
 import { useDispatch } from "react-redux";
 import { loadUserProfile } from "../store/actions/user";
 import { SupportedHospitals } from "../screens/SupportedHospitals";
+import { RegistrationForVaccination } from "../screens/RegistrationForVaccination/RegistrationForVaccination";
+import { ConfirtmRegForVaccination } from "../screens/RegistrationForVaccination/ConfirtmRegForVaccination";
+import { WorkEvaluation } from "../screens/WorkEvaluation";
+import { getInitAppState, getAppNotificationsState } from "../store/selectors/app";
+
+const getDefaultScreenOptions = (title) => ({ navigation }) => ({
+  headerTitle: title,
+  headerLeft: () => (
+    <TouchableOpacity
+      style={{ padding: 10 }}
+      onPress={() => {
+        navigation.goBack();
+      }}
+    >
+      <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+    </TouchableOpacity>
+  ),
+})
 
 const MainStack = createStackNavigator();
 
@@ -39,26 +57,14 @@ const MainStackScreen = ({ navigation }) => {
       <MainStack.Screen
         name="Main"
         component={MainScreen}
-        options={({ navigation }) => ({
+        options={{
           headerTitle: "Главная",
-        })}
+        }}
       />
 
       <MainStack.Screen
         name="Appointment"
-        options={({ navigation }) => ({
-          headerTitle: "Запись на прием",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("Запись на прием")}
       >
         {(props) => (
           <HospitalSelectionScreen
@@ -70,19 +76,7 @@ const MainStackScreen = ({ navigation }) => {
 
       <MainStack.Screen
         name="HouseCallScreen"
-        options={({ navigation }) => ({
-          headerTitle: "Вызов врача на дом",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("Вызов врача на дом")}
       >
         {(props) => (
           <HospitalSelectionScreen
@@ -95,127 +89,61 @@ const MainStackScreen = ({ navigation }) => {
       <MainStack.Screen
         name="ConfirmHouseCallScreen"
         component={ConfirmHouseCallScreen}
-        options={({ navigation }) => ({
-          headerTitle: "Вызов врача на дом",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("Вызов врача на дом")}
       />
 
       <MainStack.Screen
         name="ConfirmAppointmentScreen"
         component={ConfirmAppointmentScreen}
-        options={({ navigation }) => ({
-          headerTitle: "Запись на прием",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("Запись на прием")}
       />
 
       <MainStack.Screen
         name="SupportedHospitals"
         component={SupportedHospitals}
-        options={({ navigation }) => ({
-          headerTitle: "Список доступных организций",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("Список доступных организций")}
       />
 
       <MainStack.Screen
         name="DrugSearchScreen"
         component={DrugSearchScreen}
-        options={({ navigation }) => ({
-          headerTitle: "Поиск лекарств",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("Поиск лекарств")}
       />
 
       <MainStack.Screen
         name="HospitalDirectoryScreen"
         component={HospitalDirectoryScreen}
-        options={({ navigation }) => ({
-          headerTitle: "Справочник мед. организаций",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("Справочник мед. организаций")}
       />
 
       <MainStack.Screen
         name="ScheduleScreen"
         component={ScheduleScreen}
-        options={({ navigation }) => ({
-          headerTitle: "График работы врачей",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("График работы врачей")}
       />
 
       <MainStack.Screen
         name="DocumentScannedScreen"
         component={DocumentScannedScreen}
-        options={({ navigation }) => ({
-          headerTitle: "Проверка мед. документа",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.goBack();
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
-            </TouchableOpacity>
-          ),
-        })}
+        options={getDefaultScreenOptions("Проверка мед. документа")}
+      />
+
+      <MainStack.Screen
+        name="RegistrationForVaccination"
+        component={RegistrationForVaccination}
+        options={getDefaultScreenOptions("Записаться на вакцинацую")}
+      />
+
+      <MainStack.Screen
+        name="ConfirtmRegForVaccination"
+        component={ConfirtmRegForVaccination}
+        options={getDefaultScreenOptions("Записаться на вакцинацую")}
+      />
+
+      <MainStack.Screen
+        name="WorkEvaluation"
+        component={WorkEvaluation}
+        options={getDefaultScreenOptions("Оценка работы врача")}
       />
     </MainStack.Navigator>
   );
@@ -244,17 +172,6 @@ const ProfileStackScreen = ({ navigation }) => {
               style={{ padding: 10 }}
               onPress={() => {
                 navigation.navigate("Main");
-                // сброс состояния
-                // navigation.dispatch(
-                //   CommonActions.reset({
-                //     index: 1,
-                //     routes: [
-                //       {
-                //         name: "Main",
-                //       },
-                //     ],
-                //   })
-                // );
               }}
             >
               <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
@@ -305,7 +222,8 @@ const NotificationStackScreen = ({ navigation }) => {
 const BottonmTabNavigation = createBottomTabNavigator();
 
 const AppNavigation = () => {
-  const isInit = useSelector((state) => state.app.isInitApp);
+  const isInit = useSelector(getInitAppState);
+  const notifications = useSelector(getAppNotificationsState);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -352,6 +270,7 @@ const AppNavigation = () => {
           component={NotificationStackScreen}
           options={{
             tabBarLabel: "Уведомления",
+            tabBarBadge: notifications?.length,
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="notifications-circle-outline"

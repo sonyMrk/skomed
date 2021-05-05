@@ -248,13 +248,6 @@ const styles = StyleSheet.create({
   select: {
     marginBottom: 5,
   },
-  item: {
-    padding: 20,
-    borderColor: THEME.MAIN_COLOR,
-    borderWidth: 1,
-    marginBottom: 5,
-    borderRadius: 10,
-  },
   moList: {
     flex: 1,
     marginTop: 20,
@@ -263,6 +256,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 20,
   },
+  item: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: THEME.MAIN_COLOR,
+    padding: 10,
+    marginBottom: 5
+  }
 });
 
 const pickerSelectStyles = StyleSheet.create({

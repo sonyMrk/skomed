@@ -32,19 +32,15 @@ import {
   getAppointmentProfileSpecLoadingState,
 } from "../../store/selectors/appointment";
 
-export const ConfirmAppointmentScreen = ({ navigation, route }) => {
-  const [profileSpecialistCheckbox, setProfileSpecialistCheckbox] = useState(
-    false
-  );
+export const ConfirtmRegForVaccination = ({ navigation, route }) => {
+
   const [appointmentTime, setAppointmentTime] = useState(null); // время приема
   const [appointmentData, setAppointmentData] = useState(null); // данные (id кабинета, массив свободныч часов, даты и т.д)
-  const [reason, setReason] = useState(""); // причина визита
 
   const [specialization, setSpecialization] = useState(null); // специализация обьект с массивом врачей, id, name, коды ошибок
   const [doctor, setDoctor] = useState(null); // обьект с доктором {"Doctor" : "", "DoctorID"}
 
   const iin = route.params.iin;
-  const organization = route.params.organization;
   const appointmentUserData = route.params.appointmentUserData;
   const profilePhone = route.params.profilePhone;
 
@@ -58,22 +54,15 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
     getAppointmentProfileSpecLoadingState
   );
 
-  const handleChangeProfileSpecialist = (value) => {
-    setProfileSpecialistCheckbox(value);
-    setAppointmentTime(null);
-  };
-
   const handleChangeSpecialization = (value) => {
     setSpecialization(value);
+    setDoctor(null)
   };
 
   const handleChangeDoctor = (value) => {
     setDoctor(value);
-    const orgId =
-      organization.OrgID === "0"
-        ? appointmentUserData.AttachmentID
-        : organization.OrgID;
-    const doctorId = value?.DoctorID;
+    const orgId =  appointmentUserData.AttachmentID;
+    const doctorId = value?.DoctorID;  // может быть null если выбран placeholder
     const profileId = specialization.GUID;
     if (doctorId) {
       dispatch(getShedule(orgId, doctorId, profileId));
@@ -81,51 +70,62 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
   };
 
   const handleChangeDate = (data) => {
-    setAppointmentTime(null);
+    setAppointmentTime(null);  // сбрасывать время при изменении даты
     setAppointmentData(data);
   };
 
   const saveAppointment = () => {
-    console.log("Запись на прием сохранена...");
+    Alert.alert("Запись на вакцину сохранена...");
   };
 
   useEffect(() => {
-    let orgId;
-    let doctorId;
-
-    if (organization.OrgID === "0") {
-      // если выбрана поликлиника прикрепления
-      orgId = appointmentUserData.AttachmentID;
-      if (!profileSpecialistCheckbox) {
-        // если в поликлинике прикрепления не выбраны узкие специалисты
-        doctorId = appointmentUserData.DoctorID;
-        dispatch(getShedule(orgId, doctorId));
-      } else {
-        dispatch(getProfileSpecsData(orgId));
-      }
-    } else {
-      orgId = organization.OrgID;
-      if (organization.DisableDoctorSelection) {
-        dispatch(getShedule(orgId));
-      } else {
-        dispatch(getProfileSpecsData(orgId));
-      }
-      // если другая мед организация
-    }
-
+    dispatch(getProfileSpecsData(appointmentUserData.AttachmentID));
     return () => {
       dispatch(clearShedule());
       dispatch(clearProfileSpecs());
     };
-  }, [profileSpecialistCheckbox]);
+  }, []);
+
+  useEffect(() => {
+    showAlert();
+  }, [])
+
+  const showAlert = () =>
+  Alert.alert(
+    "Какое то предупреждение",
+    "Если нажать ОК, то можно продолжать, если ОТМЕНА то вернемся на главную",
+    [
+      {
+        text: "Отмена",
+        onPress: () => {
+          navigation.navigate("Main")
+        },
+        style: "cancel",
+      },
+      {
+        text: "Ок",
+        onPress: () => {
+          Alert.alert(
+            "Вы ознакомились со всеми предупреждениями"
+          )
+        },
+        style: "default",
+      },
+    ],
+    {
+      cancelable: true,
+      onDismiss: () =>
+        Alert.alert(
+          "Вы ознакомились со всеми предупреждениями"
+        ),
+    }
+  );
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
-          <AppBoldText style={styles.title}>
-            Запись на прием к врачу
-          </AppBoldText>
+          <AppBoldText style={styles.title}>Запись на вакцинацию</AppBoldText>
           {shedule?.ErrorCode !== 0 && (
             <AppBoldText style={styles.error}>{shedule?.ErrorDesc}</AppBoldText>
           )}
@@ -135,70 +135,6 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
             </AppBoldText>
           )}
         </View>
-        {/* Если в организации не стоит запрет на выбор врача при записи */}
-        {!organization.DisableDoctorSelection && organization.OrgID === "0" && (
-          <View>
-            {/* Если в организации доступна запись к узким специалистам */}
-            {appointmentUserData.RegToProfileSpecs && (
-              <View style={styles.toggleProfile}>
-                <View style={styles.checkboxWrapper}>
-                  <TouchableOpacity
-                    onPress={() => handleChangeProfileSpecialist(false)}
-                    activeOpacity={0.5}
-                  >
-                    <View
-                      style={[
-                        styles.checkbox,
-                        !profileSpecialistCheckbox ? styles.activeCheckbox : {},
-                      ]}
-                    >
-                      <AppText
-                        style={{
-                          textAlign: "center",
-                          color: !profileSpecialistCheckbox ? "#fff" : "#000",
-                        }}
-                      >
-                        Запись к участковому
-                      </AppText>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.checkboxWrapper}>
-                  <TouchableOpacity
-                    onPress={() => handleChangeProfileSpecialist(true)}
-                    activeOpacity={0.5}
-                  >
-                    <View
-                      style={[
-                        styles.checkbox,
-                        profileSpecialistCheckbox ? styles.activeCheckbox : {},
-                      ]}
-                    >
-                      <AppText
-                        style={{
-                          textAlign: "center",
-                          color: profileSpecialistCheckbox ? "#fff" : "#000",
-                        }}
-                      >
-                        Запись к узким специалистам
-                      </AppText>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-            {/* Если не выбран пункт к узким специалистам */}
-            {!profileSpecialistCheckbox && (
-              <View style={styles.info}>
-                <InfoItem title="Ф.И.О" value={appointmentUserData.FIO} />
-                <InfoItem
-                  title="Участковый врач"
-                  value={appointmentUserData.Doctor}
-                />
-              </View>
-            )}
-          </View>
-        )}
         {/* Если загружается профили специализаций показываем прелоадер */}
         {isLoadingProfileSpecs ? (
           <Preloader />
@@ -313,23 +249,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
             </View>
           )
         )}
-        <View>
-          <View style={styles.header}>
-            <AppBoldText style={styles.title}>Причина визита</AppBoldText>
-          </View>
-          <View style={styles.input}>
-            <AppTextInput
-              placeholder="Причина вызова"
-              value={reason}
-              onChange={setReason}
-              multiline={true}
-              numberOfLines={4}
-              autoCapitalize="sentences"
-              style={{ height: 90, marginTop: 10 }}
-            />
-          </View>
-        </View>
-        <AppButton onPress={saveAppointment} disabled={!appointmentTime}>
+        <AppButton onPress={saveAppointment} disabled={!appointmentTime} style={{ marginTop: 20 }}>
           Записаться на прием
         </AppButton>
       </View>

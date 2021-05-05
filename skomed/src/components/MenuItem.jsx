@@ -5,20 +5,22 @@ import { Ionicons } from "@expo/vector-icons";
 import { AppBoldText } from "./ui/AppBoldText";
 import { THEME } from "../theme";
 
-export const MenuItem = ({ title, icon, navigateTo, onPress }) => {
+export const MenuItem = ({ title, icon, navigateTo, style, onPress }) => {
   const handlePress = () => {
     onPress(navigateTo);
   };
 
   return (
-    <View style={styles.item}>
+    <View style={{ ...styles.item, ...style }}>
       <TouchableOpacity style={styles.opacity} onPress={handlePress}>
-        <View style={styles.icon}>
-          <Ionicons name={icon} size={50} color={THEME.MAIN_COLOR} />
-        </View>
-        <View style={styles.title}>
-          <AppBoldText style={styles.text}>{title}</AppBoldText>
-        </View>
+          {icon && (
+            <View style={styles.icon}>
+              <Ionicons name={icon} size={50} color={THEME.MAIN_COLOR} />
+            </View>
+          )}
+          <View style={styles.title}>
+            <AppBoldText style={styles.text}>{title}</AppBoldText>
+          </View>
       </TouchableOpacity>
     </View>
   );
@@ -29,7 +31,6 @@ const styles = StyleSheet.create({
     flexGrow: 0,
     width: Dimensions.get("window").width / 3,
     height: Dimensions.get("window").width / 3,
-    // minHeight: 150,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    padding: 10
+    padding: 10,
   },
   text: {
     textAlign: "center",

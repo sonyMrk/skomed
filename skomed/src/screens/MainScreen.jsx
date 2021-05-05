@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, View, ImageBackground, ScrollView } from "react-native";
 
 import { MenuItem } from "../components/MenuItem";
+import { THEME } from "../theme";
 
 const mainMenuItems = [
   {
@@ -40,6 +41,22 @@ const mainMenuItems = [
     icon: "scan-circle-outline",
     navigateTo: "DocumentScannedScreen",
   },
+  {
+    id: "7",
+    title: "Подать заявку на вакцинацию",
+    icon: "pencil-outline",
+    navigateTo: "RegistrationForVaccination",
+    style: {
+      borderColor: THEME.DANGER_COLOR,
+      borderWidth: 2
+    }
+  },
+  {
+    id: "8",
+    title: "Оценить работу врача",
+    icon: "ios-scan-sharp",
+    navigateTo: "WorkEvaluation",
+  },
 ];
 
 export const MainScreen = ({ navigation }) => {
@@ -53,7 +70,7 @@ export const MainScreen = ({ navigation }) => {
         source={require("../../assets/images/main_bg.jpeg")}
         style={styles.image}
       >
-        <ScrollView>
+        <ScrollView contentContainerStyle={{ flex: 1 }}>
           <View style={styles.menu}>
             {mainMenuItems.map((item) => (
               <MenuItem {...item} key={item.id} onPress={onMenuItemPress} />

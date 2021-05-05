@@ -3,7 +3,6 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  Alert,
   TouchableOpacity,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -33,6 +32,7 @@ import {
   clearUserError,
 } from "../store/actions/user";
 import { InfoItem } from "../components/ui/InfoItem";
+import { getUserErrorMessageState, getUserLoadingState, getUserSickListState } from "../store/selectors/user";
 
 const sickListTypes = [
   { label: "Больничный лист", value: 1 },
@@ -91,9 +91,9 @@ export const DocumentScannedScreen = ({ navigation }) => {
   const hospitals = useSelector(getHospitalsForSickListState);
   const hospitalsLoadError = useSelector(getHospitalsErrorState);
 
-  const userSickListError = useSelector((state) => state.user.errorMessage);
-  const userSickListloading = useSelector((state) => state.user.isLoading);
-  const userSickListInfo = useSelector((state) => state.user.sickList);
+  const userSickListError = useSelector(getUserErrorMessageState);
+  const userSickListloading = useSelector(getUserLoadingState);
+  const userSickListInfo = useSelector(getUserSickListState);
 
   const dispatch = useDispatch();
 
@@ -151,7 +151,7 @@ export const DocumentScannedScreen = ({ navigation }) => {
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
           ) : hospitals?.ErrorCode !== 0 ? (
             <AppBoldText style={styles.error}>
-              {hospitals.ErrorDesc}
+              {hospitals?.ErrorDesc}
             </AppBoldText>
           ) : userSickListError ? (
             <AppBoldText style={styles.error}>{userSickListError}</AppBoldText>

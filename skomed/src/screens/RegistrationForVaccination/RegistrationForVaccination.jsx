@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Alert, ScrollView } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -33,11 +32,9 @@ import {
 } from "../../store/selectors/appointment";
 import { getUserIINState, getUserFamilyState, getUserPhoneState } from "../../store/selectors/user";
 
-export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
-  const isHouseCall = navigateTo === "ConfirmHouseCallScreen"; // запись на прием или вызов врача на дом
+export const RegistrationForVaccination = ({ navigation }) => {
 
   const [access, setAccess] = useState(false);
-  const [organization, setOrganization] = useState(null); // выбранная мед. организация
   const [iinInputValue, setIinInputValue] = useState(userIin); // Значение ИИН в форме
 
   const dispatch = useDispatch();
@@ -69,20 +66,12 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
       setAccess(false);
     };
   }, []);
-  // устанавливаем первую организацию в селект после загрузки орагнизаций
-  useEffect(() => {
-    if (hospitalsForAppointment) {
-      setOrganization(hospitalsForAppointment.Orgs[0].value);
-    }
-  }, [hospitalsForAppointment]);
+
 
   useEffect(() => {
-    // если выбрана организация и получены данные о пациенте:
-    if (organization && appointmentUserData) {
-      // Проверяем, если запись в поликлинику прикрепления:
-      if (organization.OrgID === "0") {
+    // если получены данные о пациенте:
+    if (appointmentUserData) {
         if (appointmentUserData.ErrorCode !== 0) {
-          // выводим еще раз ошибку если в начале не была выбрана поликлиника
           showError(
             // выводим ошибку
             "Запись недоступна",
@@ -101,26 +90,9 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
         } else {
           setAccess(true); // иначе устанавливаем флаг
         }
-      } else {
-        if(organization.ShowMessage) {
-          showError("Кабинет пациента", organization.MessageText);
-        }
-        // Проверяем, если ли запреты на запись
-        const errorUser = appointmentUserData?.OrgErrors?.find(
-          (orgError) => orgError.OrgID === organization.OrgID
-        );
-        // БАГ, ЕСЛИ НЕ ЗАГРУЗИЛИСЬ ДАННЫЕ, ТО МОЖНО ПЕРЕЙТИ ДАЛЬШЕ
-        if (errorUser) {
-          showError(
-            "Запись недоступна по следующим причинам:",
-            errorUser.ErrorText
-          );
-        } else {
-          setAccess(true);
-        }
-      }
+      
     }
-  }, [appointmentUserData, organization]);
+  }, [appointmentUserData]);
 
   const showError = (title, errorMessage) => {
     return Alert.alert(title, errorMessage);
@@ -146,11 +118,6 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
     setAccess(false);
     fetchData(value);
   };
-  // обработчик выбора организации
-  const handleChangeOrganization = (org) => {
-    setOrganization(org);
-    setAccess(false);
-  };
 
   const handleEndEditInn = () => {
     dispatch(clearUserData());
@@ -166,7 +133,6 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.header}>
-          {isHouseCall ? null : <AppBoldText style={styles.title}>Выбор мед организации</AppBoldText>}
           {/* Выводим ошибки */}
           {hospitalsLoadError ? (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
@@ -180,23 +146,6 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
             <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
           ) : null}
         </View>
-        {!isHouseCall && hospitalsForAppointment && (
-          <View style={styles.select}>
-            <RNPickerSelect
-              placeholder={{}}
-              value={organization}
-              onValueChange={handleChangeOrganization}
-              items={hospitalsForAppointment.Orgs}
-              useNativeAndroidPickerStyle={false}
-              style={{
-                ...pickerSelectStyles,
-              }}
-              Icon={() => (
-                <AntDesign name="medicinebox" size={20} color="white" />
-              )}
-            />
-          </View>
-        )}
         <View style={styles.input}>
           <AppTextInput
             placeholder="Введите ИИН"
@@ -233,9 +182,8 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
         <View style={styles.footer}>
           <AppButton
             onPress={() => {
-              navigation.navigate(navigateTo, {
+              navigation.navigate("ConfirtmRegForVaccination", {
                 iin: iinInputValue,
-                organization,
                 profilePhone,
                 appointmentUserData,
               });
