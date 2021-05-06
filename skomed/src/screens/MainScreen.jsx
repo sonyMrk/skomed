@@ -2,7 +2,6 @@ import React from "react";
 import { StyleSheet, View, ImageBackground, ScrollView } from "react-native";
 
 import { MenuItem } from "../components/MenuItem";
-import { THEME } from "../theme";
 
 const mainMenuItems = [
   {
@@ -43,13 +42,9 @@ const mainMenuItems = [
   },
   {
     id: "7",
-    title: "Подать заявку на вакцинацию",
+    title: "Вакцинация",
     icon: "pencil-outline",
     navigateTo: "RegistrationForVaccination",
-    style: {
-      borderColor: THEME.DANGER_COLOR,
-      borderWidth: 2,
-    },
   },
   {
     id: "8",

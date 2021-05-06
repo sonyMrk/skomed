@@ -91,7 +91,7 @@ export const getHospitalsForAppointment = () => async (dispatch) => {
     dispatch(setHospitalsLoading(true));
     const respHospitals = await hospitalApi.GetOrgListForAppointment();
     if (respHospitals.ErrorCode !== 0) {
-      dispatch(setHospitalsError(MOList.ErrorDesc));
+      dispatch(setHospitalsError(respHospitals.ErrorDesc));
     } else {
       const hospitals = respHospitals.Orgs
         ? respHospitals.Orgs.reduce(
@@ -115,7 +115,29 @@ export const getAllHospitals = () => async (dispatch) => {
     const respHospitals = await hospitalApi.GetOrgListForTimetable();
 
     if (respHospitals.ErrorCode !== 0) {
-      dispatch(setHospitalsError(MOList.ErrorDesc));
+      dispatch(setHospitalsError(respHospitals.ErrorDesc));
+    } else {
+      const hospitals = respHospitals.Orgs.reduce(
+        (prev, org) => [...prev, { label: org.Name, value: org }],
+        []
+      );
+      respHospitals.Orgs = hospitals;
+      dispatch(setAllHospitals(respHospitals));
+    }
+  } catch (error) {
+    dispatch(setHospitalsError("Ошибка при загрузки списка организаций"));
+  } finally {
+    dispatch(setHospitalsLoading(false));
+  }
+};
+
+export const getHospitalsForRaiting = () => async (dispatch) => {
+  try {
+    dispatch(setHospitalsLoading(true));
+    const respHospitals = await hospitalApi.GetOrgListForRaitings();
+
+    if (respHospitals.ErrorCode !== 0) {
+      dispatch(setHospitalsError(respHospitals.ErrorDesc));
     } else {
       const hospitals = respHospitals.Orgs.reduce(
         (prev, org) => [...prev, { label: org.Name, value: org }],

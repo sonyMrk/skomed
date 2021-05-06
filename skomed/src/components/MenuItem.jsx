@@ -57,13 +57,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   icon: {
-    flex: 2,
+    flex: 3,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 10
   },
   title: {
     flex: 1,
     padding: 10,
+    alignItems: "center",
+    justifyContent: "center"
   },
   text: {
     textAlign: "center",

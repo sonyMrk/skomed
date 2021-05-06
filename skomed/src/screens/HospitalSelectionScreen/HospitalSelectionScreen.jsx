@@ -204,6 +204,7 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
             />
           </View>
         )}
+        {/* Если пустой инпут и убрать фокус не показывать ошибку */}
         <View style={styles.input}>
           <AppTextInput
             placeholder="Введите ИИН"

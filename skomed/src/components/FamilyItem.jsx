@@ -22,16 +22,16 @@ export const FamilyItem = ({ label, iin, id, onDelete, onEdit }) => {
         <View style={styles.family__actions}>
           <View>
             <AppButton style={styles.btn} onPress={handlePressEdit}>
-              <Ionicons name="pencil" size={14} color="#fff" />
+              <Ionicons name="pencil" size={20} color="#fff" />
             </AppButton>
           </View>
           <View>
             <AppButton
               style={styles.btn}
-              color={THEME.DANGER_COLOR}
+              color={THEME.MAIN_COLOR}
               onPress={handlePressDel}
             >
-              <Ionicons name="trash" size={14} color="#fff" />
+              <Ionicons name="trash" size={20} color={THEME.DANGER_COLOR} />
             </AppButton>
           </View>
         </View>
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    flexBasis: 80,
+    flexBasis: 90,
   },
   family__row: {
     flexDirection: "row",
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   btn: {
-    borderRadius: 50,
+    borderRadius: 10,
     paddingHorizontal: 10,
   },
 });

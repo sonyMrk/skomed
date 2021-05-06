@@ -176,7 +176,7 @@ export const ProfileScreen = ({ navigation }) => {
                 <AppBoldText style={styles.title}>Семья</AppBoldText>
                 <View>
                   <AppButton
-                    color="#0066ff"
+                    color={THEME.MAIN_COLOR}
                     style={styles.btn}
                     onPress={openModalForAdd}
                   >

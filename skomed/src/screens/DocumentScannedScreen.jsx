@@ -22,22 +22,19 @@ import {
 } from "../store/selectors/hospitals";
 import { BarScanner } from "../components/BarScanner";
 import {
-  getSickListInfo,
+  GetMedicalDocInfo,
   clearSickListInfo,
   clearUserError,
+  getMedicalsDoctypes,
 } from "../store/actions/user";
 import { InfoItem } from "../components/ui/InfoItem";
 import {
   getUserErrorMessageState,
   getUserLoadingState,
   getUserSickListState,
+  getMedicalDoctypesState,
 } from "../store/selectors/user";
 
-const sickListTypes = [
-  { label: "Больничный лист", value: 1 },
-  { label: "Форма 086/у", value: 2 },
-  { label: "Форма 083/у", value: 3 },
-];
 
 const formatDate = (value) => {
   return `${value.substring(6, 8)}.${value.substring(4, 6)}.${value.substring(
@@ -94,11 +91,13 @@ export const DocumentScannedScreen = ({ navigation }) => {
   const userSickListloading = useSelector(getUserLoadingState);
   const userSickListInfo = useSelector(getUserSickListState);
 
+  const medicalDocTypes = useSelector(getMedicalDoctypesState)
+
   const dispatch = useDispatch();
 
   const checkSickList = () => {
     dispatch(clearSickListInfo());
-    dispatch(getSickListInfo(organization.OrgID, listValue, typeSickList));
+    dispatch(GetMedicalDocInfo(organization.OrgID, listValue, typeSickList.ID));
   };
 
   const handleScannedQRCode = (data) => {
@@ -111,16 +110,18 @@ export const DocumentScannedScreen = ({ navigation }) => {
       query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
     }
 
+    // БАГ - ВЫЛЕТАЕТ ЕСЛИ СКАНИРОВАТЬ НЕ ПОДХОДЯЩИЙ QR
+
     const orgId = query.orgid ? query.orgid : organization.OrgID;
     const listNumber = query.number;
     const doctype = query.doctype ? query.doctype : typeSickList;
 
-    dispatch(getSickListInfo(orgId, listNumber, doctype));
+    dispatch(GetMedicalDocInfo(orgId, listNumber, doctype));
   };
 
   useEffect(() => {
     dispatch(getAllHospitals());
-    setTypeSickList(sickListTypes[0].value);
+    dispatch(getMedicalsDoctypes())
     return () => {
       dispatch(clearHospitalsError());
       dispatch(clearSickListInfo());
@@ -133,6 +134,12 @@ export const DocumentScannedScreen = ({ navigation }) => {
       setOrganization(hospitals.Orgs[0].value);
     }
   }, [hospitals]);
+
+  useEffect(() => {
+    if(medicalDocTypes) {
+      setTypeSickList(medicalDocTypes.Types[0].value);
+    }
+  }, [medicalDocTypes])
 
   if (isHospitalLoading) {
     return <Preloader />;
@@ -266,13 +273,13 @@ export const DocumentScannedScreen = ({ navigation }) => {
                     Выберите тип документа
                   </AppText>
                 </View>
-                <View style={styles.select}>
+                {medicalDocTypes && <View style={styles.select}>
                   <RNPickerSelect
                     fixAndroidTouchableBug={true}
                     placeholder={{}}
                     value={typeSickList}
                     onValueChange={setTypeSickList}
-                    items={sickListTypes}
+                    items={medicalDocTypes.Types}
                     useNativeAndroidPickerStyle={false}
                     style={{
                       ...pickerSelectStyles,
@@ -281,7 +288,7 @@ export const DocumentScannedScreen = ({ navigation }) => {
                     //   <AntDesign name="medicinebox" size={20} color="white" />
                     // )}
                   />
-                </View>
+                </View>}
                 <AppTextInput
                   value={listValue}
                   onChange={setListValue}

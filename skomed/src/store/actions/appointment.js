@@ -86,25 +86,29 @@ export const getShedule = (orgId, doctorId, profileId) => async (dispatch) => {
   try {
     dispatch(setAppointmentLoadingShedule(true));
     const shedule = await hospitalApi.GetShedule(orgId, doctorId, profileId);
-    const dates = shedule.Dates.reduce((prev, date) => {
-      return [
-        ...prev, // форматируем для селекта выбора даты
-        {
-          label: date.DateView,
-          value: {
-            ...date,
-            Times: date.Times.reduce(
-              // форматируем для селекта выбора времени
-              (prev, time) => [...prev, { label: time.TimeStart, value: time }],
-              []
-            ),
-          },
-        },
-      ];
-    }, []);
 
-    shedule.Dates = dates;
-    dispatch(setAppointmentShedule(shedule));
+      const dates = shedule.Dates?.reduce((prev, date) => {
+        return [
+          ...prev, // форматируем для селекта выбора даты
+          {
+            label: date.DateView,
+            value: {
+              ...date,
+              Times: date.Times.reduce(
+                // форматируем для селекта выбора времени
+                (prev, time) => [
+                  ...prev,
+                  { label: time.TimeStart, value: time },
+                ],
+                []
+              ),
+            },
+          },
+        ];
+      }, []);
+
+      shedule.Dates = dates;
+      dispatch(setAppointmentShedule(shedule));
   } catch (error) {
     dispatch(setAppointmentError(error));
     console.log(error);

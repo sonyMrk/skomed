@@ -8,7 +8,8 @@ import {
   SET_USER_ERROR,
   SET_SICK_LIST_INFO,
   CLEAR_SICK_LIST_INFO,
-  CLEAR_USER_ERROR
+  CLEAR_USER_ERROR,
+  SET_MEDICAL_DOC_TYPES
 } from "../types";
 
 import { userApi } from "../../services/userApi";
@@ -47,12 +48,17 @@ export const clearSickListInfo = () => ({
   type: CLEAR_SICK_LIST_INFO,
 });
 
-export const getSickListInfo = (orgId, listNumber, docType = 1) => async (
+export const setMedicalDoctypes = (payload) => ({
+  type: SET_MEDICAL_DOC_TYPES,
+  payload
+})
+
+export const GetMedicalDocInfo = (orgId, listNumber, docType = 1) => async (
   dispatch
 ) => {
   try {
     dispatch(setUserLoading(true));
-    const sickListData = await userApi.GetSickListInfo(
+    const sickListData = await userApi.GetMedicalDocInfo(
       orgId,
       listNumber,
       docType
@@ -69,6 +75,29 @@ export const getSickListInfo = (orgId, listNumber, docType = 1) => async (
     dispatch(setUserLoading(false));
   }
 };
+
+export const getMedicalsDoctypes = () => async (dispatch) => {
+
+  try {
+    const medicalsType = await userApi.GetMedicalDocTypes();
+    if (medicalsType.ErrorCode !== 0) {
+      dispatch(setUserError(medicalsType.ErrorDesc));
+    } else {
+
+      const types = medicalsType.Types.reduce((prev, type) => {
+        return [...prev, { label: type.Name, value: type }]
+      }, [])
+
+      medicalsType.Types = types;
+
+      dispatch(setMedicalDoctypes(medicalsType));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(setUserError("Ошибка при загрузке типов документа"));
+  } 
+
+}
 
 const getProfile = async () => {
   const userData = await AsyncStorage.getItem("profile");

@@ -119,6 +119,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
     };
   }, [profileSpecialistCheckbox]);
 
+
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -398,6 +399,10 @@ const styles = StyleSheet.create({
     color: THEME.GRAY_COLOR,
   },
   profileActions: {},
+  error: {
+    textAlign: "center",
+    color: THEME.DANGER_COLOR
+  }
 });
 
 const pickerSelectStyles = StyleSheet.create({

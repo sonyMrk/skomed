@@ -5,7 +5,8 @@ import {
   SET_USER_ERROR,
   SET_SICK_LIST_INFO,
   CLEAR_SICK_LIST_INFO,
-  CLEAR_USER_ERROR
+  CLEAR_USER_ERROR,
+  SET_MEDICAL_DOC_TYPES
 } from "../types";
 
 const initialState = {
@@ -13,7 +14,8 @@ const initialState = {
   profile: null,
   isLoading: false,
   errorMessage: null,
-  sickList: null
+  sickList: null,
+  doctypes: null
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -22,6 +24,13 @@ export const userReducer = (state = initialState, action) => {
       return {
         ...state,
         sickList: action.payload
+      }
+    }
+
+    case SET_MEDICAL_DOC_TYPES: {
+      return {
+        ...state,
+        doctypes: action.payload
       }
     }
 

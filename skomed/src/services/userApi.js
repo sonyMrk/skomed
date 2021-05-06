@@ -8,13 +8,19 @@ export const userApi = {
     const { data } = await axios.post("GetPatientByIIN", params);
     return data;
   },
-  GetSickListInfo: async(OrgID, ListNumber, DocType) => {
+  GetMedicalDocInfo: async(OrgID, ListNumber, DocType) => {
     const params = new URLSearchParams();
     params.append("OrgID", OrgID);
-    params.append("ListNumber", ListNumber);
+    params.append("DocNumber", ListNumber);
     params.append("DocType", DocType);
 
-    const { data } = await axios.post("GetSickListInfo", params);
+    const { data } = await axios.post("GetMedicalDocInfo", params);
     return data;
+  },
+
+  GetMedicalDocTypes: async () => {
+    const {data} = await axios.post("GetMedicalDocTypes")
+
+    return data
   }
 };

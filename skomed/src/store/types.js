@@ -5,6 +5,7 @@ export const SET_USER_PROFILE = "user/SET_USER_PROFILE";
 export const SET_USER_ERROR = "user/SET_ERROR";
 export const SET_USER_LOADING = "user/SET_USER_LOADING";
 export const SET_SICK_LIST_INFO = "user/SET_SICK_LIST_INFO";
+export const SET_MEDICAL_DOC_TYPES = "user/SET_MEDICAL_DOC_TYPES";
 export const CLEAR_SICK_LIST_INFO = "user/CLEAR_SICK_LIST_INFO"
 export const CLEAR_USER_ERROR = "user/CLEAR_USER_ERROR"
 
