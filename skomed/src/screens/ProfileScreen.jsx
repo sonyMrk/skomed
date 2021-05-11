@@ -5,8 +5,10 @@ import {
   ScrollView,
   SafeAreaView,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import Checkbox from "expo-checkbox";
 import { useSelector, useDispatch } from "react-redux";
 
 import { AppButton } from "../components/ui/AppButton";
@@ -18,23 +20,30 @@ import { EditModal } from "../components/EditModal";
 import { InfoBlock } from "../components/InfoBlock";
 import { AppTextInput } from "../components/ui/AppTextInput";
 import {
-  createUserProfile,
   logout,
   editFamilyPerson,
   removeFamilyPerson,
+  clearUserError,
+  setIsVisibleConfirmCode,
+  checkAuthFormData,
+  createUserProfile,
 } from "../store/actions/user";
 import { createFamilyPerson } from "./../store/actions/user";
 import {
   getUserProfileState,
-  getUserDataState,
   getUserLoadingState,
   getUserErrorMessageState,
+  getIsVisibleConfirmCodeState,
+  getUserDataState,
 } from "../store/selectors/user";
+import { AppText } from "../components/ui/AppText";
 
 export const ProfileScreen = ({ navigation }) => {
   const [editMode, setEditMode] = useState(false); // в каком режиме открывается модальное окно
   const [iin, setIin] = useState("");
   const [phoneValue, setPhoneValue] = useState("");
+  const [confirmCode, setConfirmCode] = useState("");
+  const [hasConfirmCode, setHasConfirmCode] = useState(false);
   const [familyPersonData, setFamilyPersonData] = useState({
     value: "",
     label: "",
@@ -46,10 +55,21 @@ export const ProfileScreen = ({ navigation }) => {
   const isLoading = useSelector(getUserLoadingState);
   const info = useSelector(getUserDataState);
   const profileLoadError = useSelector(getUserErrorMessageState);
+  const isVisibleConfirmCodeField = useSelector(getIsVisibleConfirmCodeState);
 
   const dispatch = useDispatch();
 
-  const createProfile = () => {
+  useEffect(() => {
+    return () => {
+      dispatch(clearUserError());
+      dispatch(setIsVisibleConfirmCode(false));
+    };
+  }, []);
+
+  useEffect(() => {}, [userProfile]);
+
+  const checkFormData = () => {
+    dispatch(clearUserError());
     if (iin.trim().length !== 12 || isNaN(iin)) {
       Alert.alert("Не корректный ИИН", "Значение ИИН должно быть 12 цифр");
     } else if (phoneValue.length < 11 || isNaN(phoneValue)) {
@@ -58,11 +78,20 @@ export const ProfileScreen = ({ navigation }) => {
         "Введите корректный номер телефона"
       );
     } else {
-      dispatch(createUserProfile({ iin, phone: `+7${phoneValue.slice(-10)}` }));
+      dispatch(
+        checkAuthFormData({ iin, phone: phoneValue.slice(-10), hasConfirmCode })
+      );
       setIin("");
       setPhoneValue("");
     }
   };
+
+  const createProfile = () => {
+    dispatch(
+      createUserProfile({ iin, phone: phoneValue.slice(-10), confirmCode })
+    );
+  };
+
   // добавляем нового члена семьи
   const addFamilyPerson = (newMan) => {
     dispatch(createFamilyPerson(newMan));
@@ -150,7 +179,7 @@ export const ProfileScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.wrapper}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {userProfile ? (
+        {userProfile || info ? (
           <View style={styles.container}>
             <AppBoldText style={styles.title}>Данные пользователя</AppBoldText>
             {profileLoadError && (
@@ -158,7 +187,9 @@ export const ProfileScreen = ({ navigation }) => {
                 {profileLoadError}
               </AppBoldText>
             )}
-            {info && (
+            {!info ? (
+              <Preloader />
+            ) : (
               <InfoBlock infoData={info}>
                 <EditModal
                   visible={modalVisible}
@@ -211,11 +242,7 @@ export const ProfileScreen = ({ navigation }) => {
         ) : (
           <View style={styles.loginContainer}>
             {profileLoadError && (
-              <AppBoldText
-                style={{ color: THEME.DANGER_COLOR, marginBottom: 15 }}
-              >
-                {profileLoadError}
-              </AppBoldText>
+              <AppBoldText style={styles.error}>{profileLoadError}</AppBoldText>
             )}
             <AppTextInput
               placeholder="ИИН"
@@ -233,12 +260,46 @@ export const ProfileScreen = ({ navigation }) => {
               style={{ marginBottom: 20 }}
               maxLength={12}
             />
-            <AppButton
-              style={{ paddingHorizontal: 55 }}
-              onPress={() => createProfile()}
-            >
-              Далее
-            </AppButton>
+            {!isVisibleConfirmCodeField && (
+              <View>
+                <TouchableOpacity
+                  style={styles.checkboxWrapper}
+                  onPress={() => setHasConfirmCode(!hasConfirmCode)}
+                >
+                  <Checkbox
+                    style={styles.checkbox}
+                    value={hasConfirmCode}
+                    onValueChange={setHasConfirmCode}
+                    color={hasConfirmCode ? THEME.MAIN_COLOR : undefined}
+                  />
+                  <AppText>У меня уже есть код авторизации</AppText>
+                </TouchableOpacity>
+                <AppButton
+                  style={{ paddingHorizontal: 55 }}
+                  onPress={() => checkFormData()}
+                >
+                  Проверить
+                </AppButton>
+              </View>
+            )}
+            {isVisibleConfirmCodeField && (
+              <>
+                <AppTextInput
+                  placeholder="Проверочный код"
+                  value={confirmCode}
+                  onChange={setConfirmCode}
+                  type="phone-pad"
+                  style={{ marginBottom: 20, width: 140 }}
+                  maxLength={4}
+                />
+                <AppButton
+                  style={{ paddingHorizontal: 55 }}
+                  onPress={() => createProfile()}
+                >
+                  Далее
+                </AppButton>
+              </>
+            )}
           </View>
         )}
       </ScrollView>
@@ -253,7 +314,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
-    backgroundColor: THEME.MAIN_COLOR,
   },
   loginContainer: {
     backgroundColor: "white",
@@ -293,4 +353,17 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingHorizontal: 10,
   },
+  error: {
+    color: THEME.DANGER_COLOR,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  checkboxWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 15,
+    padding: 10,
+  },
+  checkbox: {},
 });

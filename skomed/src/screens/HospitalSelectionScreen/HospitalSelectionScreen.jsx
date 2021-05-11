@@ -41,6 +41,7 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
   const isHouseCall = navigateTo === "ConfirmHouseCallScreen"; // запись на прием или вызов врача на дом
 
   const [access, setAccess] = useState(false);
+  const [showSupportedHospitals, setShowSupportedHospitals] = useState(false);
   const [organization, setOrganization] = useState(null); // выбранная мед. организация
   const [iinInputValue, setIinInputValue] = useState(userIin); // Значение ИИН в форме
 
@@ -97,6 +98,7 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
           appointmentUserData.RegAvailable !== 1 ||
           appointmentUserData.HomeCallAvailable !== 1
         ) {
+          setShowSupportedHospitals(true);
           showError(
             //  выводим ошибку
             "Запись недоступна",
@@ -132,15 +134,13 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
 
   const fetchData = (iin) => {
     if (!iin) {
-      return Alert.alert("Не корректный ИИН", "Введите ИИН");
+      Alert.alert("Не корректный ИИН", "Введите ИИН");
+    } else if (iin.trim().length !== 12 || isNaN(iin)) {
+      Alert.alert("Не корректный ИИН", "Значение ИИН должно быть 12 цифр");
+    } else {
+      dispatch(getAppointmentUserData(iin));
+      setShowSupportedHospitals(false);
     }
-    if (iin.trim().length !== 12 || isNaN(iin)) {
-      return Alert.alert(
-        "Не корректный ИИН",
-        "Значение ИИН должно быть 12 цифр"
-      );
-    }
-    dispatch(getAppointmentUserData(iin));
   };
 
   // обработчик выбора ИИН из членов семьи
@@ -255,12 +255,14 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
           </AppButton>
         </View>
         <View style={styles.footer}>
-          <AppButton
-            wrapperStyle={{ width: "100%" }}
-            onPress={() => navigation.navigate("SupportedHospitals")}
-          >
-            Посмотреть список доступных организаций
-          </AppButton>
+          {showSupportedHospitals && (
+            <AppButton
+              wrapperStyle={{ width: "100%" }}
+              onPress={() => navigation.navigate("SupportedHospitals")}
+            >
+              Посмотреть список доступных организаций
+            </AppButton>
+          )}
         </View>
       </View>
     </ScrollView>

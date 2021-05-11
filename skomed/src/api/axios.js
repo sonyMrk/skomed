@@ -18,7 +18,6 @@ axios.interceptors.request.use((config) => {
 //   return config;
 // });
 
-
 // DEV
 
 // axios.interceptors.request.use((config) => {
@@ -28,6 +27,5 @@ axios.interceptors.request.use((config) => {
 //   config.baseURL = "http://192.168.10.245/srvbase/hs/PatientCab/";
 //   return config;
 // })
-
 
 export { axios };

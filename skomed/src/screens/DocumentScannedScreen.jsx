@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  View,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
@@ -34,7 +40,6 @@ import {
   getUserSickListState,
   getMedicalDoctypesState,
 } from "../store/selectors/user";
-
 
 const formatDate = (value) => {
   return `${value.substring(6, 8)}.${value.substring(4, 6)}.${value.substring(
@@ -91,7 +96,7 @@ export const DocumentScannedScreen = ({ navigation }) => {
   const userSickListloading = useSelector(getUserLoadingState);
   const userSickListInfo = useSelector(getUserSickListState);
 
-  const medicalDocTypes = useSelector(getMedicalDoctypesState)
+  const medicalDocTypes = useSelector(getMedicalDoctypesState);
 
   const dispatch = useDispatch();
 
@@ -103,25 +108,27 @@ export const DocumentScannedScreen = ({ navigation }) => {
   const handleScannedQRCode = (data) => {
     const searchParams = data.split("?")[1];
     const query = {};
-    const pairs = searchParams.split("&");
+    if (searchParams) {
+      const pairs = searchParams.split("&");
 
-    for (let i = 0; i < pairs.length; i++) {
-      let pair = pairs[i].split("=");
-      query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
+      for (let i = 0; i < pairs.length; i++) {
+        let pair = pairs[i].split("=");
+        query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || "");
+      }
+
+      const orgId = query.orgid ? query.orgid : organization.OrgID;
+      const listNumber = query.number;
+      const doctype = query.doctype ? query.doctype : typeSickList;
+
+      dispatch(GetMedicalDocInfo(orgId, listNumber, doctype));
+    } else {
+      Alert.alert("Ошибка сканирования", "Не корректный QR-код");
     }
-
-    // БАГ - ВЫЛЕТАЕТ ЕСЛИ СКАНИРОВАТЬ НЕ ПОДХОДЯЩИЙ QR
-
-    const orgId = query.orgid ? query.orgid : organization.OrgID;
-    const listNumber = query.number;
-    const doctype = query.doctype ? query.doctype : typeSickList;
-
-    dispatch(GetMedicalDocInfo(orgId, listNumber, doctype));
   };
 
   useEffect(() => {
     dispatch(getAllHospitals());
-    dispatch(getMedicalsDoctypes())
+    dispatch(getMedicalsDoctypes());
     return () => {
       dispatch(clearHospitalsError());
       dispatch(clearSickListInfo());
@@ -136,10 +143,10 @@ export const DocumentScannedScreen = ({ navigation }) => {
   }, [hospitals]);
 
   useEffect(() => {
-    if(medicalDocTypes) {
+    if (medicalDocTypes) {
       setTypeSickList(medicalDocTypes.Types[0].value);
     }
-  }, [medicalDocTypes])
+  }, [medicalDocTypes]);
 
   if (isHospitalLoading) {
     return <Preloader />;
@@ -273,22 +280,24 @@ export const DocumentScannedScreen = ({ navigation }) => {
                     Выберите тип документа
                   </AppText>
                 </View>
-                {medicalDocTypes && <View style={styles.select}>
-                  <RNPickerSelect
-                    fixAndroidTouchableBug={true}
-                    placeholder={{}}
-                    value={typeSickList}
-                    onValueChange={setTypeSickList}
-                    items={medicalDocTypes.Types}
-                    useNativeAndroidPickerStyle={false}
-                    style={{
-                      ...pickerSelectStyles,
-                    }}
-                    // Icon={() => (
-                    //   <AntDesign name="medicinebox" size={20} color="white" />
-                    // )}
-                  />
-                </View>}
+                {medicalDocTypes && (
+                  <View style={styles.select}>
+                    <RNPickerSelect
+                      fixAndroidTouchableBug={true}
+                      placeholder={{}}
+                      value={typeSickList}
+                      onValueChange={setTypeSickList}
+                      items={medicalDocTypes.Types}
+                      useNativeAndroidPickerStyle={false}
+                      style={{
+                        ...pickerSelectStyles,
+                      }}
+                      // Icon={() => (
+                      //   <AntDesign name="medicinebox" size={20} color="white" />
+                      // )}
+                    />
+                  </View>
+                )}
                 <AppTextInput
                   value={listValue}
                   onChange={setListValue}

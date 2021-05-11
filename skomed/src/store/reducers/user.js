@@ -6,7 +6,10 @@ import {
   SET_SICK_LIST_INFO,
   CLEAR_SICK_LIST_INFO,
   CLEAR_USER_ERROR,
-  SET_MEDICAL_DOC_TYPES
+  SET_MEDICAL_DOC_TYPES,
+  SET_AUTH_REQUEST,
+  CLEAR_AUTH_REQUEST,
+  SET_VISIBLE_CONFIRM_CODE_FIELD,
 } from "../types";
 
 const initialState = {
@@ -15,7 +18,9 @@ const initialState = {
   isLoading: false,
   errorMessage: null,
   sickList: null,
-  doctypes: null
+  doctypes: null,
+  authRequest: null,
+  isVisibleConfirmCodeField: true,
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -23,30 +28,28 @@ export const userReducer = (state = initialState, action) => {
     case SET_SICK_LIST_INFO: {
       return {
         ...state,
-        sickList: action.payload
-      }
+        sickList: action.payload,
+      };
     }
 
     case SET_MEDICAL_DOC_TYPES: {
       return {
         ...state,
-        doctypes: action.payload
-      }
+        doctypes: action.payload,
+      };
     }
 
     case CLEAR_SICK_LIST_INFO: {
       return {
         ...state,
-        sickList: null
-      }
+        sickList: null,
+      };
     }
-    
+
     case SET_USER_DATA: {
       return {
         ...state,
-        userData: {
-          ...action.payload,
-        },
+        userData: action.payload,
       };
     }
 
@@ -67,14 +70,35 @@ export const userReducer = (state = initialState, action) => {
     case CLEAR_USER_ERROR: {
       return {
         ...state,
-        errorMessage: null
-      }
+        errorMessage: null,
+      };
     }
 
     case SET_USER_LOADING: {
       return {
         ...state,
         isLoading: action.payload,
+      };
+    }
+
+    case SET_AUTH_REQUEST: {
+      return {
+        ...state,
+        authRequest: action.payload,
+      };
+    }
+
+    case CLEAR_AUTH_REQUEST: {
+      return {
+        ...state,
+        authRequest: null,
+      };
+    }
+
+    case SET_VISIBLE_CONFIRM_CODE_FIELD: {
+      return {
+        ...state,
+        isVisibleConfirmCodeField: action.payload,
       };
     }
 

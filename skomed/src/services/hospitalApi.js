@@ -16,13 +16,13 @@ export const hospitalApi = {
 
     const params = new URLSearchParams();
     params.append("Token", token);
-    params.append("AppVer", "2.0.0")
+    params.append("AppVer", "2.0.0");
     // console.log("String64", token)
     // console.log("Token", token);
 
     const { data } = await axios.post("GetOrgListForAppointment", params);
     // console.log(data);
-    // 101
+    // 1.0.1
     return data;
   },
 
@@ -75,5 +75,5 @@ export const hospitalApi = {
   GetOrgListForRaitings: async () => {
     const { data } = await axios.post("GetOrgListForRaitings");
     return data;
-  }
+  },
 };

@@ -43,7 +43,7 @@ export const EditModal = ({
     const newObj = {
       label: nameValue,
       value: iinValue,
-      id: personData.id
+      id: personData.id,
     };
     editPerson(newObj);
     closeModal();
@@ -63,6 +63,7 @@ export const EditModal = ({
               onChange={setIinValue}
               type="numeric"
               style={{ marginBottom: 12 }}
+              maxLength={12}
             />
             <AppTextInput
               placeholder="ФИО"

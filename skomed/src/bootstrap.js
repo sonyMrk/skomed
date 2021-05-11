@@ -9,15 +9,14 @@ export const bootstrap = async () => {
     });
 
     // await db.init()
-    // await AsyncStorage.getAllKeys((err, keys) => {
-    //   AsyncStorage.multiGet(keys, (error, stores) => {
-    //     stores.map((result, i, store) => {
-    //       console.log({ [store[i][0]]: store[i][1] });
-    //       return true;
-    //     });
-    //   });
-    // });
-
+    await AsyncStorage.getAllKeys((err, keys) => {
+      AsyncStorage.multiGet(keys, (error, stores) => {
+        stores.map((result, i, store) => {
+          console.log({ [store[i][0]]: store[i][1] });
+          return true;
+        });
+      });
+    });
   } catch (error) {
     console.log("Error ", error);
   }
