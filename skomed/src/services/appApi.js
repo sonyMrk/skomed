@@ -1,12 +1,10 @@
 import { axios } from "../api/axios";
 import { SECRET_KEY, SEPARATOR } from "../services/keys"
 import { formatter } from "../utils/formatToBase64";
+import { GetServerTime } from "./getServerTime";
+
 
 export const appApi = {
-  GetServerTime: async () => {
-    const { data } = await axios.post("GetServerTime");
-    return data;
-  },
   UpdateSubscriberData: async (
     SubscriberID,
     AuthToken,
@@ -18,7 +16,7 @@ export const appApi = {
     // // RAM,
     // // DisableSubscription
   ) => {
-    const dataTime = await appApi.GetServerTime();
+    const dataTime = await GetServerTime()
     const paramsString = `SubscriberID=${SubscriberID}&AuthToken=${AuthToken}&DeviceGUID=${DeviceGUID}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
 
@@ -26,10 +24,11 @@ export const appApi = {
     const token = await formatter.toSHA256(dataString64);
 
     const params = new URLSearchParams();
-    params.append("AppVer", "2.0.0");
+
     params.append("SubscriberID", SubscriberID);
     params.append("AuthToken", AuthToken);
     params.append("DeviceGUID", DeviceGUID);
+    params.append("AppVer", "2.0.0");
     // params.append("DeviceName", DeviceName);
     // params.append("OSVersion", OSVersion);
     // params.append("AppVersion", AppVersion);
@@ -42,8 +41,9 @@ export const appApi = {
     return data;
   },
 
-  GetNewMessagesCount: async (DeviceGUID, AuthToken) => {
-    const dataTime = await appApi.GetServerTime()
+  GetNewMessagesCount: async (DeviceGUID, AuthToken="") => {
+    
+    const dataTime = await GetServerTime()
     const paramsString = `DeviceGUID=${DeviceGUID}&AuthToken=${AuthToken}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
 
@@ -51,9 +51,10 @@ export const appApi = {
     const token = await formatter.toSHA256(dataString64);
 
     const params = new URLSearchParams();
-    params.append("AppVer", "2.0.0");
+    
     params.append("DeviceGUID", DeviceGUID);
     params.append("AuthToken", AuthToken);
+    params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
     console.log("GetNewMessagesCount token === ", token)
@@ -62,8 +63,9 @@ export const appApi = {
     return data;
   },
 
-  GetMessagesForUser: async (DeviceGUID, AuthToken) => {
-    const dataTime = await appApi.GetServerTime();
+  GetMessagesForUser: async (DeviceGUID, AuthToken="") => {
+
+    const dataTime = await GetServerTime()
     const paramsString = `DeviceGUID=${DeviceGUID}&AuthToken=${AuthToken}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
 
@@ -71,9 +73,10 @@ export const appApi = {
     const token = await formatter.toSHA256(dataString64);
 
     const params = new URLSearchParams();
-    params.append("AppVer", "2.0.0");
+    
     params.append("DeviceGUID", DeviceGUID);
     params.append("AuthToken", AuthToken);
+    params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
     console.log("GetMessagesForUser token === ", token)
@@ -83,7 +86,7 @@ export const appApi = {
   },
 
   ConfirmMessageViewingOnDevice: async (DeviceGUID, MessageGUID) => {
-    const dataTime = await appApi.GetServerTime();
+    const dataTime = await GetServerTime()
     const paramsString = `DeviceGUID=${DeviceGUID}&MessageGUID=${MessageGUID}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
 
@@ -91,9 +94,10 @@ export const appApi = {
     const token = await formatter.toSHA256(dataString64);
 
     const params = new URLSearchParams();
-    params.append("AppVer", "2.0.0");
+    
     params.append("DeviceGUID", DeviceGUID);
     params.append("MessageGUID", MessageGUID);
+    params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
     console.log("ConfirmMessageViewingOnDevice token === ", token)

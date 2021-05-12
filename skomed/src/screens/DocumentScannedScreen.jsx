@@ -49,19 +49,19 @@ const SickListInfoBlock = ({ userSickListInfo }) => {
     <View>
       <AppBoldText style={styles.title}>Больничный лист</AppBoldText>
       <View style={styles.infoBlock}>
-        <InfoItem title="Пациент" value={userSickListInfo.Patient} />
-        <InfoItem title="Статус" value={userSickListInfo.Status} />
+        <InfoItem title="Пациент" value={userSickListInfo.Patient ? userSickListInfo.Patient : "" } />
+        <InfoItem title="Статус" value={userSickListInfo.Status ? userSickListInfo.Status : ""} />
         <InfoItem
           title="Дата выдачи"
-          value={formatServerDate(userSickListInfo.DateIssue)}
+          value={formatServerDate(userSickListInfo.DateIssue ? userSickListInfo.DateIssue : "")}
         />
         <InfoItem
           title="Дата продления"
-          value={formatServerDate(userSickListInfo.DateRenewal)}
+          value={formatServerDate(userSickListInfo.DateRenewal ? userSickListInfo.DateRenewal : "")}
         />
         <InfoItem
           title="Дата закрытия"
-          value={formatServerDate(userSickListInfo.DateClosing)}
+          value={formatServerDate(userSickListInfo.DateClosing ? userSickListInfo.DateClosing : "")}
         />
         <InfoItem
           title="Действителен"
@@ -91,6 +91,7 @@ export const DocumentScannedScreen = ({ navigation }) => {
   const userSickListError = useSelector(getUserErrorMessageState);
   const userSickListloading = useSelector(getUserLoadingState);
   const userSickListInfo = useSelector(getUserSickListState);
+
 
   const medicalDocTypes = useSelector(getMedicalDoctypesState);
 

@@ -3,12 +3,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
-import * as Application from 'expo-application';
-import * as Device from 'expo-device';
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { Platform } from "react-native";
-
 
 import { NotificationStackScreen } from "./stacks/NotificationStackScreen";
 import { ProfileStackScreen } from "./stacks/ProfileStackScreen";
@@ -43,50 +40,14 @@ const AppNavigation = () => {
   const subscriberId = useSelector(getSubscriberIdState);
   const deviceId = useSelector(getDeviceIdState);
 
-
-  const [notification, setNotification] = useState(false);
+  console.log("PUSH_TOKEN", pushToken);
+  
   const notificationListener = useRef();
   const responseListener = useRef();
 
   const dispatch = useDispatch();
 
-  const registerForPushNotificationsAsync = async () => {
-    let token;
-    if (Constants.isDevice) {
-      const {
-        status: existingStatus,
-      } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        // alert("У вас стоит запрет на получение уведомлений!");
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
-    } else {
-      alert("Must use physical device for Push Notifications");
-    }
-
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-
-    return token;
-  };
-
-
   useEffect(() => {
-    dispatch(loadUserProfile());
-    dispatch(getSubscriberID());
-
     registerForPushNotificationsAsync()
       .then((token) => dispatch(setExpoPushToken(token)))
       .catch((error) => console.log(error));
@@ -94,14 +55,14 @@ const AppNavigation = () => {
     // Этот слушатель запускается всякий раз, когда приходит уведомление, когда приложение находится на переднем плане
     notificationListener.current = Notifications.addNotificationReceivedListener(
       (notification) => {
-        setNotification(notification);
+        console.log(notification);
       }
     );
 
-    // Этот слушатель запускается всякий раз, когда пользователь нажимает на уведомление или взаимодействует с ним (работает, когда приложение находится на переднем, фоновом или убитом)
+    // Этот слушатель запускается всякий раз, когда пользователь нажимает на уведомление или взаимодействует с ним (работает, когда приложение находится на переднем плане, в фоновом режиме или убито)
     responseListener.current = Notifications.addNotificationResponseReceivedListener(
       (response) => {
-        console.log("response", response);
+        console.log(response);
       }
     );
 
@@ -114,17 +75,22 @@ const AppNavigation = () => {
   }, []);
 
   useEffect(() => {
-    if(deviceId) {
-      dispatch(getMessageForUser(deviceId))
-      dispatch(getNewNotificationsCount(deviceId))
-    }
-  }, [deviceId])
+    dispatch(loadUserProfile());
+    dispatch(getSubscriberID());
+  }, []);
 
   useEffect(() => {
-    if(subscriberId) {
-      dispatch(updateSubscriberData(subscriberId))
+    if (deviceId) {
+      dispatch(getMessageForUser(deviceId));
+      dispatch(getNewNotificationsCount(deviceId));
     }
-  }, [subscriberId])
+  }, [deviceId]);
+
+  useEffect(() => {
+    if (subscriberId) {
+      dispatch(updateSubscriberData(subscriberId));
+    }
+  }, [subscriberId]);
 
   if (!isInit) {
     return <Preloader />;
@@ -176,11 +142,51 @@ const AppNavigation = () => {
               />
             ),
           }}
-        >
-        </BottonmTabNavigation.Screen>
+        ></BottonmTabNavigation.Screen>
       </BottonmTabNavigation.Navigator>
     </NavigationContainer>
   );
+};
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+const registerForPushNotificationsAsync = async () => {
+  let token;
+  if (Constants.isDevice) {
+    const {
+      status: existingStatus,
+    } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted") {
+      alert("У вас отключены push-уведомления!");
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    // console.log(token);
+  } else {
+    alert("Must use physical device for Push Notifications");
+  }
+
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FF231F7C",
+    });
+  }
+
+  return token;
 };
 
 export default AppNavigation;

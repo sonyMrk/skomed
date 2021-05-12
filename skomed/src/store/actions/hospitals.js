@@ -19,6 +19,8 @@ import {
   CLEAR_DATA_LIST_FOR_RAITING,
   SET_LIST_OF_WORKINDICATORS,
   CLEAR_LIST_OF_WORKINDICATORS,
+  SET_SCAN_DATA_LIST_FOR_RAITING,
+  CLEAR_SCAN_DATA_LIST_FOR_RAITING,
 } from "../types";
 import { hospitalApi } from "../../services/hospitalApi";
 
@@ -88,31 +90,42 @@ export const clearDataListForTimetable = () => ({
 });
 
 export const clearDoctorTimetable = () => ({
-  type: CLEAR_DOCTORS_TIMETABLE
-})
+  type: CLEAR_DOCTORS_TIMETABLE,
+});
 
 export const setDataListForRaiting = (payload) => ({
   type: SET_DATA_LIST_FOR_RAITING,
-  payload
-})
+  payload,
+});
 
 export const setDataListForRaitingLoading = (payload) => ({
   type: SET_DATA_LIST_FOR_RAITING_LOADING,
-  payload
-})
+  payload,
+});
 
 export const clearDataListForRaing = () => ({
-  type: CLEAR_DATA_LIST_FOR_RAITING
-})
+  type: CLEAR_DATA_LIST_FOR_RAITING,
+});
 
 export const setListOfWorkIndicators = (payload) => ({
   type: SET_LIST_OF_WORKINDICATORS,
-  payload
-})
+  payload,
+});
 
 export const clearListOfWorkIndicator = () => ({
-  type: CLEAR_LIST_OF_WORKINDICATORS
-})
+  type: CLEAR_LIST_OF_WORKINDICATORS,
+});
+
+export const setScanDataListForRaiting = (payload) => ({
+  type: SET_SCAN_DATA_LIST_FOR_RAITING,
+  payload,
+});
+
+export const clearScanDataListForRaiting = () => ({
+  type: CLEAR_SCAN_DATA_LIST_FOR_RAITING,
+});
+
+// THUNKS______________________________________________________________________________________________________________________________
 
 export const getHospitalsForAppointment = () => async (dispatch) => {
   try {
@@ -201,11 +214,32 @@ export const getDataListForRaiting = (orgId) => async (dispatch) => {
   } finally {
     dispatch(setDataListForRaitingLoading(false));
   }
-}
+};
 
-export const getListForWorkIndicator = (orgId) => async (dispatch) => {
+export const getScanDataListForRaiting = (orgId, cabId) => async (dispatch) => {
   try {
-    const respHospitals = await hospitalApi.GetListOfWorkIndicators(orgId);
+    dispatch(setDataListForRaitingLoading(true));
+    const respDataList = await hospitalApi.GetDataListsForRatings(orgId);
+
+    if (respDataList.ErrorCode !== 0) {
+      dispatch(setHospitalsError(respDataList.ErrorDesc));
+    } else {
+      const doctorsList = respDataList.ListsMap.filter(
+        (doc) => doc.CabinetGUID === cabId
+      ).reduce((prev, doc) => [...prev, { label: doc.Doctor, value: doc }], []);
+      respDataList.ListsMap = doctorsList;
+      dispatch(setScanDataListForRaiting(respDataList));
+    }
+  } catch (error) {
+    dispatch(setHospitalsError("Ошибка при загрузки списка врачей"));
+  } finally {
+    dispatch(setDataListForRaitingLoading(false));
+  }
+};
+
+export const getListForWorkIndicator = (typeId=1) => async (dispatch) => {
+  try {
+    const respHospitals = await hospitalApi.GetListOfWorkIndicators(typeId);
 
     if (respHospitals.ErrorCode !== 0) {
       dispatch(setHospitalsError(respHospitals.ErrorDesc));
@@ -215,7 +249,7 @@ export const getListForWorkIndicator = (orgId) => async (dispatch) => {
   } catch (error) {
     dispatch(setHospitalsError("Ошибка при загрузки списка организаций"));
   }
-}
+};
 
 export const getAllMO = () => async (dispatch) => {
   try {
@@ -257,7 +291,7 @@ export const getDataListForTimetable = (orgId) => async (dispatch) => {
     if (dataForTimeTable.ErrorCode !== 0) {
       dispatch(setHospitalsError(dataForTimeTable.ErrorDesc));
     } else {
-      const doctorsList = dataForTimeTable.ListsMap.reduce((prev, doc) => {
+      const doctorsList = dataForTimeTable?.ListsMap?.reduce((prev, doc) => {
         return [...prev, { label: doc.Doctor, value: doc }];
       }, []);
 
@@ -266,6 +300,7 @@ export const getDataListForTimetable = (orgId) => async (dispatch) => {
       dispatch(setDataListForTimeTable(dataForTimeTable));
     }
   } catch (error) {
+    console.log(error);
     dispatch(setHospitalsError("Ошибка при загрузки списка врачей"));
   } finally {
     dispatch(setDoctorsListLoading(false));
@@ -302,6 +337,7 @@ export const getDoctorTimetable = (orgId, doctorId, cabinetId) => async (
       dispatch(setDoctorTimetable(timetableData));
     }
   } catch (error) {
+    console.log(error);
     dispatch(setHospitalsError("Ошибка при загрузки расписания"));
   } finally {
     dispatch(setDoctorTimetableLoading(false));

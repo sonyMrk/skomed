@@ -95,7 +95,7 @@ export const getNewNotificationsCount = (deviceGUID) => async (
   try {
     const userProfile = await AsyncStorage.getItem("profile");
 
-    const authToken = userProfile?.AuthToken;
+    const authToken = JSON.parse(userProfile)?.AuthToken;;
 
     const respData = await appApi.GetNewMessagesCount(deviceGUID, authToken);
 
@@ -116,7 +116,7 @@ export const getMessageForUser = (deviceGUID) => async (
   try {
     const userProfile = await AsyncStorage.getItem("profile");
 
-    const authToken = userProfile?.AuthToken;
+    const authToken = JSON.parse(userProfile)?.AuthToken;
 
     const respData = await appApi.GetMessagesForUser(deviceGUID, authToken);
 
@@ -136,7 +136,7 @@ export const updateSubscriberData = (SubscriberID) => async (dispatch) => {
     const userProfile = await AsyncStorage.getItem("profile");
     const DeviceID = await AsyncStorage.getItem("deviceId");
 
-    const AuthToken = userProfile?.AuthToken;
+    const AuthToken = JSON.parse(userProfile)?.AuthToken;;
 
     if (!DeviceID) {
       const respData = await appApi.UpdateSubscriberData(
@@ -171,7 +171,7 @@ export const confirmMessageViewingOnDevice = (
 ) => async (dispatch) => {
   try {
     const userProfile = await AsyncStorage.getItem("profile");
-    const AuthToken = userProfile?.AuthToken;
+    const AuthToken = JSON.parse(userProfile)?.AuthToken;
 
     const respMessageData = await appApi.ConfirmMessageViewingOnDevice(
       deviceId,

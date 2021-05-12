@@ -75,7 +75,8 @@ export const ConfirmHouseCallScreen = ({ navigation, route }) => {
             placeholder="Телефон пациента"
             value={phone}
             onChange={setPhone}
-            type="numeric"
+            type="phone-pad"
+            maxLength={12}
             style={{ marginTop: 10 }}
           />
         </View>

@@ -83,7 +83,7 @@ export const ScheduleScreen = ({ navigation }) => {
         )
       );
     }
-  }, [organization, doctor]);
+  }, [doctor]);
 
   // обработчик выбора организации
   const handleChangeOrganization = (org) => {

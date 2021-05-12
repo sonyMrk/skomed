@@ -86,7 +86,33 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
   };
 
   const saveAppointment = () => {
-    console.log("Запись на прием сохранена...");
+    const orgId =
+      organization.OrgID === "0"
+        ? appointmentUserData.AttachmentID
+        : organization.OrgID;
+
+    let doctorId;
+    if (organization.OrgID === "0") {
+      if (!profileSpecialistCheckbox) {
+        // если в поликлинике прикрепления не выбраны узкие специалисты
+        doctorId = appointmentUserData.DoctorID;
+      } else {
+        doctorId = doctor.DoctorID;
+      }
+    } else {
+      doctorId = doctor.DoctorID;
+    }
+
+    console.log("IIN", iin);
+    console.log("OrgID", orgId);
+    console.log("DoctorID", doctorId);
+    console.log("Date", appointmentData.Date);
+    console.log("TimeStart", appointmentTime.TimeStart);
+    console.log("TimeEnd", appointmentTime.TimeEnd);
+    console.log("RecordingMethod", 1);
+    console.log("CabinetID", appointmentData.CabinetID);
+    console.log("Reason", reason);
+    console.log("Language", 1);
   };
 
   useEffect(() => {
@@ -118,7 +144,6 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
       dispatch(clearProfileSpecs());
     };
   }, [profileSpecialistCheckbox]);
-
 
   return (
     <ScrollView>
@@ -401,8 +426,8 @@ const styles = StyleSheet.create({
   profileActions: {},
   error: {
     textAlign: "center",
-    color: THEME.DANGER_COLOR
-  }
+    color: THEME.DANGER_COLOR,
+  },
 });
 
 const pickerSelectStyles = StyleSheet.create({

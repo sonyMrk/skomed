@@ -39,6 +39,7 @@ import {
 export const RegistrationForVaccination = ({ navigation }) => {
   const [access, setAccess] = useState(false);
   const [iinInputValue, setIinInputValue] = useState(userIin); // Значение ИИН в форме
+  const [showSupportedHospitals, setShowSupportedHospitals] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -84,6 +85,7 @@ export const RegistrationForVaccination = ({ navigation }) => {
         appointmentUserData.RegAvailable !== 1 ||
         appointmentUserData.HomeCallAvailable !== 1
       ) {
+        setShowSupportedHospitals(true);
         showError(
           //  выводим ошибку
           "Запись недоступна",
@@ -110,6 +112,7 @@ export const RegistrationForVaccination = ({ navigation }) => {
       );
     }
     dispatch(getAppointmentUserData(iin));
+    setShowSupportedHospitals(false);
   };
 
   // обработчик выбора ИИН из членов семьи
@@ -194,12 +197,14 @@ export const RegistrationForVaccination = ({ navigation }) => {
           </AppButton>
         </View>
         <View style={styles.footer}>
-          <AppButton
-            wrapperStyle={{ width: "100%" }}
-            onPress={() => navigation.navigate("SupportedHospitals")}
-          >
-            Посмотреть список доступных организаций
-          </AppButton>
+          {showSupportedHospitals && (
+            <AppButton
+              wrapperStyle={{ width: "100%" }}
+              onPress={() => navigation.navigate("SupportedHospitals")}
+            >
+              Посмотреть список доступных организаций
+            </AppButton>
+          )}
         </View>
       </View>
     </ScrollView>

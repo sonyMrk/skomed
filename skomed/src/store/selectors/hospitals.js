@@ -88,6 +88,8 @@ export const getDoctorTimetableLoadingState = (state) => getHospitalsState(state
 
 export const getDoctorsListForRaitingState = (state) => getHospitalsState(state).dataListForRaiting?.ListsMap;
 
+export const getScanDoctorsListForRaitingState = (state) => getHospitalsState(state).scanDataListForRaiting?.ListsMap;
+
 export const getDataListForRaitingLoadingState = (state) => getHospitalsState(state).dataListForRaitingLoading;
 
 export const getListForWorkIndicatorsState = (state) => getHospitalsState(state).listOfWorkIndicators;

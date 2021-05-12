@@ -86,6 +86,7 @@ export const ProfileScreen = ({ navigation }) => {
 
   const createProfile = () => {
     dispatch(
+      // БАГ НУЖНО СТИРАТЬ ОШИБКУ ПОСЛЕ АВТОРИЗАЦИИ
       createUserProfile({ iin, phone: phoneValue.slice(-10), confirmCode })
     );
   };
