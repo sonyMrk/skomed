@@ -3,7 +3,6 @@ const getHospitalsState = (state) => state.hospitals;
 export const getHospitalsLoadingState = (state) =>
   getHospitalsState(state).isLoading;
 
-export const getHospitalsErrorDesc = (state) => getAllHospitalsState(state)?.ErrorDesc;
 
 export const getHospitalsForAppointmentState = (state) =>
   getHospitalsState(state).hospitalsForAppointment;
@@ -82,3 +81,13 @@ export const getOrgDoctorsListLoadingState = (state) => getHospitalsState(state)
 export const getDoctorTimetableState = (state) => getHospitalsState(state)?.doctorTimetable?.Timetable;
 
 export const getDoctorTimetableLoadingState = (state) => getHospitalsState(state)?.doctorTimetableLoading;
+
+
+// для оценки работы врача
+
+
+export const getDoctorsListForRaitingState = (state) => getHospitalsState(state).dataListForRaiting?.ListsMap;
+
+export const getDataListForRaitingLoadingState = (state) => getHospitalsState(state).dataListForRaitingLoading;
+
+export const getListForWorkIndicatorsState = (state) => getHospitalsState(state).listOfWorkIndicators;

@@ -7,30 +7,55 @@ import {
   clearHospitalsError,
   clearAllHospitals,
   getHospitalsForRaiting,
+  getDataListForRaiting,
+  clearDataListForRaing,
+  clearListOfWorkIndicator,
+  getListForWorkIndicator,
 } from "../store/actions/hospitals";
 import { Preloader } from "../components/ui/Preloader";
+import { AppTextInput } from "../components/ui/AppTextInput";
 import { THEME } from "../theme";
 import {
   getHospitalsLoadingState,
   getAllHospitalsState,
   getHospitalsErrorState,
-  getHospitalsErrorDesc,
+  getDataListForRaitingLoadingState,
+  getDoctorsListForRaitingState,
+  getListForWorkIndicatorsState,
 } from "../store/selectors/hospitals";
 
 import { AppBoldText } from "../components/ui/AppBoldText";
 import { AppText } from "../components/ui/AppText";
 import { BarScanner } from "../components/BarScanner";
-import { getUserProfileState } from "../store/selectors/user";
+import { getUserProfileState, getUserIINState } from "../store/selectors/user";
 import { AppButton } from "./../components/ui/AppButton";
+
+const rateList = [
+  { label: "1", value: 1 },
+  { label: "2", value: 2 },
+  { label: "3", value: 3 },
+  { label: "4", value: 4 },
+  { label: "5", value: 5 },
+];
+
+// СДЕЛАТЬ КНОПКУ НЕ АКТИВНОЙ ЕСЛИ НЕ ВСЕ ОЦЕНКИ ПОСТАВЛЕНЫ
 
 export const WorkEvaluation = ({ navigation }) => {
   const isHospitalLoading = useSelector(getHospitalsLoadingState);
   const hospitals = useSelector(getAllHospitalsState);
   const hospitalsLoadError = useSelector(getHospitalsErrorState);
-  const hospitalsErrorDesc = useSelector(getHospitalsErrorDesc);
+  const dataListForRaitingLoading = useSelector(
+    getDataListForRaitingLoadingState
+  );
+  const doctorsList = useSelector(getDoctorsListForRaitingState);
+  const listOfWorkIndicators = useSelector(getListForWorkIndicatorsState);
+
+  const iin = useSelector(getUserIINState);
+
 
   const [data, setData] = useState(null);
   const [isScanScreen, setIsScanScreen] = useState(false);
+  const [raiting, setRaiting] = useState({})
 
   const userProfile = useSelector(getUserProfileState);
 
@@ -43,10 +68,37 @@ export const WorkEvaluation = ({ navigation }) => {
     dispatch(getHospitalsForRaiting());
 
     return () => {
+      setRaiting({})
+      dispatch(clearListOfWorkIndicator());
       dispatch(clearHospitalsError());
       dispatch(clearAllHospitals());
+      dispatch(clearDataListForRaing());
     };
   }, []);
+
+  useEffect(() => {
+    if (hospitals) {
+      setOrganization(hospitals.Orgs[0]);
+    }
+  }, [hospitals]);
+
+  useEffect(() => {
+    if (organization) {
+      dispatch(getDataListForRaiting(organization?.value.GUID));
+    }
+  }, [organization]);
+
+  useEffect(() => {
+    if (doctor) {
+      dispatch(getListForWorkIndicator(doctor.CabinetTypeID));
+    }
+  }, [doctor]);
+
+  useEffect(() => {
+    if (doctorsList) {
+      setDoctor(doctorsList[0]);
+    }
+  }, [doctorsList]);
 
   if (isHospitalLoading) {
     return <Preloader />;
@@ -59,6 +111,30 @@ export const WorkEvaluation = ({ navigation }) => {
   const handleNavigateOnProfile = () => {
     navigation.navigate("Profile");
   };
+
+  const handleChangeOrganization = (org) => {
+    dispatch(clearHospitalsError());
+    dispatch(clearDataListForRaing());
+    setOrganization(org);
+    dispatch(getDataListForRaiting(org.GUID));
+  };
+
+  const handleChangeDoctor = (doctor) => {
+    setDoctor(doctor);
+    dispatch(getListForWorkIndicator(doctor.CabinetTypeID));
+  };
+
+
+  const handlePressSetRate = () => {
+    console.log("iin", iin)
+    console.log("organizationId", organization.value.GUID);
+    console.log("DoctorGUID", doctor.value.DoctorGUID);
+    console.log("DoctorName", doctor.value.Doctor);
+    console.log("CabinetGUID", doctor.value.CabinetGUID);
+    console.log("CabinetName ", doctor.value.Cabinet);
+    console.log(Object.keys(raiting).map((key) => ({ [key] : raiting[key] })));
+  };
+
 
   if (!userProfile) {
     return (
@@ -86,6 +162,11 @@ export const WorkEvaluation = ({ navigation }) => {
         <View style={styles.header}>
           <AppBoldText style={styles.title}>Оценка работы врача</AppBoldText>
         </View>
+        {hospitalsLoadError ? (
+          <View style={styles.errorWrapper}>
+            <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
+          </View>
+        ) : null}
         <View style={styles.toggleProfile}>
           <View style={styles.checkboxWrapper}>
             <TouchableOpacity
@@ -132,13 +213,6 @@ export const WorkEvaluation = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-
-        {hospitalsLoadError ? (
-          <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-        ) : hospitalsErrorDesc ? (
-          <AppBoldText style={styles.error}>{hospitalsErrorDesc}</AppBoldText>
-        ) : null}
-
         {isScanScreen ? (
           <View style={styles.flex}>
             {/* Показывать сканер? */}
@@ -163,26 +237,91 @@ export const WorkEvaluation = ({ navigation }) => {
             )}
           </View>
         ) : (
-          <View style={styles.select}>
-            <View style={styles.header}>
-              <AppText style={styles.subtitle}>
-                Выберите мед. организацию
-              </AppText>
+          <View>
+            <View style={styles.select}>
+              <View style={styles.header}>
+                <AppText style={styles.subtitle}>
+                  Выберите мед. организацию
+                </AppText>
+              </View>
+              <RNPickerSelect
+                fixAndroidTouchableBug={true}
+                placeholder={{}}
+                value={organization}
+                onValueChange={handleChangeOrganization}
+                items={hospitals?.Orgs ? hospitals?.Orgs : []}
+                useNativeAndroidPickerStyle={false}
+                style={{
+                  ...pickerSelectStyles,
+                }}
+                // Icon={() => (
+                //   <AntDesign name="medicinebox" size={20} color="white" />
+                // )}
+              />
             </View>
-            <RNPickerSelect
-              fixAndroidTouchableBug={true}
-              placeholder={{}}
-              value={organization}
-              onValueChange={setOrganization}
-              items={hospitals?.Orgs ? hospitals?.Orgs : []}
-              useNativeAndroidPickerStyle={false}
-              style={{
-                ...pickerSelectStyles,
-              }}
-              // Icon={() => (
-              //   <AntDesign name="medicinebox" size={20} color="white" />
-              // )}
-            />
+            {dataListForRaitingLoading ? (
+              <Preloader style={{ marginTop: 15 }} />
+            ) : (
+              doctorsList && (
+                <View style={styles.select}>
+                  <View style={styles.header}>
+                    <AppText style={styles.subtitle}>Выберите врача</AppText>
+                  </View>
+                  <RNPickerSelect
+                    fixAndroidTouchableBug={true}
+                    placeholder={{}}
+                    value={doctor}
+                    onValueChange={handleChangeDoctor}
+                    items={doctorsList ? doctorsList : []}
+                    useNativeAndroidPickerStyle={false}
+                    style={{
+                      ...pickerSelectStyles,
+                    }}
+                    // Icon={() => (
+                    //   <AntDesign name="medicinebox" size={20} color="white" />
+                    // )}
+                  />
+                </View>
+              )
+            )}
+            {listOfWorkIndicators && (
+              <View style={styles.indicators}>
+                <View style={styles.header}>
+                  <AppText style={styles.subtitle}>
+                    Поставьте оценки от 1 - 5
+                  </AppText>
+                </View>
+                {listOfWorkIndicators.map((indicator) => {
+                  return (
+                    <View style={styles.indicators_item} key={indicator.GUID}>
+                      <AppBoldText key={indicator.GUID} style={{ textAlign: "center", marginBottom: 10 }}>
+                        {indicator.Name}
+                      </AppBoldText>
+                      <RNPickerSelect
+                        fixAndroidTouchableBug={true}
+                        placeholder={{
+                          value: null,
+                          color: THEME.MAIN_COLOR,
+                          label: "Выберите оценку"
+                        }}
+                        onValueChange={(value) => {
+                          setRaiting(prev => ({...prev, [indicator.GUID] : value}))
+                        }}
+                        items={rateList}
+                        useNativeAndroidPickerStyle={false}
+                        style={{
+                          ...pickerSelectStyles,
+                        }}
+                        // Icon={() => (
+                        //   <AntDesign name="medicinebox" size={20} color="white" />
+                        // )}
+                      />
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+            <AppButton onPress={handlePressSetRate}>Поставить оценку</AppButton>
           </View>
         )}
       </View>
@@ -211,6 +350,7 @@ const styles = StyleSheet.create({
   toggleProfile: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 15,
   },
   checkboxWrapper: {
     flexBasis: "48%",
@@ -234,11 +374,12 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     fontSize: 18,
-    // borderBottomColor: THEME.MAIN_COLOR,
-    // borderBottomWidth: 2,
     paddingBottom: 15,
     marginBottom: 10,
     marginTop: 15,
+  },
+  errorWrapper: {
+    marginBottom: 15,
   },
   error: {
     color: THEME.DANGER_COLOR,
@@ -252,29 +393,18 @@ const styles = StyleSheet.create({
   select: {
     marginBottom: 5,
   },
-  doctorInfo: {
-    backgroundColor: "#fff",
-    padding: 10,
-  },
-  table: {
-    borderWidth: 1,
-    borderColor: THEME.MAIN_COLOR,
-  },
-  head: {
-    height: 40,
-    backgroundColor: "#e0ebeb",
-  },
-  text: {
-    margin: 6,
-  },
   flex: {
     flex: 1,
   },
   scannerWrapper: {
     minHeight: 300,
   },
-  timetable: {},
-  item: {},
+  indicators: {
+    marginTop: 20,
+  },
+  indicators_item: {
+    marginBottom: 15,
+  },
 });
 
 const pickerSelectStyles = StyleSheet.create({

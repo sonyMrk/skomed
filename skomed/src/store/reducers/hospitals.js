@@ -14,6 +14,11 @@ import {
   SET_DOCTORS_TIMETABLE,
   SET_DOCTORS_TIMETABLE_LOADING,
   CLEAR_DOCTORS_TIMETABLE,
+  SET_DATA_LIST_FOR_RAITING,
+  SET_DATA_LIST_FOR_RAITING_LOADING,
+  CLEAR_DATA_LIST_FOR_RAITING,
+  SET_LIST_OF_WORKINDICATORS,
+  CLEAR_LIST_OF_WORKINDICATORS,
 } from "../types";
 
 const initialState = {
@@ -24,6 +29,8 @@ const initialState = {
   errorMessage: null,
   dataListForTimetable: null,
   dataListForRaiting: null,
+  dataListForRaitingLoading: false,
+  listOfWorkIndicators: null,
   doctorsListLoading: false,
   doctorTimetable: null,
   doctorTimetableLoading: false,
@@ -51,6 +58,7 @@ export const hospitalsReducer = (state = initialState, action) => {
         isLoading: action.payload,
       };
     }
+
     case SET_HOSPITALS_FOR_APPOINTMENT: {
       return {
         ...state,
@@ -133,6 +141,41 @@ export const hospitalsReducer = (state = initialState, action) => {
         ...state,
         doctorTimetable: null,
       };
+    }
+
+    case SET_DATA_LIST_FOR_RAITING: {
+      return {
+        ...state,
+        dataListForRaiting: action.payload,
+      };
+    }
+
+    case SET_DATA_LIST_FOR_RAITING_LOADING:{
+      return {
+        ...state,
+        dataListForRaitingLoading: action.payload
+      }
+    }
+
+    case CLEAR_DATA_LIST_FOR_RAITING: {
+      return {
+        ...state,
+        dataListForRaiting: null
+      }
+    }
+
+    case SET_LIST_OF_WORKINDICATORS: {
+      return {
+        ...state,
+        listOfWorkIndicators: action.payload
+      }
+    }
+
+    case CLEAR_LIST_OF_WORKINDICATORS: {
+      return {
+        ...state,
+        listOfWorkIndicators: null
+      }
     }
 
     default:

@@ -81,8 +81,6 @@ export const ProfileScreen = ({ navigation }) => {
       dispatch(
         checkAuthFormData({ iin, phone: phoneValue.slice(-10), hasConfirmCode })
       );
-      setIin("");
-      setPhoneValue("");
     }
   };
 
@@ -265,6 +263,7 @@ export const ProfileScreen = ({ navigation }) => {
                 <TouchableOpacity
                   style={styles.checkboxWrapper}
                   onPress={() => setHasConfirmCode(!hasConfirmCode)}
+                  activeOpacity={0.5}
                 >
                   <Checkbox
                     style={styles.checkbox}

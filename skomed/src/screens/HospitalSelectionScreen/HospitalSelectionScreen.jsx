@@ -133,13 +133,13 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
   };
 
   const fetchData = (iin) => {
-    if (!iin) {
-      Alert.alert("Не корректный ИИН", "Введите ИИН");
-    } else if (iin.trim().length !== 12 || isNaN(iin)) {
-      Alert.alert("Не корректный ИИН", "Значение ИИН должно быть 12 цифр");
-    } else {
-      dispatch(getAppointmentUserData(iin));
-      setShowSupportedHospitals(false);
+    if (iin) {
+      if (iin.trim().length !== 12 || isNaN(iin)) {
+        Alert.alert("Не корректный ИИН", "Значение ИИН должно быть 12 цифр");
+      } else {
+        dispatch(getAppointmentUserData(iin));
+        setShowSupportedHospitals(false);
+      }
     }
   };
 
@@ -204,7 +204,6 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
             />
           </View>
         )}
-        {/* Если пустой инпут и убрать фокус не показывать ошибку */}
         <View style={styles.input}>
           <AppTextInput
             placeholder="Введите ИИН"

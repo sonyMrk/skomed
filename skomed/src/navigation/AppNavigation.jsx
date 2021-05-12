@@ -3,9 +3,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
+import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 import { Platform } from "react-native";
+
+
 import { NotificationStackScreen } from "./stacks/NotificationStackScreen";
 import { ProfileStackScreen } from "./stacks/ProfileStackScreen";
 import { MainStackScreen } from "./stacks/MainStackScreen";
@@ -17,12 +21,15 @@ import {
   getNewNotificationsCountState,
   getExpoPushTokenState,
   getSubscriberIdState,
+  getDeviceIdState,
 } from "../store/selectors/app";
 import { loadUserProfile } from "../store/actions/user";
 import {
   getSubscriberID,
   setExpoPushToken,
   updateSubscriberData,
+  getMessageForUser,
+  getNewNotificationsCount,
 } from "../store/actions/app";
 
 // нижняя навигация
@@ -34,6 +41,8 @@ const AppNavigation = () => {
   const newNotificationsCount = useSelector(getNewNotificationsCountState);
   const pushToken = useSelector(getExpoPushTokenState);
   const subscriberId = useSelector(getSubscriberIdState);
+  const deviceId = useSelector(getDeviceIdState);
+
 
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
@@ -73,6 +82,7 @@ const AppNavigation = () => {
     return token;
   };
 
+
   useEffect(() => {
     dispatch(loadUserProfile());
     dispatch(getSubscriberID());
@@ -104,10 +114,17 @@ const AppNavigation = () => {
   }, []);
 
   useEffect(() => {
-    if (subscriberId && pushToken !== null) {
-      dispatch(updateSubscriberData(subscriberId, pushToken));
+    if(deviceId) {
+      dispatch(getMessageForUser(deviceId))
+      dispatch(getNewNotificationsCount(deviceId))
     }
-  }, [subscriberId, pushToken]);
+  }, [deviceId])
+
+  useEffect(() => {
+    if(subscriberId) {
+      dispatch(updateSubscriberData(subscriberId))
+    }
+  }, [subscriberId])
 
   if (!isInit) {
     return <Preloader />;
@@ -159,7 +176,8 @@ const AppNavigation = () => {
               />
             ),
           }}
-        />
+        >
+        </BottonmTabNavigation.Screen>
       </BottonmTabNavigation.Navigator>
     </NavigationContainer>
   );

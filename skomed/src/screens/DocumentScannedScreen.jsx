@@ -40,13 +40,9 @@ import {
   getUserSickListState,
   getMedicalDoctypesState,
 } from "../store/selectors/user";
+import { formatServerDate } from "../utils/formatDate";
 
-const formatDate = (value) => {
-  return `${value.substring(6, 8)}.${value.substring(4, 6)}.${value.substring(
-    0,
-    4
-  )}`;
-};
+
 
 const SickListInfoBlock = ({ userSickListInfo }) => {
   return (
@@ -57,15 +53,15 @@ const SickListInfoBlock = ({ userSickListInfo }) => {
         <InfoItem title="Статус" value={userSickListInfo.Status} />
         <InfoItem
           title="Дата выдачи"
-          value={formatDate(userSickListInfo.DateIssue)}
+          value={formatServerDate(userSickListInfo.DateIssue)}
         />
         <InfoItem
           title="Дата продления"
-          value={formatDate(userSickListInfo.DateRenewal)}
+          value={formatServerDate(userSickListInfo.DateRenewal)}
         />
         <InfoItem
           title="Дата закрытия"
-          value={formatDate(userSickListInfo.DateClosing)}
+          value={formatServerDate(userSickListInfo.DateClosing)}
         />
         <InfoItem
           title="Действителен"

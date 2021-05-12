@@ -26,7 +26,6 @@ import {
   getHospitalsErrorState,
   getOrgDoctorsListState,
   getOrgDoctorsListLoadingState,
-  getHospitalsErrorDesc,
   getDoctorTimetableState,
   getDoctorTimetableLoadingState,
 } from "../store/selectors/hospitals";
@@ -41,7 +40,6 @@ export const ScheduleScreen = ({ navigation }) => {
 
   const isHospitalLoading = useSelector(getHospitalsLoadingState);
   const hospitals = useSelector(getAllHospitalsState);
-  const hospitalsErrorDesc = useSelector(getHospitalsErrorDesc);
   const hospitalsLoadError = useSelector(getHospitalsErrorState);
 
   const doctorsList = useSelector(getOrgDoctorsListState);
@@ -114,8 +112,6 @@ export const ScheduleScreen = ({ navigation }) => {
           {/* Выводим ошибки */}
           {hospitalsLoadError ? (
             <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-          ) : hospitalsErrorDesc ? (
-            <AppBoldText style={styles.error}>{hospitalsErrorDesc}</AppBoldText>
           ) : null}
         </View>
         {hospitals && (

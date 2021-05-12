@@ -16,7 +16,7 @@ import {
 } from "../types";
 
 import { userApi } from "../../services/userApi";
-import { setInitApp } from "./app";
+import { setInitApp, updateSubscriberData } from "./app";
 
 export const setUserData = (payload) => ({
   type: SET_USER_DATA,
@@ -130,9 +130,10 @@ export const checkAuthFormData = (formData) => async (dispatch) => {
 
     const authRequest = await userApi.AuthorizationRequest(
       formData.iin,
-      formData.phone
+      formData.phone,
+      formData.hasConfirmCode
     );
-
+     
     if (authRequest.ErrorCode !== 0) {
       dispatch(setUserError(authRequest.ErrorDesc));
     } else {
@@ -158,6 +159,7 @@ export const createUserProfile = (formData) => async (dispatch) => {
     if (userData.ErrorCode !== 0) {
       dispatch(setUserError(userData.ErrorDesc));
     } else {
+      const subscriberId = AsyncStorage.getItem("subscriberId");
       const profile = {
         ...userData,
         phone: formData.phone,
@@ -166,6 +168,7 @@ export const createUserProfile = (formData) => async (dispatch) => {
       };
       setProfile(profile, dispatch);
       dispatch(loadUserProfile());
+      dispatch(updateSubscriberData(subscriberId));
     }
   } catch (error) {
     dispatch(setUserError("Ошибка при создании профиля"));

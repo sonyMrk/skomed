@@ -14,6 +14,11 @@ import {
   SET_DOCTORS_TIMETABLE,
   SET_DOCTORS_TIMETABLE_LOADING,
   CLEAR_DOCTORS_TIMETABLE,
+  SET_DATA_LIST_FOR_RAITING,
+  SET_DATA_LIST_FOR_RAITING_LOADING,
+  CLEAR_DATA_LIST_FOR_RAITING,
+  SET_LIST_OF_WORKINDICATORS,
+  CLEAR_LIST_OF_WORKINDICATORS,
 } from "../types";
 import { hospitalApi } from "../../services/hospitalApi";
 
@@ -86,6 +91,29 @@ export const clearDoctorTimetable = () => ({
   type: CLEAR_DOCTORS_TIMETABLE
 })
 
+export const setDataListForRaiting = (payload) => ({
+  type: SET_DATA_LIST_FOR_RAITING,
+  payload
+})
+
+export const setDataListForRaitingLoading = (payload) => ({
+  type: SET_DATA_LIST_FOR_RAITING_LOADING,
+  payload
+})
+
+export const clearDataListForRaing = () => ({
+  type: CLEAR_DATA_LIST_FOR_RAITING
+})
+
+export const setListOfWorkIndicators = (payload) => ({
+  type: SET_LIST_OF_WORKINDICATORS,
+  payload
+})
+
+export const clearListOfWorkIndicator = () => ({
+  type: CLEAR_LIST_OF_WORKINDICATORS
+})
+
 export const getHospitalsForAppointment = () => async (dispatch) => {
   try {
     dispatch(setHospitalsLoading(true));
@@ -152,6 +180,42 @@ export const getHospitalsForRaiting = () => async (dispatch) => {
     dispatch(setHospitalsLoading(false));
   }
 };
+
+export const getDataListForRaiting = (orgId) => async (dispatch) => {
+  try {
+    dispatch(setDataListForRaitingLoading(true));
+    const respDataList = await hospitalApi.GetDataListsForRatings(orgId);
+
+    if (respDataList.ErrorCode !== 0) {
+      dispatch(setHospitalsError(respDataList.ErrorDesc));
+    } else {
+      const doctorsList = respDataList.ListsMap.reduce(
+        (prev, doc) => [...prev, { label: doc.Doctor, value: doc }],
+        []
+      );
+      respDataList.ListsMap = doctorsList;
+      dispatch(setDataListForRaiting(respDataList));
+    }
+  } catch (error) {
+    dispatch(setHospitalsError("Ошибка при загрузки списка врачей"));
+  } finally {
+    dispatch(setDataListForRaitingLoading(false));
+  }
+}
+
+export const getListForWorkIndicator = (orgId) => async (dispatch) => {
+  try {
+    const respHospitals = await hospitalApi.GetListOfWorkIndicators(orgId);
+
+    if (respHospitals.ErrorCode !== 0) {
+      dispatch(setHospitalsError(respHospitals.ErrorDesc));
+    } else {
+      dispatch(setListOfWorkIndicators(respHospitals.Indicators));
+    }
+  } catch (error) {
+    dispatch(setHospitalsError("Ошибка при загрузки списка организаций"));
+  }
+}
 
 export const getAllMO = () => async (dispatch) => {
   try {
