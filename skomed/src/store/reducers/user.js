@@ -20,7 +20,7 @@ const initialState = {
   sickList: null,
   doctypes: null,
   authRequest: null,
-  isVisibleConfirmCodeField: true,
+  isVisibleConfirmCodeField: false,
 };
 
 export const userReducer = (state = initialState, action) => {

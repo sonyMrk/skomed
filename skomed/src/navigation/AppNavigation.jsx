@@ -27,7 +27,9 @@ import {
   updateSubscriberData,
   getMessageForUser,
   getNewNotificationsCount,
+  getHistoryAppointments
 } from "../store/actions/app";
+import { HistoryStackScreen } from "./stacks/HistoryStackScreen";
 
 // нижняя навигация
 
@@ -41,6 +43,7 @@ const AppNavigation = () => {
   const deviceId = useSelector(getDeviceIdState);
 
   console.log("PUSH_TOKEN", pushToken);
+  console.log("isInit", isInit)
   
   const notificationListener = useRef();
   const responseListener = useRef();
@@ -55,14 +58,14 @@ const AppNavigation = () => {
     // Этот слушатель запускается всякий раз, когда приходит уведомление, когда приложение находится на переднем плане
     notificationListener.current = Notifications.addNotificationReceivedListener(
       (notification) => {
-        console.log(notification);
+        // console.log(notification);
       }
     );
 
     // Этот слушатель запускается всякий раз, когда пользователь нажимает на уведомление или взаимодействует с ним (работает, когда приложение находится на переднем плане, в фоновом режиме или убито)
     responseListener.current = Notifications.addNotificationResponseReceivedListener(
       (response) => {
-        console.log(response);
+        // console.log(response);
       }
     );
 
@@ -77,6 +80,7 @@ const AppNavigation = () => {
   useEffect(() => {
     dispatch(loadUserProfile());
     dispatch(getSubscriberID());
+    dispatch(getHistoryAppointments());
   }, []);
 
   useEffect(() => {
@@ -127,6 +131,18 @@ const AppNavigation = () => {
             ),
           }}
         />
+        <BottonmTabNavigation.Screen
+          name="History"
+          component={HistoryStackScreen}
+          options={{
+            tabBarLabel: "История записей",
+            tabBarBadge:
+              newNotificationsCount > 0 ? newNotificationsCount : null,
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="file-tray-stacked-outline" size={25} color={color} />
+            ),
+          }}
+        ></BottonmTabNavigation.Screen>
         <BottonmTabNavigation.Screen
           name="Notification"
           component={NotificationStackScreen}

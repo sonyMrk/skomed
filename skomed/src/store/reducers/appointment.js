@@ -10,6 +10,11 @@ import {
   SET_APPOINTMENT_LOADING_SHEDULE,
   SET_APPOINTMENT_LOADING_PROFILE_SPECS,
   CLEAR_APPOINTMENT_ERROR,
+  SET_HOUSE_CALL_RESULT,
+  SET_SAVE_APPOINTMENT_RESULT,
+  SET_SAVE_APPOINTMENT_LOADING,
+  CLEAR_HOUSE_CALL_RESULT,
+  CLEAR_SAVE_APPOINTMENT_RESULT,
 } from "../types";
 
 const initialState = {
@@ -20,6 +25,9 @@ const initialState = {
   errorMessage: null,
   shedule: null,
   profileSpecsData: null,
+  saveHouseCallResult: null,
+  saveAppointmentResult: null,
+  saveAppointmentLoading: false
 };
 
 export const appointmentReducer = (state = initialState, action) => {
@@ -98,6 +106,41 @@ export const appointmentReducer = (state = initialState, action) => {
         ...state,
         errorMessage: null,
       };
+    }
+
+    case SET_HOUSE_CALL_RESULT: {
+      return {
+        ...state,
+        saveHouseCallResult: action.payload
+      }
+    }
+
+    case SET_SAVE_APPOINTMENT_RESULT: {
+      return {
+        ...state,
+        saveAppointmentResult: action.payload
+      }
+    }
+
+    case CLEAR_HOUSE_CALL_RESULT: {
+      return {
+        ...state,
+        saveHouseCallResult: null
+      }
+    }
+
+    case CLEAR_SAVE_APPOINTMENT_RESULT: {
+      return {
+        ...state,
+        saveAppointmentResult: null
+      }
+    }
+
+    case SET_SAVE_APPOINTMENT_LOADING: {
+      return {
+        ...state,
+        saveAppointmentLoading: action.payload
+      }
     }
 
     default:

@@ -8,6 +8,9 @@ import {
   SET_NOTIFICATIONS_ERROR,
   SET_NOTIFICATIONS_LOADING,
   SET_DEVICE_ID,
+  SET_HISTOTRY_APPOINTMENTS,
+  SET_HISTOTRY_APPOINTMENTS_ERROR,
+  SET_HISTOTRY_APPOINTMENTS_LOADING,
 } from "../types";
 import newId from "../../utils/newId";
 import { SET_SUBSCRIBER_ID } from "./../types";
@@ -52,6 +55,21 @@ export const setDeviceId = (payload) => ({
   payload,
 });
 
+export const setHistoryAppointments = (payload) => ({
+  type: SET_HISTOTRY_APPOINTMENTS,
+  payload
+})
+
+// export const setHistoryAppointmentsError = (payload) => ({
+//   type: SET_HISTOTRY_APPOINTMENTS_ERROR,
+//   payload
+// })
+
+// export const setHistoryAppointmentsLoading = (payload) => ({
+//   type: SET_HISTOTRY_APPOINTMENTS_LOADING,
+//   payload
+// })
+
 export const saveDeviceID = (deviceID) => async (dispatch) => { 
   try {
     const oldDeviceId = await AsyncStorage.getItem(
@@ -86,6 +104,29 @@ export const getSubscriberID = () => async (dispatch) => {
   } catch (error) {
     dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
     console.log("subscriberId", error);
+  }
+};
+
+export const getHistoryAppointments = () => async (dispatch) => {
+  try {
+    let history = await AsyncStorage.getItem("history");
+    
+    if (history) {
+      const parsedHistory = JSON.parse(history)
+      dispatch(setHistoryAppointments(parsedHistory));
+    } else {
+      await AsyncStorage.setItem(
+        "history",
+        JSON.stringify({
+          appointments: [],
+          houseCalls: []
+        })
+      );
+      dispatch(setHistoryAppointments([]));
+    }
+  } catch (error) {
+    dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
+    console.log("getHistoryAppointments", error);
   }
 };
 

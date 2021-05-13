@@ -14,3 +14,9 @@ export const getAppointmentSheduleState = (state) => getAppointmentState(state).
 export const getAppointmentSheduleLoadingState = (state) => getAppointmentState(state).isLoadingShedule
 
 export const getAppointmentProfileSpecLoadingState = (state) => getAppointmentState(state).isLoadingProfileSpecs
+
+export const getAppointmentHouseCallResultState = (state) => getAppointmentState(state).saveHouseCallResult
+
+export const getSaveAppointmentResultState = (state) => getAppointmentState(state).saveAppointmentResult
+
+export const getSaveAppointmentLoadingState = (state) => getAppointmentState(state).saveAppointmentLoading

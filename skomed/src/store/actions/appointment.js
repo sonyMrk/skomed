@@ -10,9 +10,17 @@ import {
   SET_APPOINTMENT_LOADING_SHEDULE,
   SET_APPOINTMENT_LOADING_PROFILE_SPECS,
   CLEAR_APPOINTMENT_ERROR,
+  SET_HOUSE_CALL_RESULT,
+  SET_SAVE_APPOINTMENT_RESULT,
+  SET_SAVE_APPOINTMENT_LOADING,
+  CLEAR_HOUSE_CALL_RESULT,
+  CLEAR_SAVE_APPOINTMENT_RESULT,
 } from "../types";
 import { userApi } from "../../services/userApi";
 import { hospitalApi } from "../../services/hospitalApi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getHistoryAppointments } from "./app";
+import { formatDateWithHourse } from "../../utils/formatDate";
 
 export const setAppointmentUserData = (payload) => ({
   type: SET_APPOINTMENT_USER_DATA,
@@ -65,6 +73,29 @@ export const clearAppointmentError = () => ({
   type: CLEAR_APPOINTMENT_ERROR,
 });
 
+export const setHouseCallResult = (payload) => ({
+  type: SET_HOUSE_CALL_RESULT,
+  payload
+})
+
+export const clearHouseCallResult = () => ({
+  type: CLEAR_HOUSE_CALL_RESULT
+})
+
+export const setAppointmentSaveResult = (payload) => ({
+  type: SET_SAVE_APPOINTMENT_RESULT,
+  payload
+})
+
+export const clearAppointmentSaveResult = () => ({
+  type: CLEAR_SAVE_APPOINTMENT_RESULT
+})
+
+export const setAppointmentSaveLoading = (payload) => ({
+  type: SET_SAVE_APPOINTMENT_LOADING,
+  payload
+})
+
 export const getAppointmentUserData = (iin) => async (dispatch) => {
   try {
     dispatch(clearAppointmentError());
@@ -75,7 +106,7 @@ export const getAppointmentUserData = (iin) => async (dispatch) => {
     }
     dispatch(setAppointmentUserData(userData));
   } catch (error) {
-    dispatch(setAppointmentError(error));
+    dispatch(setAppointmentError("Ошибка при получении данных о пользователе!"));
     console.log(error);
   } finally {
     dispatch(setAppointmentLoadingUserData(false));
@@ -110,7 +141,7 @@ export const getShedule = (orgId, doctorId, profileId) => async (dispatch) => {
       shedule.Dates = dates;
       dispatch(setAppointmentShedule(shedule));
   } catch (error) {
-    dispatch(setAppointmentError(error));
+    dispatch(setAppointmentError("Ошибка при получении данных о расписании!"));
     console.log(error);
   } finally {
     dispatch(setAppointmentLoadingShedule(false));
@@ -140,9 +171,68 @@ export const getProfileSpecsData = (orgId) => async (dispatch) => {
     profileSpecs.Profiles = profiles;
     dispatch(setAppointmentProfileSpecs(profileSpecs));
   } catch (error) {
-    dispatch(setAppointmentError(error));
+    dispatch(setAppointmentError("Ошибка при получении данных о специалистах!"));
     console.log(error);
   } finally {
     dispatch(setAppointmentLoadingProfileSpecs(false));
   }
 };
+
+
+export const saveAppointment = (info, iin, orgId, doctorId, date, TimeStart, timeEnd, recordingMethod, cabinetId, reason, language) => async (dispatch) => {
+  try {
+    dispatch(setAppointmentSaveLoading(true));
+
+    const respData = await hospitalApi.SaveAppointment(iin, orgId, doctorId, date, TimeStart, timeEnd, recordingMethod, cabinetId, reason, language)
+
+    if(respData.ErrorCode !== 0) {
+      dispatch(setAppointmentError(respData.ErrorDesc))
+    } else {
+      const history = await AsyncStorage.getItem("history");
+      const updateHistory = JSON.parse(history)
+      
+      updateHistory.appointments.push({...respData, ...info, iin, dateCancel: null})
+
+      await AsyncStorage.setItem("history", JSON.stringify(updateHistory))
+
+      dispatch(setAppointmentSaveResult({...respData, ...info, iin, dateCancel: null}))
+      dispatch(getHistoryAppointments())
+    }
+
+  } catch (error) {
+    dispatch(setAppointmentError("Ошибка при сохранении записи на прием!"));
+    console.log(error);
+  } finally {
+    dispatch(setAppointmentSaveLoading(false));
+  }
+}
+
+
+export const saveHouseCall = (info, iin, orgId, phoneNumber, reason, recordingMethod, language) => async (dispatch) => {
+  try {
+    dispatch(setAppointmentSaveLoading(true));
+
+    const respData = await hospitalApi.SaveDoctorCall(iin, orgId, phoneNumber, reason, recordingMethod, language)
+
+
+    if(respData.ErrorCode !== 0) {
+      dispatch(setAppointmentError(respData.ErrorDesc))
+    } else {
+      const history = await AsyncStorage.getItem("history");
+
+      const updateHistory = JSON.parse(history)
+
+      updateHistory.houseCalls.push({...respData, ...info, iin, dateCancel: null})
+
+      await AsyncStorage.setItem("history", JSON.stringify(updateHistory))
+
+      dispatch(setHouseCallResult(respData))
+      dispatch(getHistoryAppointments())
+    }
+  } catch (error) {
+    dispatch(setAppointmentError("Ошибка при сохранении вызова врача на дом!"));
+    console.log(error);
+  } finally {
+    dispatch(setAppointmentSaveLoading(false));
+  }
+}

@@ -24,13 +24,21 @@ import {
   clearShedule,
   getProfileSpecsData,
   clearProfileSpecs,
+  saveAppointment,
+  clearAppointmentError,
+  clearHouseCallResult,
+  clearAppointmentSaveResult,
 } from "../../store/actions/appointment";
 import {
   getAppointmentProfileSpecDataState,
   getAppointmentSheduleState,
   getAppointmentSheduleLoadingState,
   getAppointmentProfileSpecLoadingState,
+  getSaveAppointmentResultState,
+  getSaveAppointmentLoadingState,
+  getAppointmentErrorMessageState,
 } from "../../store/selectors/appointment";
+import { formatServerDate } from "../../utils/formatDate";
 
 export const ConfirmAppointmentScreen = ({ navigation, route }) => {
   const [profileSpecialistCheckbox, setProfileSpecialistCheckbox] = useState(
@@ -53,13 +61,18 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
   const shedule = useSelector(getAppointmentSheduleState);
   const profileSpecsData = useSelector(getAppointmentProfileSpecDataState);
 
+  const saveAppointmentResult = useSelector(getSaveAppointmentResultState);
+  const saveAppointmentLoading = useSelector(getSaveAppointmentLoadingState);
+
   const isLoadingShedule = useSelector(getAppointmentSheduleLoadingState);
   const isLoadingProfileSpecs = useSelector(
     getAppointmentProfileSpecLoadingState
   );
+  const appointmentError = useSelector(getAppointmentErrorMessageState);
 
   const handleChangeProfileSpecialist = (value) => {
     setProfileSpecialistCheckbox(value);
+    setDoctor(null);
     setAppointmentTime(null);
   };
 
@@ -85,13 +98,23 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
     setAppointmentData(data);
   };
 
-  const saveAppointment = () => {
+  const handleSaveAppointment = () => {
     const orgId =
       organization.OrgID === "0"
         ? appointmentUserData.AttachmentID
         : organization.OrgID;
 
+    const orgName =
+      organization.OrgID === "0"
+        ? appointmentUserData.Attachment
+        : organization.Name;
+
+    const doctorName =
+      // organization.OrgID === "0" &&  ? appointmentUserData.Doctor : doctor.Doctor;
+      doctor ? doctor.Doctor : appointmentUserData.Doctor;
+
     let doctorId;
+
     if (organization.OrgID === "0") {
       if (!profileSpecialistCheckbox) {
         // если в поликлинике прикрепления не выбраны узкие специалисты
@@ -103,21 +126,37 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
       doctorId = doctor.DoctorID;
     }
 
-    console.log("IIN", iin);
-    console.log("OrgID", orgId);
-    console.log("DoctorID", doctorId);
-    console.log("Date", appointmentData.Date);
-    console.log("TimeStart", appointmentTime.TimeStart);
-    console.log("TimeEnd", appointmentTime.TimeEnd);
-    console.log("RecordingMethod", 1);
-    console.log("CabinetID", appointmentData.CabinetID);
-    console.log("Reason", reason);
-    console.log("Language", 1);
+    const info = {
+      orgName,
+      doctorName,
+      timeStart: appointmentTime.TimeStart,
+      data: appointmentData.Date,
+      patientName: appointmentUserData.FIO,
+    };
+
+    dispatch(
+      saveAppointment(
+        info,
+        iin,
+        orgId,
+        doctorId,
+        appointmentData.Date,
+        appointmentTime.TimeStart,
+        appointmentTime.TimeEnd,
+        1,
+        appointmentData.CabinetID,
+        reason,
+        1,
+        orgName
+      )
+    );
   };
 
   useEffect(() => {
     let orgId;
     let doctorId;
+
+    dispatch(clearAppointmentError());
 
     if (organization.OrgID === "0") {
       // если выбрана поликлиника прикрепления
@@ -130,13 +169,13 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
         dispatch(getProfileSpecsData(orgId));
       }
     } else {
+      // если другая мед организация
       orgId = organization.OrgID;
       if (organization.DisableDoctorSelection) {
         dispatch(getShedule(orgId));
       } else {
         dispatch(getProfileSpecsData(orgId));
       }
-      // если другая мед организация
     }
 
     return () => {
@@ -144,6 +183,43 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
       dispatch(clearProfileSpecs());
     };
   }, [profileSpecialistCheckbox]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearHouseCallResult);
+      dispatch(clearAppointmentSaveResult());
+    };
+  }, []);
+
+  if (saveAppointmentLoading) {
+    return <Preloader />;
+  }
+
+  if (saveAppointmentResult) {
+    return (
+      <View style={styles.result}>
+        <View style={styles.header}>
+          <AppBoldText style={{ ...styles.title, color: "#009933" }}>
+            Вы успешно записались на прием!
+          </AppBoldText>
+        </View>
+        <AppText style={styles.result__text}>
+          Дата приема: {saveAppointmentResult.timeStart} -{" "}
+          {formatServerDate(saveAppointmentResult.data)}
+        </AppText>
+        <AppText style={styles.result__text}>
+          Номер талона {saveAppointmentResult.ReceiptNumber}
+        </AppText>
+        <AppButton
+          onPress={() => {
+            navigation.navigate("History");
+          }}
+        >
+          Перейти к истории записей
+        </AppButton>
+      </View>
+    );
+  }
 
   return (
     <ScrollView>
@@ -159,6 +235,9 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
             <AppBoldText style={styles.error}>
               {profileSpecsData?.ErrorDesc}
             </AppBoldText>
+          )}
+          {appointmentError && (
+            <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
           )}
         </View>
         {/* Если в организации не стоит запрет на выбор врача при записи */}
@@ -359,7 +438,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
             />
           </View>
         </View>
-        <AppButton onPress={saveAppointment} disabled={!appointmentTime}>
+        <AppButton onPress={handleSaveAppointment} disabled={!appointmentTime}>
           Записаться на прием
         </AppButton>
       </View>
@@ -371,6 +450,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
+  },
+  result: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 15,
+  },
+  result__text: {
+    textAlign: "center",
+    marginBottom: 10,
   },
   header: {
     paddingVertical: 10,

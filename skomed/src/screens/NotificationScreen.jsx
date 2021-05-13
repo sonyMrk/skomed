@@ -16,6 +16,8 @@ import { AppText } from "../components/ui/AppText";
 import { formatServerDate } from "../utils/formatDate";
 import { useState } from "react";
 import { confirmMessageViewingOnDevice } from "../store/actions/app";
+import { AppButton } from "../components/ui/AppButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const NotificationItem = ({ item, expoPushToken }) => {
   const [fullSize, setFullSize] = useState(false);
@@ -91,6 +93,7 @@ export const NotificationScreen = ({}) => {
             );
           })}
       </View>
+      <AppButton onPress={() => { AsyncStorage.clear() }}>Очистить хранилище</AppButton>
     </View>
   );
 };

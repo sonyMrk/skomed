@@ -37,6 +37,7 @@ import {
   getUserDataState,
 } from "../store/selectors/user";
 import { AppText } from "../components/ui/AppText";
+// import { getFarm } from "../api/axios";
 
 export const ProfileScreen = ({ navigation }) => {
   const [editMode, setEditMode] = useState(false); // в каком режиме открывается модальное окно
@@ -59,7 +60,13 @@ export const ProfileScreen = ({ navigation }) => {
 
   const dispatch = useDispatch();
 
+  // const getFarmData = async () => {
+  //   const data = await getFarm()
+  //   console.log(data)
+  // }
+
   useEffect(() => {
+    // getFarmData()
     return () => {
       dispatch(clearUserError());
       dispatch(setIsVisibleConfirmCode(false));
@@ -85,8 +92,8 @@ export const ProfileScreen = ({ navigation }) => {
   };
 
   const createProfile = () => {
+    dispatch(clearUserError())
     dispatch(
-      // БАГ НУЖНО СТИРАТЬ ОШИБКУ ПОСЛЕ АВТОРИЗАЦИИ
       createUserProfile({ iin, phone: phoneValue.slice(-10), confirmCode })
     );
   };

@@ -1,33 +1,52 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Alert, ScrollView } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
 import { AppBoldText } from "../../components/ui/AppBoldText";
 import { THEME } from "../../theme";
 import { AppTextInput } from "../../components/ui/AppTextInput";
 import { AppButton } from "../../components/ui/AppButton";
 import { AppText } from "../../components/ui/AppText";
+import { Preloader } from "../../components/ui/Preloader";
 import { defaultFormatDate } from "../../utils/formatDate";
+import {
+  getSaveAppointmentLoadingState,
+  getAppointmentErrorMessageState,
+  getAppointmentHouseCallResultState,
+} from "../../store/selectors/appointment";
+import { saveHouseCall, clearAppointmentSaveResult, clearHouseCallResult, clearAppointmentError } from "../../store/actions/appointment";
 
 export const ConfirmHouseCallScreen = ({ navigation, route }) => {
+  const [visibleInfo, setVisibleInfo] = useState(true)
+
   const iin = route.params.iin;
   const appointmentUserData = route.params.appointmentUserData;
   const profilePhone = route.params.profilePhone;
 
+
+  const appointmentError = useSelector(getAppointmentErrorMessageState)
+  const saveHouseCallResult = useSelector(getAppointmentHouseCallResultState);
+  const saveAppointmentLoading = useSelector(getSaveAppointmentLoadingState)
+
   const [phone, setPhone] = useState(profilePhone);
   const [reason, setReason] = useState("");
 
+  const dispatch = useDispatch()
+
   const callDoctor = () => {
-    console.log({
-      IIN: iin,
-      OrgID: appointmentUserData.AttachmentID,
-      PhoneNumber: phone,
-      Reason: reason,
-      RecordingMethod: 1,
-      Language: 1,
-    });
+    setVisibleInfo(false)
+    
+    const info = {
+      orgName: appointmentUserData.Attachment,
+      doctorName: appointmentUserData.Doctor,
+      patientName: appointmentUserData.FIO
+    };
+
+    dispatch(saveHouseCall(info, iin, appointmentUserData.AttachmentID, phone, reason, 1, 1))
   };
 
   useEffect(() => {
+    dispatch(clearAppointmentError())
     Alert.alert(
       "Справка",
       `
@@ -47,26 +66,52 @@ export const ConfirmHouseCallScreen = ({ navigation, route }) => {
       8)	ухудшение состояния у родильницы
     `
     );
+    return () => {
+      dispatch(clearAppointmentSaveResult())
+      dispatch(clearHouseCallResult())
+    }
   }, []);
+
+  if(saveAppointmentLoading) {
+    return <Preloader />
+  }
+
+  if(saveHouseCallResult) {
+    return (
+      <View style={styles.result}>
+        <AppBoldText style={styles.result__text}>
+          Дата {saveHouseCallResult.RegDateTime}
+        </AppBoldText>
+        <AppButton onPress={() => { navigation.navigate("History") }}>
+          Перейти к истории записей
+        </AppButton>
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
         <View style={styles.header}>
           <AppBoldText style={styles.title}>Вызов врача на дом</AppBoldText>
+          {appointmentError && (
+            <AppBoldText style={styles.error}>
+              {appointmentError}
+            </AppBoldText>
+          )}
         </View>
         <View style={styles.date}>
           <AppText>Дата вызова</AppText>
           <AppText>{defaultFormatDate(new Date())}</AppText>
         </View>
-        <View style={styles.info}>
+        {visibleInfo && <View style={styles.info}>
           <AppBoldText
             style={{ color: THEME.DANGER_COLOR, textAlign: "center" }}
           >
             Внимание! Обязательно укажите корректый номер телефона, по которому
             доктор сможет связаться с пациентом и подтвердить свой визит.
           </AppBoldText>
-        </View>
+        </View>}
         <View style={styles.input}>
           <AppBoldText style={{ textAlign: "center" }}>
             Телефон пациента
@@ -105,6 +150,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
   },
+  result: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 15,
+  },
+  result__text: {
+    textAlign: "center",
+    marginBottom: 10,
+  },
   header: {
     paddingVertical: 10,
   },
@@ -125,5 +180,9 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 15,
+  },
+  error: {
+    textAlign: "center",
+    color: THEME.DANGER_COLOR,
   },
 });

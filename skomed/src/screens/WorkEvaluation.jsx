@@ -92,6 +92,7 @@ export const WorkEvaluation = ({ navigation }) => {
   useEffect(() => {
     if (doctor) {
       dispatch(getListForWorkIndicator(doctor.CabinetTypeID));
+      console.log(doctor);
     }
   }, [doctor]);
 
@@ -136,6 +137,7 @@ export const WorkEvaluation = ({ navigation }) => {
     dispatch(clearHospitalsError());
     setRaiting({});
     dispatch(clearListOfWorkIndicator());
+    setDoctor(null)
     if (doctor) {
       dispatch(getListForWorkIndicator(doctor.CabinetTypeID));
     }
@@ -252,6 +254,13 @@ export const WorkEvaluation = ({ navigation }) => {
                   ) : (
                     doctorsList && (
                       <View style={styles.select}>
+                        {doctor && (
+                          <View style={styles.header}>
+                            <AppText style={styles.title_cab}>
+                              {doctor.Cabinet}
+                            </AppText>
+                          </View>
+                        )}
                         <View style={styles.header}>
                           <AppText style={styles.subtitle}>
                             Выберите врача
@@ -370,6 +379,11 @@ export const WorkEvaluation = ({ navigation }) => {
             ) : (
               doctorsList && (
                 <View style={styles.select}>
+                  {doctor && (
+                    <View style={styles.header}>
+                      <AppText style={styles.title_cab}>{doctor.Cabinet}</AppText>
+                    </View>
+                  )}
                   <View style={styles.header}>
                     <AppText style={styles.subtitle}>Выберите врача</AppText>
                   </View>
@@ -502,6 +516,14 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     marginBottom: 10,
     marginTop: 15,
+  },
+  title_cab: {
+    textAlign: "center",
+    fontSize: 18,
+    marginTop: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 2,
+    borderColor: THEME.MAIN_COLOR
   },
   errorWrapper: {
     marginBottom: 15,

@@ -1,7 +1,31 @@
-import { format } from "date-fns";
+import { format, compareAsc, formatDistanceToNow  } from "date-fns";
+import ru from "date-fns/locale/ru"
 
 export const defaultFormatDate = (date) => {
   return format(date, "dd.MM.yyyy");
+};
+
+export const formatDateWithHourse = (date) => {
+  return format(date, "dd.MM.yyyy HH:mm");
+};
+
+export const compareAscDate = (date1, date2) => {
+  return compareAsc(date1, date2);
+};
+
+export const formatDataDistance = (data) => {
+  return formatDistanceToNow (data, { locale: ru })
+}
+
+
+export const formatDateForHistory = (date, time) => {
+  const year = date.substring(0, 4);
+  const month = date.substring(4, 6);
+  const day = date.substring(6, 8);
+  const houre = time.substring(0, 2);
+  const min = time.substring(3, 5);
+
+  return new Date(`${year}-${month}-${day}T${houre}:${min}`)
 };
 
 export const formatServerDate = (value) => {
@@ -12,4 +36,3 @@ export const formatServerDate = (value) => {
     value.substring(10, 12) ? ":" + value.substring(10, 12) : ""
   }`;
 };
-

@@ -7,6 +7,9 @@ import {
   SET_NOTIFICATIONS_ERROR,
   SET_NOTIFICATIONS_LOADING,
   SET_DEVICE_ID,
+  SET_HISTOTRY_APPOINTMENTS,
+  SET_HISTOTRY_APPOINTMENTS_ERROR,
+  SET_HISTOTRY_APPOINTMENTS_LOADING,
 } from "../types";
 
 const initialState = {
@@ -17,7 +20,10 @@ const initialState = {
   newNotificationsCount: 0,
   expoPushToken: null,
   subscriberId: null,
-  deviceId: null
+  deviceId: null,
+  historyAppointments: null,
+  historyAppointmentsLoading: false,
+  historyAppointmentsError: null
 };
 
 export const appReducer = (state = initialState, action) => {
@@ -77,6 +83,27 @@ export const appReducer = (state = initialState, action) => {
         newNotificationsCount: action.payload,
       };
     }
+
+    case SET_HISTOTRY_APPOINTMENTS: {
+      return {
+        ...state,
+        historyAppointments: action.payload
+      }
+    }
+
+    // case SET_HISTOTRY_APPOINTMENTS_ERROR: {
+    //   return {
+    //     ...state,
+    //     historyAppointmentsError: action.payload
+    //   }
+    // }
+
+    // case SET_HISTOTRY_APPOINTMENTS_LOADING: {
+    //   return {
+    //     ...state,
+    //     historyAppointmentsLoading: action.payload
+    //   }
+    // }
 
     default:
       return state;
