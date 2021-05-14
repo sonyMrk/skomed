@@ -203,7 +203,33 @@ export const hospitalApi = {
 
     return data;
   },
+  SaveWorkIndicatorsByUser: async (iin, orgId, doctorId, doctorName, cabinetId, cabinetName, appraisals, comment) => {
+    const dataTime = await GetServerTime();
+    const paramsString = `IIN=${iin}&OrgGUID=${orgId}&DoctorGUID=${doctorId}&DoctorName=${doctorName}&CabinetGUID=${cabinetId}&CabinetName=${cabinetName}&Indicators=${appraisals}&Comment=${comment}&AppVer=2.0.0`;
+    const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
 
+    const dataString64 = formatter.toBase64(dataString);
+    const token = await formatter.toSHA256(dataString64);
+
+    const params = new URLSearchParams();
+
+    params.append("IIN", iin);
+    params.append("OrgGUID", orgId);
+    params.append("DoctorGUID", doctorId);
+    params.append("DoctorName", doctorName);
+    params.append("CabinetGUID", cabinetId);
+    params.append("CabinetName", cabinetName);
+    params.append("Indicators", appraisals);
+    params.append("Comment", comment);
+    params.append("AppVer", "2.0.0");
+    params.append("Token", token);
+
+    console.log("SaveWorkIndicatorsByUser token === ", token);
+
+    const { data } = await axios.post("SaveWorkIndicatorsByUser", params);
+
+    return data;
+  },
   SaveAppointment: async (
     iin,
     orgId,
@@ -220,13 +246,7 @@ export const hospitalApi = {
     const paramsString = `IIN=${iin}&OrgID=${orgId}&DoctorID=${doctorId}&Date=${date}&TimeStart=${timeStart}&TimeEnd=${timeEnd}&RecordingMethod=${recordingMethod}&CabinetID=${cabinetId}&Reason=${reason}&Language=${language}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
 
-    // const dataString = `${SECRET_KEY}${SEPARATOR}20210513000000${SEPARATOR}${paramsString}`;
-
-    // console.log("DATA_STRING===", dataString)
-
     const dataString64 = formatter.toBase64(dataString);
-
-    // console.log("BASE_64===", dataString64)
 
     const token = await formatter.toSHA256(dataString64);
 
@@ -281,6 +301,28 @@ export const hospitalApi = {
     console.log("SaveDoctorCall token === ", token);
 
     const { data } = await axios.post("SaveDoctorCall", params);
+
+    return data;
+  },
+  СancelReception: async (orgId, regType, id) => {
+    const dataTime = await GetServerTime();
+    const paramsString = `OrgID=${orgId}&RegType=${regType}&GUID=${id}&AppVer=2.0.0`;
+    const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
+
+    const dataString64 = formatter.toBase64(dataString);
+    const token = await formatter.toSHA256(dataString64);
+
+    const params = new URLSearchParams();
+
+    params.append("OrgID", orgId);
+    params.append("RegType", regType);
+    params.append("GUID", id);
+    params.append("AppVer", "2.0.0");
+    params.append("Token", token);
+
+    console.log("СancelReception token === ", token);
+
+    const { data } = await axios.post("СancelReception", params);
 
     return data;
   },

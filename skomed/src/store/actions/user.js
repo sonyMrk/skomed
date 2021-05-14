@@ -13,6 +13,8 @@ import {
   SET_AUTH_REQUEST,
   CLEAR_AUTH_REQUEST,
   SET_VISIBLE_CONFIRM_CODE_FIELD,
+  SET_SICK_LIST_ERROR,
+  CLEAR_SICK_LIST_ERROR,
 } from "../types";
 
 import { userApi } from "../../services/userApi";
@@ -70,6 +72,15 @@ export const setIsVisibleConfirmCode = (payload) => ({
   payload,
 });
 
+export const setSickListError = (payload) => ({
+  type: SET_SICK_LIST_ERROR,
+  payload
+})
+
+export const clearSickListError = () => ({
+  type: CLEAR_SICK_LIST_ERROR
+})
+
 export const GetMedicalDocInfo = (orgId, listNumber, docType = 1) => async (
   dispatch
 ) => {
@@ -81,13 +92,13 @@ export const GetMedicalDocInfo = (orgId, listNumber, docType = 1) => async (
       docType
     );
     if (sickListData.ErrorCode !== 0) {
-      dispatch(setUserError(sickListData.ErrorDesc));
+      dispatch(setSickListError(sickListData.ErrorDesc));
     } else {
       dispatch(setSickListInfo(sickListData));
     }
   } catch (error) {
     console.log(error);
-    dispatch(setUserError("Ошибка при загрузке данных о больничном листе"));
+    dispatch(setSickListError("Ошибка при загрузке данных о больничном листе"));
   } finally {
     dispatch(setUserLoading(false));
   }
@@ -97,7 +108,7 @@ export const getMedicalsDoctypes = () => async (dispatch) => {
   try {
     const medicalsType = await userApi.GetMedicalDocTypes();
     if (medicalsType.ErrorCode !== 0) {
-      dispatch(setUserError(medicalsType.ErrorDesc));
+      dispatch(setSickListError(medicalsType.ErrorDesc));
     } else {
       const types = medicalsType.Types.reduce((prev, type) => {
         return [...prev, { label: type.Name, value: type }];
@@ -109,7 +120,7 @@ export const getMedicalsDoctypes = () => async (dispatch) => {
     }
   } catch (error) {
     console.log(error);
-    dispatch(setUserError("Ошибка при загрузке типов документа"));
+    dispatch(setSickListError("Ошибка при загрузке типов документа"));
   }
 };
 
@@ -202,6 +213,7 @@ export const loadUserData = (iin) => async (dispatch) => {
     const userData = await userApi.GetPatientByIIN(iin);
     if (userData.ErrorCode !== 0) {
       dispatch(setUserError(userData.ErrorDesc));
+      dispatch(setUserData(userData));               // ДЛЯ ТЕСТОВОГО СЕРВАКА
     } else {
       dispatch(setUserData(userData));
     }

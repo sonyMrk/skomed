@@ -22,10 +22,7 @@ export const formatDateForHistory = (date, time) => {
   const year = date.substring(0, 4);
   const month = date.substring(4, 6);
   const day = date.substring(6, 8);
-  const houre = time.substring(0, 2);
-  const min = time.substring(3, 5);
-
-  return new Date(`${year}-${month}-${day}T${houre}:${min}`)
+  return new Date(`${year}-${month}-${day}T${time}:00+06:00`)
 };
 
 export const formatServerDate = (value) => {

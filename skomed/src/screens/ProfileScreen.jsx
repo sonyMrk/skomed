@@ -189,7 +189,7 @@ export const ProfileScreen = ({ navigation }) => {
           <View style={styles.container}>
             <AppBoldText style={styles.title}>Данные пользователя</AppBoldText>
             {profileLoadError && (
-              <AppBoldText style={{ color: THEME.DANGER_COLOR, fontSize: 18 }}>
+              <AppBoldText style={styles.error}>
                 {profileLoadError}
               </AppBoldText>
             )}

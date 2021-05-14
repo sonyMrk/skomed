@@ -10,6 +10,8 @@ import {
   SET_AUTH_REQUEST,
   CLEAR_AUTH_REQUEST,
   SET_VISIBLE_CONFIRM_CODE_FIELD,
+  CLEAR_SICK_LIST_ERROR,
+  SET_SICK_LIST_ERROR,
 } from "../types";
 
 const initialState = {
@@ -17,10 +19,11 @@ const initialState = {
   profile: null,
   isLoading: false,
   errorMessage: null,
+  sickListError: null,
   sickList: null,
   doctypes: null,
   authRequest: null,
-  isVisibleConfirmCodeField: false,
+  isVisibleConfirmCodeField: true,
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -100,6 +103,20 @@ export const userReducer = (state = initialState, action) => {
         ...state,
         isVisibleConfirmCodeField: action.payload,
       };
+    }
+
+    case CLEAR_SICK_LIST_ERROR: {
+      return {
+        ...state,
+        sickListError: null
+      }
+    }
+
+    case SET_SICK_LIST_ERROR: {
+      return {
+        ...state,
+        sickListError: action.payload
+      }
     }
 
     default:

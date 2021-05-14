@@ -8,7 +8,7 @@ import { AppTextInput } from "../../components/ui/AppTextInput";
 import { AppButton } from "../../components/ui/AppButton";
 import { AppText } from "../../components/ui/AppText";
 import { Preloader } from "../../components/ui/Preloader";
-import { defaultFormatDate } from "../../utils/formatDate";
+import { defaultFormatDate, formatServerDate } from "../../utils/formatDate";
 import {
   getSaveAppointmentLoadingState,
   getAppointmentErrorMessageState,
@@ -28,23 +28,32 @@ export const ConfirmHouseCallScreen = ({ navigation, route }) => {
   const saveHouseCallResult = useSelector(getAppointmentHouseCallResultState);
   const saveAppointmentLoading = useSelector(getSaveAppointmentLoadingState)
 
-  const [phone, setPhone] = useState(profilePhone);
+  const [phone, setPhone] = useState(`8${profilePhone}`);
   const [reason, setReason] = useState("");
 
   const dispatch = useDispatch()
 
   const callDoctor = () => {
-    setVisibleInfo(false)
+    if (phone?.trim()?.length < 11 || isNaN(phone)) {
+      Alert.alert("Не корректный телефона", "Введите корректный номер телефона");
+    } else if (reason.length < 10 ) {
+      Alert.alert(
+        "Введите причину вызова",
+        "Минимальная длина 10 символов!"
+      );
+    } else {
+      setVisibleInfo(false)
+      
     
-    const info = {
-      orgName: appointmentUserData.Attachment,
-      doctorName: appointmentUserData.Doctor,
-      patientName: appointmentUserData.FIO
+      const info = {
+        orgName: appointmentUserData.Attachment,
+        orgId: appointmentUserData.AttachmentID,
+        patientName: appointmentUserData.FIO,
+      };
+      dispatch(clearAppointmentError())
+      dispatch(saveHouseCall(info, iin, appointmentUserData.AttachmentID, phone, reason, 1, 1))
     };
-
-    dispatch(saveHouseCall(info, iin, appointmentUserData.AttachmentID, phone, reason, 1, 1))
-  };
-
+    }
   useEffect(() => {
     dispatch(clearAppointmentError())
     Alert.alert(
@@ -79,10 +88,19 @@ export const ConfirmHouseCallScreen = ({ navigation, route }) => {
   if(saveHouseCallResult) {
     return (
       <View style={styles.result}>
-        <AppBoldText style={styles.result__text}>
-          Дата {saveHouseCallResult.RegDateTime}
-        </AppBoldText>
-        <AppButton onPress={() => { navigation.navigate("History") }}>
+        <View style={styles.header}>
+          <AppBoldText style={{ ...styles.title, color: "#009933" }}>
+            Вы успешно записались на прием!
+          </AppBoldText>
+        </View>
+        <AppText style={styles.result__text}>
+          Время вызова врача:
+          {formatServerDate(saveHouseCallResult.RegDateTime)}
+        </AppText>
+        <AppButton onPress={() => { 
+          dispatch(clearAppointmentError())  
+          navigation.navigate("History") 
+        }}>
           Перейти к истории записей
         </AppButton>
       </View>

@@ -129,11 +129,12 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
     const info = {
       orgName,
       doctorName,
+      orgId,
       timeStart: appointmentTime.TimeStart,
       data: appointmentData.Date,
       patientName: appointmentUserData.FIO,
     };
-
+    dispatch(clearAppointmentError());
     dispatch(
       saveAppointment(
         info,
@@ -212,7 +213,9 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
         </AppText>
         <AppButton
           onPress={() => {
+            dispatch(clearAppointmentError())
             navigation.navigate("History");
+            dispatch(clearAppointmentSaveResult())
           }}
         >
           Перейти к истории записей
@@ -244,7 +247,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
         {!organization.DisableDoctorSelection && organization.OrgID === "0" && (
           <View>
             {/* Если в организации доступна запись к узким специалистам */}
-            {appointmentUserData.RegToProfileSpecs && (
+            {appointmentUserData?.RegToProfileSpecs && (
               <View style={styles.toggleProfile}>
                 <View style={styles.checkboxWrapper}>
                   <TouchableOpacity

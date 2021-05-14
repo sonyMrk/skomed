@@ -8,9 +8,6 @@ import {
   SET_NOTIFICATIONS_ERROR,
   SET_NOTIFICATIONS_LOADING,
   SET_DEVICE_ID,
-  SET_HISTOTRY_APPOINTMENTS,
-  SET_HISTOTRY_APPOINTMENTS_ERROR,
-  SET_HISTOTRY_APPOINTMENTS_LOADING,
 } from "../types";
 import newId from "../../utils/newId";
 import { SET_SUBSCRIBER_ID } from "./../types";
@@ -55,11 +52,6 @@ export const setDeviceId = (payload) => ({
   payload,
 });
 
-export const setHistoryAppointments = (payload) => ({
-  type: SET_HISTOTRY_APPOINTMENTS,
-  payload
-})
-
 // export const setHistoryAppointmentsError = (payload) => ({
 //   type: SET_HISTOTRY_APPOINTMENTS_ERROR,
 //   payload
@@ -70,11 +62,9 @@ export const setHistoryAppointments = (payload) => ({
 //   payload
 // })
 
-export const saveDeviceID = (deviceID) => async (dispatch) => { 
+export const saveDeviceID = (deviceID) => async (dispatch) => {
   try {
-    const oldDeviceId = await AsyncStorage.getItem(
-      "deviceId"
-    );
+    const oldDeviceId = await AsyncStorage.getItem("deviceId");
     if (oldDeviceId) {
       dispatch(setDeviceId(JSON.parse(oldDeviceId)));
     } else {
@@ -107,41 +97,18 @@ export const getSubscriberID = () => async (dispatch) => {
   }
 };
 
-export const getHistoryAppointments = () => async (dispatch) => {
-  try {
-    let history = await AsyncStorage.getItem("history");
-    
-    if (history) {
-      const parsedHistory = JSON.parse(history)
-      dispatch(setHistoryAppointments(parsedHistory));
-    } else {
-      await AsyncStorage.setItem(
-        "history",
-        JSON.stringify({
-          appointments: [],
-          houseCalls: []
-        })
-      );
-      dispatch(setHistoryAppointments([]));
-    }
-  } catch (error) {
-    dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
-    console.log("getHistoryAppointments", error);
-  }
-};
-
-export const getNewNotificationsCount = (deviceGUID) => async (
-  dispatch
-) => {
+export const getNewNotificationsCount = (deviceGUID) => async (dispatch) => {
   try {
     const userProfile = await AsyncStorage.getItem("profile");
 
-    const authToken = JSON.parse(userProfile)?.AuthToken;;
+    const authToken = JSON.parse(userProfile)?.AuthToken;
 
     const respData = await appApi.GetNewMessagesCount(deviceGUID, authToken);
 
     if (respData.ErrorCode !== 0) {
-      dispatch(setNotificationsError(respData.ErrorDesc + "getNewNotificationsCount"));
+      dispatch(
+        setNotificationsError(respData.ErrorDesc + "getNewNotificationsCount")
+      );
     } else {
       dispatch(setNewNotificationsCount(respData.MessagesCount));
     }
@@ -151,9 +118,7 @@ export const getNewNotificationsCount = (deviceGUID) => async (
   }
 };
 
-export const getMessageForUser = (deviceGUID) => async (
-  dispatch
-) => {
+export const getMessageForUser = (deviceGUID) => async (dispatch) => {
   try {
     const userProfile = await AsyncStorage.getItem("profile");
 
@@ -177,13 +142,13 @@ export const updateSubscriberData = (SubscriberID) => async (dispatch) => {
     const userProfile = await AsyncStorage.getItem("profile");
     const DeviceID = await AsyncStorage.getItem("deviceId");
 
-    const AuthToken = JSON.parse(userProfile)?.AuthToken;;
+    const AuthToken = JSON.parse(userProfile)?.AuthToken;
 
     if (!DeviceID) {
       const respData = await appApi.UpdateSubscriberData(
         SubscriberID,
         AuthToken,
-        DeviceID,
+        DeviceID
         // DeviceName,
         // OSVersion,
         // AppVersion,
@@ -197,7 +162,7 @@ export const updateSubscriberData = (SubscriberID) => async (dispatch) => {
         dispatch(saveDeviceID(respData.DeviceGUID));
       }
     } else {
-      dispatch(saveDeviceID(DeviceID))
+      dispatch(saveDeviceID(DeviceID));
     }
   } catch (error) {
     console.log("updateSubscriberData", error);

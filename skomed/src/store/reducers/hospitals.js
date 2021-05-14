@@ -21,6 +21,9 @@ import {
   CLEAR_LIST_OF_WORKINDICATORS,
   SET_SCAN_DATA_LIST_FOR_RAITING,
   CLEAR_SCAN_DATA_LIST_FOR_RAITING,
+  SET_EVALUATION_RESULT,
+  SET_EVALUATION_RESULT_LOADING,
+  CLEAR_EVALUATION_RESULT,
 } from "../types";
 
 const initialState = {
@@ -34,6 +37,8 @@ const initialState = {
   scanDataListForRaiting: null,
   dataListForRaitingLoading: false,
   listOfWorkIndicators: null,
+  evaluationResult: null,
+  evaluationResultLoading: false,
   doctorsListLoading: false,
   doctorTimetable: null,
   doctorTimetableLoading: false,
@@ -192,6 +197,27 @@ export const hospitalsReducer = (state = initialState, action) => {
       return {
         ...state,
         scanDataListForRaiting: null
+      }
+    }
+
+    case SET_EVALUATION_RESULT: {
+      return {
+        ...state,
+        evaluationResult: action.payload
+      }
+    }
+
+    case SET_EVALUATION_RESULT_LOADING: {
+      return {
+        ...state,
+        evaluationResultLoading: action.payload
+      }
+    }
+
+    case CLEAR_EVALUATION_RESULT: {
+      return {
+        ...state,
+        evaluationResult: null
       }
     }
     default:

@@ -1,9 +1,22 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  RefreshControl,
+} from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+import { Ionicons } from "@expo/vector-icons";
 
 import { AppBoldText } from "../components/ui/AppBoldText";
 import { AppText } from "../components/ui/AppText";
-import { useSelector } from "react-redux";
+import {
+  cancelReception,
+  clearAppointmentError,
+  getHistoryAppointments,
+} from "../store/actions/appointment";
 import { getHistoryAppointmentsState } from "../store/selectors/app";
 import { THEME } from "../theme";
 import {
@@ -15,24 +28,82 @@ import {
 } from "../utils/formatDate";
 import { useState } from "react";
 import { AppButton } from "../components/ui/AppButton";
+import { getAppointmentErrorMessageState } from "../store/selectors/appointment";
+import { useEffect } from "react";
+import { removeItemFromHistoryAppointments } from "../store/actions/app";
 
 export const HistoryAppointmentsScreen = () => {
   const [isHouseCallScreen, setIsHouseCallScreen] = useState(false);
 
   const history = useSelector(getHistoryAppointmentsState);
+  const appointmentError = useSelector(getAppointmentErrorMessageState);
 
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  const handleDeleteAppointment = (id) => {
-    console.log(id)
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    dispatch(getHistoryAppointments());
+    dispatch(clearAppointmentError());
+    setRefreshing(false);
+  }, []);
+
+  const dispatch = useDispatch();
+
+  // TODO: КОГДА ДО ПРИЕМА ОСТАЕТСЯ МЕНЬШЕ ЧАСА СКРЫВАТЬ КНОПКУ ОТМЕНЫ
+
+  const handleDeleteAppointment = (orgId, regType, id) => {
+    Alert.alert("Запись будет отменена", "Продолжить выполнение операции?", [
+      {
+        text: "Отмена",
+        style: "cancel",
+      },
+      {
+        text: "Ок",
+        onPress: () => {
+          dispatch(cancelReception(orgId, regType, id));
+        },
+        style: "default",
+      },
+    ]);
+  };
+
+  const handlePressDel = (id, regType) => {
+    Alert.alert("Запись будет удалена", "Продолжить выполнение операции?", [
+      {
+        text: "Отмена",
+        style: "cancel",
+      },
+      {
+        text: "Ок",
+        onPress: () => {
+          dispatch(removeItemFromHistoryAppointments(id, regType));
+        },
+        style: "default",
+      },
+    ]);
   }
 
+  useEffect(() => {
+    return () => {
+      dispatch(clearAppointmentError());
+    };
+  }, []);
+
+
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.container}>
         <View style={styles.header}>
           <AppBoldText style={styles.title}>
             История записей и вызовов врача
           </AppBoldText>
+          {appointmentError && (
+            <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
+          )}
         </View>
         <View style={styles.toggleProfile}>
           <View style={styles.checkboxWrapper}>
@@ -116,20 +187,55 @@ export const HistoryAppointmentsScreen = () => {
                     </View>
                     <View style={styles.infoItem}>
                       <AppText>Статус: </AppText>
-                      <AppBoldText>
+                      <View>
                         {compareAscDate(
                           formatDateForHistory(app.data, app.timeStart),
                           new Date()
-                        ) === 1
-                          ? `До приема осталось ${formatDataDistance(
-                              formatDateForHistory(app.data, app.timeStart)
-                            )}`
-                          : "ЗАВЕРШЕНО"}
-                      </AppBoldText>
+                        ) === 1 ? (
+                          <View>
+                            <AppBoldText>
+                              {`До приема осталось ${formatDataDistance(
+                                formatDateForHistory(app.data, app.timeStart)
+                              )}`}
+                            </AppBoldText>
+                          </View>
+                        ) : (
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              flex: 1,
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <AppBoldText>"ЗАВЕРШЕНО"</AppBoldText>
+                              <AppButton
+                                style={styles.btn}
+                                color={THEME.MAIN_COLOR}
+                                onPress={() => { handlePressDel(app.GUID, "1") }}
+                              >
+                                <Ionicons
+                                  name="trash"
+                                  size={20}
+                                  color={THEME.DANGER_COLOR}
+                                />
+                              </AppButton>
+                            </View>
+                        )}
+                      </View>
                     </View>
-                    <AppButton onPress={() => { 
-                      handleDeleteAppointment(app.GUID)
-                    }}>Отменить запись</AppButton>
+                    {compareAscDate(
+                      formatDateForHistory(app.data, app.timeStart),
+                      new Date()
+                    ) === 1 && (
+                      <AppButton
+                        onPress={() => {
+                          handleDeleteAppointment(app.orgId, "1", app.GUID);
+                        }}
+                      >
+                        Отменить вызов
+                      </AppButton>
+                    )}
                   </View>
                 );
               })}
@@ -139,7 +245,7 @@ export const HistoryAppointmentsScreen = () => {
             {history &&
               history.houseCalls?.map((app) => {
                 return (
-                  <TouchableOpacity key={app.GUID} style={styles.appointment}>
+                  <View key={app.GUID} style={styles.appointment}>
                     <View style={styles.infoItem}>
                       <AppText>Имя пациента: </AppText>
                       <AppBoldText>{app.patientName}</AppBoldText>
@@ -154,7 +260,14 @@ export const HistoryAppointmentsScreen = () => {
                         {formatServerDate(app.RegDateTime)}
                       </AppBoldText>
                     </View>
-                  </TouchableOpacity>
+                    <AppButton
+                      onPress={() => {
+                        handleDeleteAppointment(app.orgId, "2", app.GUID);
+                      }}
+                    >
+                      Отменить вызов
+                    </AppButton>
+                  </View>
                 );
               })}
           </View>
@@ -211,5 +324,14 @@ const styles = StyleSheet.create({
   },
   activeText: {
     color: "#fff",
+  },
+  error: {
+    textAlign: "center",
+    color: THEME.DANGER_COLOR,
+  },
+  btn: {
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    marginLeft: 25
   },
 });

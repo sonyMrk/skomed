@@ -15,12 +15,13 @@ import {
   SET_SAVE_APPOINTMENT_LOADING,
   CLEAR_HOUSE_CALL_RESULT,
   CLEAR_SAVE_APPOINTMENT_RESULT,
+  SET_HISTOTRY_APPOINTMENTS,
+  SET_HISTOTRY_APPOINTMENTS_ERROR,
+  SET_HISTOTRY_APPOINTMENTS_LOADING,
 } from "../types";
 import { userApi } from "../../services/userApi";
 import { hospitalApi } from "../../services/hospitalApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getHistoryAppointments } from "./app";
-import { formatDateWithHourse } from "../../utils/formatDate";
 
 export const setAppointmentUserData = (payload) => ({
   type: SET_APPOINTMENT_USER_DATA,
@@ -95,6 +96,11 @@ export const setAppointmentSaveLoading = (payload) => ({
   type: SET_SAVE_APPOINTMENT_LOADING,
   payload
 })
+
+export const setHistoryAppointments = (payload) => ({
+  type: SET_HISTOTRY_APPOINTMENTS,
+  payload,
+});
 
 export const getAppointmentUserData = (iin) => async (dispatch) => {
   try {
@@ -185,9 +191,11 @@ export const saveAppointment = (info, iin, orgId, doctorId, date, TimeStart, tim
 
     const respData = await hospitalApi.SaveAppointment(iin, orgId, doctorId, date, TimeStart, timeEnd, recordingMethod, cabinetId, reason, language)
 
+    console.log("saveAppointment", respData)
+
     if(respData.ErrorCode !== 0) {
       dispatch(setAppointmentError(respData.ErrorDesc))
-    } else {
+    }else {
       const history = await AsyncStorage.getItem("history");
       const updateHistory = JSON.parse(history)
       
@@ -214,7 +222,6 @@ export const saveHouseCall = (info, iin, orgId, phoneNumber, reason, recordingMe
 
     const respData = await hospitalApi.SaveDoctorCall(iin, orgId, phoneNumber, reason, recordingMethod, language)
 
-
     if(respData.ErrorCode !== 0) {
       dispatch(setAppointmentError(respData.ErrorDesc))
     } else {
@@ -236,3 +243,100 @@ export const saveHouseCall = (info, iin, orgId, phoneNumber, reason, recordingMe
     dispatch(setAppointmentSaveLoading(false));
   }
 }
+
+
+export const cancelReception = (orgId, regType, id) => async (dispatch) => {
+  try {
+
+    const types = {
+      "1" : "appointments",
+      "2" : "houseCalls"
+    }
+
+    const currentType = types[regType]
+
+    dispatch(setAppointmentSaveLoading(true));
+
+    const respData = await hospitalApi.СancelReception(orgId, regType, id);
+
+    if(respData.ErrorCode !== 0) {
+      dispatch(setAppointmentError(respData.ErrorDesc))
+    }  if (!respData.UnregDateTime) {
+      dispatch(setAppointmentError("ошибка отмены регистрации - отмена визита возможна не менее чем за 1 час до начала приема!"))
+    } else {
+      const history = await AsyncStorage.getItem("history");
+
+      const updateHistory = JSON.parse(history)
+
+       const filteredHistory = updateHistory[currentType].filter((rec) => rec.GUID !== id)
+
+       updateHistory[currentType] = filteredHistory;
+
+
+      await AsyncStorage.setItem("history", JSON.stringify(updateHistory))
+
+      dispatch(getHistoryAppointments())
+    }
+  } catch (error) {
+    dispatch(setAppointmentError("Ошибка при удалении записи"));
+    console.log(error);
+  } finally {
+    dispatch(setAppointmentSaveLoading(false));
+  }
+}
+
+export const getHistoryAppointments = () => async (dispatch) => {
+  try {
+    let history = await AsyncStorage.getItem("history");
+
+    if (history) {
+      const parsedHistory = JSON.parse(history);
+
+      dispatch(setHistoryAppointments(parsedHistory));
+    } else {
+      await AsyncStorage.setItem(
+        "history",
+        JSON.stringify({
+          appointments: [],
+          houseCalls: [],
+        })
+      );
+      dispatch(setHistoryAppointments([]));
+    }
+  } catch (error) {
+    dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
+    console.log("getHistoryAppointments", error);
+  }
+};
+
+export const removeItemFromHistoryAppointments = (id, regType) => async (
+  dispatch
+) => {
+  try {
+    const types = {
+      1: "appointments",
+      2: "houseCalls",
+    };
+
+    const currentType = types[regType];
+
+    dispatch(setAppointmentSaveLoading(true));
+
+    const history = await AsyncStorage.getItem("history");
+
+    const updateHistory = JSON.parse(history);
+
+    const filteredHistory = updateHistory[currentType].filter(
+      (rec) => rec.GUID !== id
+    );
+
+    updateHistory[currentType] = filteredHistory;
+
+    await AsyncStorage.setItem("history", JSON.stringify(updateHistory));
+
+    dispatch(getHistoryAppointments());
+  } catch (error) {
+    dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
+    console.log("getHistoryAppointments", error);
+  }
+};

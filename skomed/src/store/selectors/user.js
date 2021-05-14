@@ -7,6 +7,9 @@ export const getUserLoadingState = (state) => getUserState(state).isLoading;
 
 export const getUserSickListState = (state) => getUserState(state).sickList;
 
+export const getUserSickListErrorMessageState = (state) =>
+  getUserState(state).sickListError;
+
 export const getMedicalDoctypesState = (state) => getUserState(state).doctypes;
 
 export const getUserProfileState = (state) => getUserState(state).profile;

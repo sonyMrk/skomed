@@ -30,12 +30,12 @@ import { BarScanner } from "../components/BarScanner";
 import {
   GetMedicalDocInfo,
   clearSickListInfo,
-  clearUserError,
   getMedicalsDoctypes,
+  clearSickListError,
 } from "../store/actions/user";
 import { InfoItem } from "../components/ui/InfoItem";
 import {
-  getUserErrorMessageState,
+  getUserSickListErrorMessageState,
   getUserLoadingState,
   getUserSickListState,
   getMedicalDoctypesState,
@@ -88,10 +88,9 @@ export const DocumentScannedScreen = ({ navigation }) => {
   const hospitals = useSelector(getHospitalsForSickListState);
   const hospitalsLoadError = useSelector(getHospitalsErrorState);
 
-  const userSickListError = useSelector(getUserErrorMessageState);
+  const userSickListError = useSelector(getUserSickListErrorMessageState);
   const userSickListloading = useSelector(getUserLoadingState);
   const userSickListInfo = useSelector(getUserSickListState);
-
 
   const medicalDocTypes = useSelector(getMedicalDoctypesState);
 
@@ -129,7 +128,7 @@ export const DocumentScannedScreen = ({ navigation }) => {
     return () => {
       dispatch(clearHospitalsError());
       dispatch(clearSickListInfo());
-      dispatch(clearUserError());
+      dispatch(clearSickListError());
     };
   }, []);
 

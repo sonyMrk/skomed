@@ -21,6 +21,9 @@ import {
   CLEAR_LIST_OF_WORKINDICATORS,
   SET_SCAN_DATA_LIST_FOR_RAITING,
   CLEAR_SCAN_DATA_LIST_FOR_RAITING,
+  SET_EVALUATION_RESULT,
+  SET_EVALUATION_RESULT_LOADING,
+  CLEAR_EVALUATION_RESULT,
 } from "../types";
 import { hospitalApi } from "../../services/hospitalApi";
 
@@ -124,6 +127,20 @@ export const setScanDataListForRaiting = (payload) => ({
 export const clearScanDataListForRaiting = () => ({
   type: CLEAR_SCAN_DATA_LIST_FOR_RAITING,
 });
+
+export const setEvaluationResult = (payload) => ({
+  type: SET_EVALUATION_RESULT,
+  payload
+})
+
+export const setEvaluationResultLoading = (payload) => ({
+  type: SET_EVALUATION_RESULT_LOADING,
+  payload
+})
+
+export const clearEvaluationResult = () => ({
+  type: CLEAR_EVALUATION_RESULT
+})
 
 // THUNKS______________________________________________________________________________________________________________________________
 
@@ -343,3 +360,21 @@ export const getDoctorTimetable = (orgId, doctorId, cabinetId) => async (
     dispatch(setDoctorTimetableLoading(false));
   }
 };
+
+export const setEvaluation = (iin, orgId, doctorId, doctorName, cabinetId, cabinetName, appraisals, comment) => async (dispatch) => {
+  try {
+    dispatch(setEvaluationResultLoading(true));
+    const respData = await hospitalApi.SaveWorkIndicatorsByUser(iin, orgId, doctorId, doctorName, cabinetId, cabinetName, appraisals, comment);
+
+    if (respData.ErrorCode !== 0) {
+      dispatch(setHospitalsError(respData.ErrorDesc));
+    } else {
+      dispatch(setEvaluationResult(respData));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(setHospitalsError("Ошибка при сохранении оценки"));
+  } finally {
+    dispatch(setEvaluationResultLoading(false));
+  }
+}

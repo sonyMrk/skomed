@@ -27,9 +27,9 @@ import {
   updateSubscriberData,
   getMessageForUser,
   getNewNotificationsCount,
-  getHistoryAppointments
 } from "../store/actions/app";
 import { HistoryStackScreen } from "./stacks/HistoryStackScreen";
+import { getHistoryAppointments } from "../store/actions/appointment";
 
 // нижняя навигация
 

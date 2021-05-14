@@ -93,3 +93,7 @@ export const getScanDoctorsListForRaitingState = (state) => getHospitalsState(st
 export const getDataListForRaitingLoadingState = (state) => getHospitalsState(state).dataListForRaitingLoading;
 
 export const getListForWorkIndicatorsState = (state) => getHospitalsState(state).listOfWorkIndicators;
+
+export const getEvaluationResultState = (state) => getHospitalsState(state).evaluationResult;
+
+export const getEvaluationResultLoadingState = (state) => getHospitalsState(state).evaluationResultLoading;

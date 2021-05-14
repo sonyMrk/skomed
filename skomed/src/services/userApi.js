@@ -69,10 +69,8 @@ export const userApi = {
   AuthorizationRequest: async (iin, phone, hasConfirmCode) => {
     const dataTime = await GetServerTime();
     
-    // ${hasConfirmCode ? "Да" : "Нет"}
     const paramsString = `IIN=${iin}&MobileNumber=${phone}&HasConfirmCode=${hasConfirmCode ? "Да" : "Нет"}&AppVer=2.0.0`;
-    // const paramsString = `IIN=${iin}&MobileNumber=${phone}&HasConfirmCode=Да&AppVer=2.0.0`;
-    const dataString = `${SECRET_KEY}${SEPARATOR}20210512095500${SEPARATOR}${paramsString}`;
+    const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime}${SEPARATOR}${paramsString}`;
     
     const dataString64 = formatter.toBase64(dataString);
     const token = await formatter.toSHA256(dataString64);
