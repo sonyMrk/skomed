@@ -43,8 +43,8 @@ const AppNavigation = () => {
   const deviceId = useSelector(getDeviceIdState);
 
   console.log("PUSH_TOKEN", pushToken);
-  console.log("isInit", isInit)
-  
+  console.log("isInit", isInit);
+
   const notificationListener = useRef();
   const responseListener = useRef();
 
@@ -136,10 +136,12 @@ const AppNavigation = () => {
           component={HistoryStackScreen}
           options={{
             tabBarLabel: "История записей",
-            tabBarBadge:
-              newNotificationsCount > 0 ? newNotificationsCount : null,
             tabBarIcon: ({ color }) => (
-              <Ionicons name="file-tray-stacked-outline" size={25} color={color} />
+              <Ionicons
+                name="file-tray-stacked-outline"
+                size={25}
+                color={color}
+              />
             ),
           }}
         ></BottonmTabNavigation.Screen>
@@ -188,7 +190,6 @@ const registerForPushNotificationsAsync = async () => {
       return;
     }
     token = (await Notifications.getExpoPushTokenAsync()).data;
-    // console.log(token);
   } else {
     alert("Must use physical device for Push Notifications");
   }

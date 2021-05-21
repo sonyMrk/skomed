@@ -203,7 +203,16 @@ export const hospitalApi = {
 
     return data;
   },
-  SaveWorkIndicatorsByUser: async (iin, orgId, doctorId, doctorName, cabinetId, cabinetName, appraisals, comment) => {
+  SaveWorkIndicatorsByUser: async (
+    iin,
+    orgId,
+    doctorId,
+    doctorName,
+    cabinetId,
+    cabinetName,
+    appraisals,
+    comment
+  ) => {
     const dataTime = await GetServerTime();
     const paramsString = `IIN=${iin}&OrgGUID=${orgId}&DoctorGUID=${doctorId}&DoctorName=${doctorName}&CabinetGUID=${cabinetId}&CabinetName=${cabinetName}&Indicators=${appraisals}&Comment=${comment}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
@@ -238,8 +247,8 @@ export const hospitalApi = {
     timeStart,
     timeEnd,
     recordingMethod = 1,
-    cabinetId="",
-    reason="",
+    cabinetId = "",
+    reason = "",
     language = 1
   ) => {
     const dataTime = await GetServerTime();
@@ -276,7 +285,7 @@ export const hospitalApi = {
     iin,
     orgId,
     phoneNumber,
-    reason="",
+    reason = "",
     recordingMethod = 1,
     language = 1
   ) => {
@@ -308,6 +317,8 @@ export const hospitalApi = {
     const dataTime = await GetServerTime();
     const paramsString = `OrgID=${orgId}&RegType=${regType}&GUID=${id}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
+
+    console.log("paramsString API", paramsString);
 
     const dataString64 = formatter.toBase64(dataString);
     const token = await formatter.toSHA256(dataString64);

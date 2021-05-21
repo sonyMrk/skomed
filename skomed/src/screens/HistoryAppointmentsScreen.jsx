@@ -23,7 +23,6 @@ import {
   formatServerDate,
   formatDateForHistory,
   compareAscDate,
-  defaultFormatDate,
   formatDataDistance,
 } from "../utils/formatDate";
 import { useState } from "react";
@@ -48,8 +47,6 @@ export const HistoryAppointmentsScreen = () => {
   }, []);
 
   const dispatch = useDispatch();
-
-  // TODO: КОГДА ДО ПРИЕМА ОСТАЕТСЯ МЕНЬШЕ ЧАСА СКРЫВАТЬ КНОПКУ ОТМЕНЫ
 
   const handleDeleteAppointment = (orgId, regType, id) => {
     Alert.alert("Запись будет отменена", "Продолжить выполнение операции?", [
@@ -81,14 +78,13 @@ export const HistoryAppointmentsScreen = () => {
         style: "default",
       },
     ]);
-  }
+  };
 
   useEffect(() => {
     return () => {
       dispatch(clearAppointmentError());
     };
   }, []);
-
 
   return (
     <ScrollView
@@ -209,18 +205,20 @@ export const HistoryAppointmentsScreen = () => {
                             }}
                           >
                             <AppBoldText>"ЗАВЕРШЕНО"</AppBoldText>
-                              <AppButton
-                                style={styles.btn}
-                                color={THEME.MAIN_COLOR}
-                                onPress={() => { handlePressDel(app.GUID, "1") }}
-                              >
-                                <Ionicons
-                                  name="trash"
-                                  size={20}
-                                  color={THEME.DANGER_COLOR}
-                                />
-                              </AppButton>
-                            </View>
+                            <AppButton
+                              style={styles.btn}
+                              color={THEME.MAIN_COLOR}
+                              onPress={() => {
+                                handlePressDel(app.GUID, "1");
+                              }}
+                            >
+                              <Ionicons
+                                name="trash"
+                                size={20}
+                                color={THEME.DANGER_COLOR}
+                              />
+                            </AppButton>
+                          </View>
                         )}
                       </View>
                     </View>
@@ -332,6 +330,6 @@ const styles = StyleSheet.create({
   btn: {
     borderRadius: 10,
     paddingHorizontal: 10,
-    marginLeft: 25
+    marginLeft: 25,
   },
 });

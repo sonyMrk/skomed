@@ -147,17 +147,11 @@ export const updateSubscriberData = (SubscriberID) => async (dispatch) => {
     if (!DeviceID) {
       const respData = await appApi.UpdateSubscriberData(
         SubscriberID,
-        AuthToken,
-        DeviceID
-        // DeviceName,
-        // OSVersion,
-        // AppVersion,
-        // Processor,
-        // RAM,
-        // (DisableSubscription = pushToken === undefined)
+        AuthToken
       );
+
       if (respData.ErrorCode !== 0) {
-        dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
+        dispatch(setNotificationsError(respData.ErrorDesc));
       } else {
         dispatch(saveDeviceID(respData.DeviceGUID));
       }
