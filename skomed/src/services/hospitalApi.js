@@ -1,4 +1,4 @@
-import { axios } from "../api/axios";
+import { axios } from "../api/skoMedAxios";
 import { SECRET_KEY, SEPARATOR } from "./keys";
 import { formatter } from "../utils/formatToBase64";
 import { GetServerTime } from "./getServerTime";

@@ -1,5 +1,5 @@
-import { axios } from "../api/axios";
-import { SECRET_KEY, SEPARATOR } from "../services/keys"
+import { axios } from "../api/skoMedAxios";
+import { SECRET_KEY, SEPARATOR } from "../services/keys";
 import { formatter } from "../utils/formatToBase64";
 import { GetServerTime } from "./getServerTime";
 
@@ -13,13 +13,13 @@ export const userApi = {
     const token = await formatter.toSHA256(dataString64);
 
     const params = new URLSearchParams();
-    
+
     params.append("IIN", iin);
     params.append("AppVer", "2.0.0");
 
     params.append("Token", token);
 
-    console.log("GetPatientByIIN token === ", token)
+    console.log("GetPatientByIIN token === ", token);
 
     const { data } = await axios.post("GetPatientByIIN", params);
     return data;
@@ -33,14 +33,14 @@ export const userApi = {
     const token = await formatter.toSHA256(dataString64);
 
     const params = new URLSearchParams();
-    
+
     params.append("OrgID", OrgID);
     params.append("DocNumber", ListNumber);
     params.append("DocType", DocType);
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetMedicalDocInfo token === ", token)
+    console.log("GetMedicalDocInfo token === ", token);
 
     const { data } = await axios.post("GetMedicalDocInfo", params);
     return data;
@@ -59,7 +59,7 @@ export const userApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetMedicalDocTypes token === ", token)
+    console.log("GetMedicalDocTypes token === ", token);
 
     const { data } = await axios.post("GetMedicalDocTypes", params);
 
@@ -68,10 +68,12 @@ export const userApi = {
 
   AuthorizationRequest: async (iin, phone, hasConfirmCode) => {
     const dataTime = await GetServerTime();
-    
-    const paramsString = `IIN=${iin}&MobileNumber=${phone}&HasConfirmCode=${hasConfirmCode ? "Да" : "Нет"}&AppVer=2.0.0`;
+
+    const paramsString = `IIN=${iin}&MobileNumber=${phone}&HasConfirmCode=${
+      hasConfirmCode ? "Да" : "Нет"
+    }&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime}${SEPARATOR}${paramsString}`;
-    
+
     const dataString64 = formatter.toBase64(dataString);
     const token = await formatter.toSHA256(dataString64);
 
@@ -83,7 +85,7 @@ export const userApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("AuthorizationRequest token === ", token)
+    console.log("AuthorizationRequest token === ", token);
 
     const { data } = await axios.post("AuthorizationRequest", params);
 
@@ -99,7 +101,7 @@ export const userApi = {
     const token = await formatter.toSHA256(dataString64);
 
     const params = new URLSearchParams();
-    
+
     params.append("IIN", iin);
     params.append("MobileNumber", phone);
     params.append("ConfirmCode", confirmCode);
@@ -107,7 +109,7 @@ export const userApi = {
 
     params.append("Token", token);
 
-    console.log("UserLogin token === ", token)
+    console.log("UserLogin token === ", token);
 
     const { data } = await axios.post("UserLogin", params);
 
