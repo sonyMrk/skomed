@@ -13,10 +13,10 @@ export const NotificationStackScreen = ({ navigation }) => {
     <NotificationStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: THEME.MAIN_COLOR,
+          backgroundColor: "#fff",
         },
         title: "Уведомления",
-        headerTintColor: "#fff",
+        headerTintColor: "#000",
       }}
     >
       <NotificationStack.Screen
@@ -31,7 +31,7 @@ export const NotificationStackScreen = ({ navigation }) => {
                 navigation.navigate("Main");
               }}
             >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+              <Ionicons name="ios-arrow-back-outline" size={24} color="black" />
             </TouchableOpacity>
           ),
         })}

@@ -14,10 +14,10 @@ export const ProfileStackScreen = ({ navigation }) => {
     <ProfileStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: THEME.MAIN_COLOR,
+          backgroundColor: "#fff",
         },
         title: "Профиль",
-        headerTintColor: "#fff",
+        headerTintColor: "#000",
       }}
     >
       <ProfileStack.Screen
@@ -32,7 +32,7 @@ export const ProfileStackScreen = ({ navigation }) => {
                 navigation.navigate("Main");
               }}
             >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+              <Ionicons name="ios-arrow-back-outline" size={24} color="black" />
             </TouchableOpacity>
           ),
         })}

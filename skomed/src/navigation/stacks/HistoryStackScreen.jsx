@@ -15,10 +15,10 @@ export const HistoryStackScreen = ({ navigation }) => {
     <ProfileStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: THEME.MAIN_COLOR,
+          backgroundColor: "#fff",
         },
         title: "История",
-        headerTintColor: "#fff",
+        headerTintColor: "#000",
       }}
     >
       <ProfileStack.Screen
@@ -33,7 +33,7 @@ export const HistoryStackScreen = ({ navigation }) => {
                 navigation.navigate("Main");
               }}
             >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+              <Ionicons name="ios-arrow-back-outline" size={24} color="black" />
             </TouchableOpacity>
           ),
         })}

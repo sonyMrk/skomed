@@ -11,6 +11,7 @@
     "@react-native-async-storage/async-storage": "^1.15.4",
     "@react-native-community/checkbox": "^0.5.7",
     "@react-native-community/masked-view": "^0.1.10",
+    "@react-native-community/viewpager": "5.0.11",
     "@react-native-picker/picker": "1.9.11",
     "@react-navigation/bottom-tabs": "^5.11.10",
     "@react-navigation/material-top-tabs": "^5.3.15",
@@ -38,12 +39,16 @@
     "react-native-reanimated": "~2.1.0",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "~3.0.0",
+    "react-native-snap-carousel": "^3.9.1",
+    "react-native-svg": "12.1.0",
+    "react-native-svg-transformer": "^0.14.3",
     "react-native-table-component": "^1.2.1",
     "react-native-web": "~0.13.12",
     "react-redux": "^7.2.4",
     "redux": "^4.1.0",
     "redux-thunk": "^2.3.0",
-    "uuid": "^3.4.0"
+    "uuid": "^3.4.0",
+    "expo-asset": "~8.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

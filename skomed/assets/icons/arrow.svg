@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 24 39" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-1069.72,-1403.1)">
+        <rect id="Монтажная-область1" serif:id="Монтажная область1" x="0" y="0" width="1125" height="2436" style="fill:none;"/>
+        <clipPath id="_clip1">
+            <rect id="Монтажная-область11" serif:id="Монтажная область1" x="0" y="0" width="1125" height="2436"/>
+        </clipPath>
+        <g clip-path="url(#_clip1)">
+            <rect x="0" y="0" width="1125" height="2436" style="fill:rgb(242,242,242);"/>
+            <g id="Icon-and-Label" serif:id="Icon and Label" transform="matrix(0.686466,-5.20722e-17,-1.0365e-16,1.41197,-136.385,966.735)">
+                <rect x="197.818" y="276.112" width="1638.4" height="93.487" style="fill:none;"/>
+                <clipPath id="_clip2">
+                    <rect x="197.818" y="276.112" width="1638.4" height="93.487"/>
+                </clipPath>
+                <g clip-path="url(#_clip2)">
+                    <g transform="matrix(16.4651,6.06733e-16,1.59366e-16,1.05661,-7000.13,-2069.37)">
+                        <rect x="437.165" y="2219.81" width="99.508" height="88.478" style="fill:white;"/>
+                    </g>
+                    <g transform="matrix(4.36907,1.57425e-16,3.28271e-16,2.12414,538.011,277.186)">
+                        <path d="M280.333,28L287,21.5L280.333,15L279,16.3L284.333,21.5L279,26.7L280.333,28Z" style="fill:rgb(209,209,214);"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,6 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { HospitalSelectionScreen } from "../../screens/HospitalSelectionScreen/HospitalSelectionScreen";
@@ -17,9 +17,23 @@ import { WorkEvaluation } from "../../screens/WorkEvaluation";
 
 import { THEME } from "../../theme";
 import { MainScreen } from "./../../screens/MainScreen";
+import ProfileIcon from "../../../assets/icons/person.svg";
+import AlarmIcon from "../../../assets/icons/alarm.svg";
+import { AppText } from "../../components/ui/AppText";
+import { useSelector } from "react-redux";
+import { getUserProfileState } from "../../store/selectors/user";
+import { NotificationScreen } from "../../screens/NotificationScreen";
+import { getNewNotificationsCountState } from "../../store/selectors/app";
 
 const getDefaultScreenOptions = (title) => ({ navigation }) => ({
   headerTitle: title,
+  headerTitleStyle: {
+    fontSize: 20,
+  },
+  headerStyle: {
+    backgroundColor: "#fff",
+  },
+  headerTintColor: "#000",
   headerLeft: () => (
     <TouchableOpacity
       style={{ padding: 10 }}
@@ -27,7 +41,7 @@ const getDefaultScreenOptions = (title) => ({ navigation }) => ({
         navigation.goBack();
       }}
     >
-      <Ionicons name="ios-arrow-back-outline" size={24} color="white" />
+      <Ionicons name="ios-arrow-back-outline" size={24} color="#000" />
     </TouchableOpacity>
   ),
 });
@@ -35,20 +49,88 @@ const getDefaultScreenOptions = (title) => ({ navigation }) => ({
 const MainStack = createStackNavigator();
 
 export const MainStackScreen = ({ navigation }) => {
+  const profileData = useSelector(getUserProfileState);
+  const newNotificationsCount = useSelector(getNewNotificationsCountState);
+
   return (
-    <MainStack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: THEME.MAIN_COLOR,
-        },
-        headerTintColor: "#fff",
-      }}
-    >
+    <MainStack.Navigator>
       <MainStack.Screen
         name="Main"
         component={MainScreen}
         options={{
-          headerTitle: "Главная",
+          headerTitle: "SKOmed",
+          headerStyle: {
+            height: 120,
+          },
+          headerTitleStyle: {
+            marginBottom: 5,
+            fontWeight: "bold",
+            fontSize: 27,
+          },
+          headerRight: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                {profileData && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("Profile");
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <View
+                        style={{
+                          marginRight: 5,
+                          maxWidth: 100,
+                        }}
+                      >
+                        <AppText
+                          numberOfLines={1}
+                          style={{ fontSize: 12, color: "#808080" }}
+                        >
+                          {profileData.FIO}
+                        </AppText>
+                      </View>
+                      <ProfileIcon width={27} height={27} />
+                    </View>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("Notification");
+                  }}
+                  style={{
+                    marginRight: 10,
+                    marginLeft: 15,
+                    position: "relative",
+                  }}
+                >
+                  <AlarmIcon width={27} height={27} />
+                  {newNotificationsCount > 0 && (
+                    <View
+                      style={{
+                        backgroundColor: "#FF0000",
+                        width: 10,
+                        height: 10,
+                        borderRadius: 5,
+                        position: "absolute",
+                        right: 0,
+                      }}
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+            );
+          },
         }}
       />
 
@@ -133,6 +215,11 @@ export const MainStackScreen = ({ navigation }) => {
       <MainStack.Screen
         name="WorkEvaluation"
         component={WorkEvaluation}
+        options={getDefaultScreenOptions("Оценка работы врача")}
+      />
+      <MainStack.Screen
+        name="Notification"
+        component={NotificationScreen}
         options={getDefaultScreenOptions("Оценка работы врача")}
       />
     </MainStack.Navigator>

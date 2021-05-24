@@ -15,7 +15,6 @@ import { THEME } from "../theme";
 import { Preloader } from "../components/ui/Preloader";
 import {
   getInitAppState,
-  getNewNotificationsCountState,
   getExpoPushTokenState,
   getSubscriberIdState,
   getDeviceIdState,
@@ -30,6 +29,7 @@ import {
 } from "../store/actions/app";
 import { HistoryStackScreen } from "./stacks/HistoryStackScreen";
 import { getHistoryAppointments } from "../store/actions/appointment";
+import { getUserProfileState } from "../store/selectors/user";
 
 // нижняя навигация
 
@@ -37,10 +37,11 @@ const BottonmTabNavigation = createBottomTabNavigator();
 
 const AppNavigation = () => {
   const isInit = useSelector(getInitAppState);
-  const newNotificationsCount = useSelector(getNewNotificationsCountState);
+
   const pushToken = useSelector(getExpoPushTokenState);
   const subscriberId = useSelector(getSubscriberIdState);
   const deviceId = useSelector(getDeviceIdState);
+  const profileData = useSelector(getUserProfileState);
 
   console.log("PUSH_TOKEN", pushToken);
   console.log("isInit", isInit);
@@ -104,30 +105,33 @@ const AppNavigation = () => {
     <NavigationContainer>
       <BottonmTabNavigation.Navigator
         tabBarOptions={{
-          activeBackgroundColor: "#379494",
-          inactiveBackgroundColor: THEME.MAIN_COLOR,
+          inactiveBackgroundColor: "#fff",
           activeTintColor: "#c7eaea",
-          inactiveTintColor: "#fff",
-          showLabel: false,
+          inactiveTintColor: "#8E8E93",
+          style: {
+            height: 70,
+            paddingBottom: 10,
+          },
         }}
       >
         <BottonmTabNavigation.Screen
           name="Main"
           component={MainStackScreen}
           options={{
-            tabBarLabel: "Главная",
+            tabBarLabel: "Сервисы",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="ios-home-outline" size={27} color={color} />
+              <Ionicons name="ios-home-outline" size={32} color={color} />
             ),
           }}
         />
+
         <BottonmTabNavigation.Screen
           name="Profile"
           component={ProfileStackScreen}
           options={{
             tabBarLabel: "Профиль",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="md-people-outline" size={27} color={color} />
+              <Ionicons name="md-people-outline" size={32} color={color} />
             ),
           }}
         />
@@ -135,17 +139,17 @@ const AppNavigation = () => {
           name="History"
           component={HistoryStackScreen}
           options={{
-            tabBarLabel: "История записей",
+            tabBarLabel: "Мои записи",
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="file-tray-stacked-outline"
-                size={25}
+                size={32}
                 color={color}
               />
             ),
           }}
-        ></BottonmTabNavigation.Screen>
-        <BottonmTabNavigation.Screen
+        />
+        {/* <BottonmTabNavigation.Screen
           name="Notification"
           component={NotificationStackScreen}
           options={{
@@ -160,7 +164,7 @@ const AppNavigation = () => {
               />
             ),
           }}
-        ></BottonmTabNavigation.Screen>
+        ></BottonmTabNavigation.Screen> */}
       </BottonmTabNavigation.Navigator>
     </NavigationContainer>
   );
