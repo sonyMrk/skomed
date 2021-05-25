@@ -3,6 +3,7 @@ import {
   SET_MEDICATIONS_LIST,
   SET_MEDICATIONS_LIST_LOADING,
   CLEAR_MEDICATIONS_ERROR,
+  CLEAR_MEDICATIONS_LIST,
 } from "../types";
 
 const initialState = {
@@ -41,6 +42,12 @@ export const medicationsReducer = (state = initialState, action) => {
       };
     }
 
+    case CLEAR_MEDICATIONS_LIST: {
+      return {
+        ...state,
+        medicationsList: null,
+      };
+    }
     default:
       return state;
   }

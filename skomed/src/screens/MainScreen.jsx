@@ -33,6 +33,14 @@ const carouselItems = [
   },
 ];
 
+const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
+  "window"
+);
+const SLIDE_WIDTH = Math.round(viewportWidth / 1.7);
+const ITEM_HORIZONTAL_MARGIN = 25;
+const ITEM_WIDTH = SLIDE_WIDTH + ITEM_HORIZONTAL_MARGIN * 2;
+const SLIDER_WIDTH = viewportWidth * 0.93;
+
 export const MainScreen = ({ navigation }) => {
   const carouselRef = useRef(null);
 
@@ -42,22 +50,24 @@ export const MainScreen = ({ navigation }) => {
 
   const renderCarouselItem = ({ item, index }) => {
     return (
-      <ImageBackground
-        source={{
-          uri: item.imageURI,
-        }}
-        style={styles.slider__image}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate(item.navigateTo);
+      <View style={{ marginRight: 20 }}>
+        <ImageBackground
+          source={{
+            uri: item.imageURI,
           }}
+          style={styles.slider__image}
         >
-          <View style={styles.slide}>
-            <AppBoldText style={styles.slide__text}>{item.title}</AppBoldText>
-          </View>
-        </TouchableOpacity>
-      </ImageBackground>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(item.navigateTo);
+            }}
+          >
+            <View style={styles.slide}>
+              <AppBoldText style={styles.slide__text}>{item.title}</AppBoldText>
+            </View>
+          </TouchableOpacity>
+        </ImageBackground>
+      </View>
     );
   };
 
@@ -159,11 +169,15 @@ export const MainScreen = ({ navigation }) => {
 
       <View style={styles.carousel}>
         <Carousel
+          sliderWidth={SLIDER_WIDTH}
+          itemWidth={ITEM_WIDTH}
+          itemHeight={Dimensions.get("window").height / 6}
+          activeSlideAlignment={"start"}
+          inactiveSlideScale={1}
+          inactiveSlideOpacity={1}
           ref={carouselRef}
           data={carouselItems}
           renderItem={renderCarouselItem}
-          sliderWidth={Dimensions.get("window").width}
-          itemWidth={Dimensions.get("window").width * 0.8}
           layout={"default"}
         />
       </View>
@@ -205,24 +219,25 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   image: {
-    flex: 2,
+    flex: 2.8,
     resizeMode: "cover",
     justifyContent: "center",
-    marginBottom: 20,
+    marginBottom: Dimensions.get("window").height / 30,
   },
   menu: {
-    flex: 4,
+    flex: 3,
     width: Dimensions.get("window").width,
+    marginBottom: Dimensions.get("window").height / 10,
   },
   carousel: {
-    flex: 2,
+    flex: 2.5,
+    padding: 20,
   },
   slider__image: {
-    width: Dimensions.get("window").width * 0.8,
-    height: Dimensions.get("window").height / 6,
+    width: "100%",
+    height: "100%",
     resizeMode: "cover",
     justifyContent: "center",
-    marginBottom: 20,
     borderRadius: 30,
     overflow: "hidden",
   },
@@ -230,10 +245,10 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   slide__text: {
-    fontSize: 20,
+    fontSize: 18,
     maxWidth: 200,
     textShadowColor: "#fff",
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 10,
+    textShadowOffset: { width: -10, height: 13 },
+    textShadowRadius: 20,
   },
 });

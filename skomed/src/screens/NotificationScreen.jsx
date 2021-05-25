@@ -25,13 +25,19 @@ const NotificationItem = ({ item, expoPushToken }) => {
   const subscriberId = useSelector(getSubscriberIdState);
   const deviceId = useSelector(getDeviceIdState);
 
-
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handlePressOnItem = () => {
-    setFullSize(!fullSize)
-    dispatch(confirmMessageViewingOnDevice(subscriberId, deviceId, item.MessageGUID, expoPushToken ))
-  }
+    setFullSize(!fullSize);
+    dispatch(
+      confirmMessageViewingOnDevice(
+        subscriberId,
+        deviceId,
+        item.MessageGUID,
+        expoPushToken
+      )
+    );
+  };
 
   return (
     <TouchableOpacity style={styles.notification} onPress={handlePressOnItem}>
@@ -59,7 +65,6 @@ export const NotificationScreen = ({}) => {
   const notificationsError = useSelector(getAppNotificationsErrorState);
   const notificationsLoading = useSelector(getAppNotificationsLoadingState);
   const newNotificationsCount = useSelector(getNewNotificationsCountState);
-   
 
   if (notificationsLoading) {
     return <Preloader />;
@@ -68,7 +73,6 @@ export const NotificationScreen = ({}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <AppBoldText style={styles.title}>Уведомления</AppBoldText>
         {/* Выводим ошибки */}
         {notificationsError ? (
           <AppBoldText style={styles.error}>{notificationsError}</AppBoldText>
@@ -93,7 +97,13 @@ export const NotificationScreen = ({}) => {
             );
           })}
       </View>
-      <AppButton onPress={() => { AsyncStorage.clear() }}>Очистить хранилище</AppButton>
+      <AppButton
+        onPress={() => {
+          AsyncStorage.clear();
+        }}
+      >
+        Очистить хранилище
+      </AppButton>
     </View>
   );
 };
@@ -132,4 +142,3 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
-

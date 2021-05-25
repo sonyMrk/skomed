@@ -23,8 +23,8 @@ export const MenuItem = ({ title, navigateTo, style, onPress, children }) => {
           </View>
           <View style={styles.arrow}>
             <ArrowIcon
-              width={Dimensions.get("screen").width / 20}
-              height={Dimensions.get("screen").width / 20}
+              width={Dimensions.get("window").width / 20}
+              height={Dimensions.get("window").width / 20}
             />
           </View>
         </View>
@@ -36,7 +36,7 @@ export const MenuItem = ({ title, navigateTo, style, onPress, children }) => {
 const styles = StyleSheet.create({
   item: {
     backgroundColor: "#fff",
-    padding: 10,
+    padding: Dimensions.get("window").width / 40,
     borderColor: "#D1D1D6",
     borderBottomWidth: 1,
   },

@@ -5,14 +5,9 @@ import { AppText } from "./AppText";
 import { AppBoldText } from "./AppBoldText";
 import { THEME } from "../../theme";
 
-export const InfoItem = ({
-  title,
-  value,
-  color = "#000",
-  children,
-}) => {
+export const InfoItem = ({ title, value, color = "#000", children, style }) => {
   return (
-    <View style={styles.item}>
+    <View style={{ ...styles.item, ...style }}>
       <View>
         <AppText style={{ color: THEME.GRAY_COLOR }}>{title}</AppText>
       </View>

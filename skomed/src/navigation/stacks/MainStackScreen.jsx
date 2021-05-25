@@ -17,11 +17,8 @@ import { WorkEvaluation } from "../../screens/WorkEvaluation";
 
 import { THEME } from "../../theme";
 import { MainScreen } from "./../../screens/MainScreen";
-import ProfileIcon from "../../../assets/icons/person.svg";
 import AlarmIcon from "../../../assets/icons/alarm.svg";
-import { AppText } from "../../components/ui/AppText";
 import { useSelector } from "react-redux";
-import { getUserProfileState } from "../../store/selectors/user";
 import { NotificationScreen } from "../../screens/NotificationScreen";
 import { getNewNotificationsCountState } from "../../store/selectors/app";
 
@@ -49,7 +46,6 @@ const getDefaultScreenOptions = (title) => ({ navigation }) => ({
 const MainStack = createStackNavigator();
 
 export const MainStackScreen = ({ navigation }) => {
-  const profileData = useSelector(getUserProfileState);
   const newNotificationsCount = useSelector(getNewNotificationsCountState);
 
   return (
@@ -75,35 +71,6 @@ export const MainStackScreen = ({ navigation }) => {
                   alignItems: "center",
                 }}
               >
-                {profileData && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("Profile");
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          marginRight: 5,
-                          maxWidth: 100,
-                        }}
-                      >
-                        <AppText
-                          numberOfLines={1}
-                          style={{ fontSize: 12, color: "#808080" }}
-                        >
-                          {profileData.FIO}
-                        </AppText>
-                      </View>
-                      <ProfileIcon width={27} height={27} />
-                    </View>
-                  </TouchableOpacity>
-                )}
                 <TouchableOpacity
                   onPress={() => {
                     navigation.navigate("Notification");
@@ -220,7 +187,7 @@ export const MainStackScreen = ({ navigation }) => {
       <MainStack.Screen
         name="Notification"
         component={NotificationScreen}
-        options={getDefaultScreenOptions("Оценка работы врача")}
+        options={getDefaultScreenOptions("Уведомления")}
       />
     </MainStack.Navigator>
   );
