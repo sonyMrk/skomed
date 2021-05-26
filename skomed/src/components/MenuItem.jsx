@@ -1,10 +1,14 @@
 import React from "react";
-import { View, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Dimensions,
+  StyleSheet,
+  Image,
+} from "react-native";
 
 import { AppText } from "./ui/AppText";
-import { THEME } from "../theme";
-
-import ArrowIcon from "../../assets/icons/arrow.svg";
+import { normalize } from "../utils/normalizeFontSize";
 
 export const MenuItem = ({ title, navigateTo, style, onPress, children }) => {
   const handlePress = () => {
@@ -21,10 +25,10 @@ export const MenuItem = ({ title, navigateTo, style, onPress, children }) => {
               <AppText style={styles.text}>{title}</AppText>
             </View>
           </View>
-          <View style={styles.arrow}>
-            <ArrowIcon
-              width={Dimensions.get("window").width / 20}
-              height={Dimensions.get("window").width / 20}
+          <View>
+            <Image
+              source={require("../../assets/icons/arrow.png")}
+              style={styles.arrow}
             />
           </View>
         </View>
@@ -36,7 +40,7 @@ export const MenuItem = ({ title, navigateTo, style, onPress, children }) => {
 const styles = StyleSheet.create({
   item: {
     backgroundColor: "#fff",
-    padding: Dimensions.get("window").width / 40,
+    padding: Dimensions.get("window").width / 45,
     borderColor: "#D1D1D6",
     borderBottomWidth: 1,
   },
@@ -49,11 +53,15 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   text: {
-    fontSize: 17,
+    fontSize: normalize(13),
   },
   left: {
     flexDirection: "row",
     alignItems: "center",
   },
-  arrow: {},
+  arrow: {
+    width: Dimensions.get("window").width / 25,
+    height: Dimensions.get("window").width / 25,
+    maxWidth: "100%",
+  },
 });

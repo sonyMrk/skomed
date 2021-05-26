@@ -217,6 +217,9 @@ export const DrugSearchScreen = ({ navigation }) => {
   const handleGoBack = () => {
     dispatch(clearMedicationsError());
     dispatch(clearMedicationsList());
+    setMedicationName("");
+    setPharmacy(null);
+    setDistrict(null);
   };
 
   const handleWatchOnMap = (value) => {
@@ -234,32 +237,30 @@ export const DrugSearchScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        {medicationsList ? (
-          <View>
-            <View style={styles.result}>
-              {mapScreen ? (
-                <View>
-                  <AppButton
-                    onPress={() => {
-                      handleWatchOnMap(false);
-                    }}
-                  >
-                    Посмотреть список
-                  </AppButton>
-                  {medicationsList && (
-                    <MedicationsMap medicationsList={medicationsList} />
-                  )}
-                </View>
-              ) : (
+    <View style={styles.container}>
+      {medicationsList ? (
+        <View style={{ flex: 1 }}>
+          <View style={styles.result}>
+            {mapScreen ? (
+              <View style={{ flex: 1 }}>
+                <AppButton
+                  onPress={() => {
+                    handleWatchOnMap(false);
+                  }}
+                >
+                  Посмотреть список
+                </AppButton>
+                {medicationsList && (
+                  <MedicationsMap medicationsList={medicationsList} />
+                )}
+              </View>
+            ) : (
+              <ScrollView>
                 <View style={styles.result__list}>
                   <AppButton onPress={handleGoBack}>Вернутся назад</AppButton>
                   {medicationsList.length == 0 ? (
                     <AppText style={styles.result__text}>
-                      ИЗВИНИТЕ, на данный момент в базе данных Справочной службы
-                      138 этого препарата (изделия) нет. Не забудьте уточнить
-                      название препарата
+                      По вашему запросу результатов не найдено
                     </AppText>
                   ) : (
                     <AppText
@@ -303,99 +304,101 @@ export const DrugSearchScreen = ({ navigation }) => {
                       );
                     })}
                 </View>
-              )}
-            </View>
-          </View>
-        ) : (
-          <View>
-            {medicationsError ? (
-              <View style={styles.errorWrapper}>
-                <AppBoldText style={styles.error}>
-                  {medicationsError}
-                </AppBoldText>
-              </View>
-            ) : null}
-            {medicationsLoading ? (
-              <Preloader />
-            ) : (
-              <View style={styles.filters}>
-                <View style={styles.select}>
-                  <View style={styles.header}>
-                    <AppText style={styles.subtitle}>Введите название</AppText>
-                  </View>
-                  <AppTextInput
-                    placeholder="Название лекарства"
-                    onChange={setMedicationName}
-                    value={medicationName}
-                  />
-                </View>
-
-                <View style={styles.select}>
-                  <View style={styles.header}>
-                    <AppText style={styles.subtitle}>Выберите аптеку</AppText>
-                  </View>
-                  <RNPickerSelect
-                    fixAndroidTouchableBug={true}
-                    placeholder={{
-                      value: null,
-                      label: "Выберите аптеку",
-                      color: THEME.MAIN_COLOR,
-                    }}
-                    onValueChange={setPharmacy}
-                    items={pharmacysList}
-                    useNativeAndroidPickerStyle={false}
-                    style={{
-                      ...pickerSelectStyles,
-                    }}
-                    // Icon={() => (
-                    //   <AntDesign name="medicinebox" size={20} color="white" />
-                    // )}
-                  />
-                </View>
-                <View style={styles.select}>
-                  <View style={styles.header}>
-                    <AppText style={styles.subtitle}>Выберите район</AppText>
-                  </View>
-                  <RNPickerSelect
-                    fixAndroidTouchableBug={true}
-                    placeholder={{
-                      value: null,
-                      label: "Выберите район",
-                      color: THEME.MAIN_COLOR,
-                    }}
-                    onValueChange={setDistrict}
-                    items={disctrictList}
-                    useNativeAndroidPickerStyle={false}
-                    style={{
-                      ...pickerSelectStyles,
-                    }}
-                    // Icon={() => (
-                    //   <AntDesign name="medicinebox" size={20} color="white" />
-                    // )}
-                  />
-                </View>
-                <AppButton
-                  onPress={handleSearch}
-                  disabled={medicationName.length < 2}
-                >
-                  Поиск
-                </AppButton>
-              </View>
+              </ScrollView>
             )}
           </View>
-        )}
-      </View>
-    </ScrollView>
+        </View>
+      ) : (
+        <View>
+          {medicationsError ? (
+            <View style={styles.errorWrapper}>
+              <AppBoldText style={styles.error}>{medicationsError}</AppBoldText>
+            </View>
+          ) : null}
+          {medicationsLoading ? (
+            <View style={styles.preloader}>
+              <Preloader />
+            </View>
+          ) : (
+            <View style={styles.filters}>
+              <View style={styles.select}>
+                <View style={styles.header}>
+                  <AppText style={styles.subtitle}>Введите название</AppText>
+                </View>
+                <AppTextInput
+                  placeholder="Название лекарства"
+                  onChange={setMedicationName}
+                  value={medicationName}
+                />
+              </View>
+
+              <View style={styles.select}>
+                <View style={styles.header}>
+                  <AppText style={styles.subtitle}>Выберите аптеку</AppText>
+                </View>
+                <RNPickerSelect
+                  fixAndroidTouchableBug={true}
+                  placeholder={{
+                    value: null,
+                    label: "Выберите аптеку",
+                    color: THEME.MAIN_COLOR,
+                  }}
+                  onValueChange={setPharmacy}
+                  items={pharmacysList}
+                  useNativeAndroidPickerStyle={false}
+                  style={{
+                    ...pickerSelectStyles,
+                  }}
+                  // Icon={() => (
+                  //   <AntDesign name="medicinebox" size={20} color="white" />
+                  // )}
+                />
+              </View>
+              <View style={styles.select}>
+                <View style={styles.header}>
+                  <AppText style={styles.subtitle}>Выберите район</AppText>
+                </View>
+                <RNPickerSelect
+                  fixAndroidTouchableBug={true}
+                  placeholder={{
+                    value: null,
+                    label: "Выберите район",
+                    color: THEME.MAIN_COLOR,
+                  }}
+                  onValueChange={setDistrict}
+                  items={disctrictList}
+                  useNativeAndroidPickerStyle={false}
+                  style={{
+                    ...pickerSelectStyles,
+                  }}
+                  // Icon={() => (
+                  //   <AntDesign name="medicinebox" size={20} color="white" />
+                  // )}
+                />
+              </View>
+              <AppButton
+                onPress={handleSearch}
+                disabled={medicationName.length < 2}
+              >
+                Поиск
+              </AppButton>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
   },
   header: {
     paddingVertical: 5,
+  },
+  preloader: {
+    marginTop: 30,
   },
   title: {
     textAlign: "center",
@@ -412,7 +415,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
   },
-  filters: {},
+  filters: {
+    padding: 15,
+  },
   subtitle: {
     textAlign: "center",
     color: THEME.GRAY_COLOR,
@@ -421,7 +426,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   result: {
-    marginTop: 20,
+    flex: 1,
   },
   map__tooltip: {
     borderRadius: 10,
@@ -441,14 +446,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
-  result__list: {},
+  result__list: {
+    padding: 15,
+  },
   map: {
     width: "100%",
     height: "100%",
   },
   map__wrapper: {
     padding: 10,
-    height: Dimensions.get("window").height * 0.7,
+    height: Dimensions.get("window").height * 0.9,
     width: "100%",
   },
 });

@@ -5,6 +5,7 @@ import {
   ImageBackground,
   Dimensions,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import { Asset } from "expo-asset";
@@ -12,12 +13,8 @@ import { Asset } from "expo-asset";
 import { MenuItem } from "../components/MenuItem";
 import { AppText } from "../components/ui/AppText";
 
-import AppointmentIcon from "../../assets/icons/appointment.svg";
-import HouseCallIcon from "../../assets/icons/house_call.svg";
-import SheduleIcon from "../../assets/icons/shedule.svg";
-import WorkEvaluationIcon from "../../assets/icons/work_ev.svg";
-import DocumentScannedIcon from "../../assets/icons/doc_scan.svg";
 import { AppBoldText } from "../components/ui/AppBoldText";
+import { normalize } from "../utils/normalizeFontSize";
 
 const carouselItems = [
   {
@@ -36,6 +33,7 @@ const carouselItems = [
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
 );
+
 const SLIDE_WIDTH = Math.round(viewportWidth / 1.7);
 const ITEM_HORIZONTAL_MARGIN = 25;
 const ITEM_WIDTH = SLIDE_WIDTH + ITEM_HORIZONTAL_MARGIN * 2;
@@ -73,38 +71,42 @@ export const MainScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/images/banner.jpg")}
-        style={styles.image}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("RegistrationForVaccination");
-          }}
+      <View style={styles.banner__wrapper}>
+        <ImageBackground
+          source={require("../../assets/images/banner.jpg")}
+          style={styles.image}
         >
-          <View style={styles.banner}>
-            <View style={styles.info}>
-              <AppBoldText style={styles.info__title}>
-                Запись на прививку от COVID19
-              </AppBoldText>
-              <View style={styles.actions}>
-                <View
-                  style={{
-                    ...styles.action,
-                    backgroundColor: "#F12B2B",
-                    marginRight: 10,
-                  }}
-                >
-                  <AppText style={styles.action__text}>Бесплатно</AppText>
-                </View>
-                <View style={{ ...styles.action, backgroundColor: "#F1842B" }}>
-                  <AppText style={styles.action__text}>Быстро</AppText>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("RegistrationForVaccination");
+            }}
+          >
+            <View style={styles.banner}>
+              <View style={styles.info}>
+                <AppBoldText style={styles.info__title}>
+                  Запись на прививку от COVID19
+                </AppBoldText>
+                <View style={styles.actions}>
+                  <View
+                    style={{
+                      ...styles.action,
+                      backgroundColor: "#F12B2B",
+                      marginRight: 10,
+                    }}
+                  >
+                    <AppText style={styles.action__text}>Бесплатно</AppText>
+                  </View>
+                  <View
+                    style={{ ...styles.action, backgroundColor: "#F1842B" }}
+                  >
+                    <AppText style={styles.action__text}>Быстро</AppText>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      </ImageBackground>
+          </TouchableOpacity>
+        </ImageBackground>
+      </View>
       <View style={styles.menu}>
         <MenuItem
           title="Запись на прием"
@@ -112,9 +114,9 @@ export const MainScreen = ({ navigation }) => {
           onPress={onMenuItemPress}
           navigateTo="Appointment"
         >
-          <AppointmentIcon
-            width={Dimensions.get("screen").width / 13}
-            height={Dimensions.get("screen").width / 13}
+          <Image
+            source={require("../../assets/icons/appointment.png")}
+            style={styles.icon}
           />
         </MenuItem>
 
@@ -124,9 +126,9 @@ export const MainScreen = ({ navigation }) => {
           onPress={onMenuItemPress}
           navigateTo="HouseCallScreen"
         >
-          <HouseCallIcon
-            width={Dimensions.get("screen").width / 13}
-            height={Dimensions.get("screen").width / 13}
+          <Image
+            source={require("../../assets/icons/house_call.png")}
+            style={styles.icon}
           />
         </MenuItem>
 
@@ -136,9 +138,9 @@ export const MainScreen = ({ navigation }) => {
           onPress={onMenuItemPress}
           navigateTo="ScheduleScreen"
         >
-          <SheduleIcon
-            width={Dimensions.get("screen").width / 13}
-            height={Dimensions.get("screen").width / 13}
+          <Image
+            source={require("../../assets/icons/shedule.png")}
+            style={styles.icon}
           />
         </MenuItem>
 
@@ -148,9 +150,9 @@ export const MainScreen = ({ navigation }) => {
           onPress={onMenuItemPress}
           navigateTo="WorkEvaluation"
         >
-          <WorkEvaluationIcon
-            width={Dimensions.get("screen").width / 13}
-            height={Dimensions.get("screen").width / 13}
+          <Image
+            source={require("../../assets/icons/work_ev.png")}
+            style={styles.icon}
           />
         </MenuItem>
 
@@ -160,9 +162,9 @@ export const MainScreen = ({ navigation }) => {
           onPress={onMenuItemPress}
           navigateTo="DocumentScannedScreen"
         >
-          <DocumentScannedIcon
-            width={Dimensions.get("screen").width / 13}
-            height={Dimensions.get("screen").width / 13}
+          <Image
+            source={require("../../assets/icons/doc_scan.png")}
+            style={styles.icon}
           />
         </MenuItem>
       </View>
@@ -171,7 +173,7 @@ export const MainScreen = ({ navigation }) => {
         <Carousel
           sliderWidth={SLIDER_WIDTH}
           itemWidth={ITEM_WIDTH}
-          itemHeight={Dimensions.get("window").height / 6}
+          itemHeight={viewportHeight / 6}
           activeSlideAlignment={"start"}
           inactiveSlideScale={1}
           inactiveSlideOpacity={1}
@@ -187,24 +189,32 @@ export const MainScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
     alignItems: "center",
     flex: 1,
   },
+  banner__wrapper: {
+    flex: 1.5,
+    resizeMode: "cover",
+    justifyContent: "center",
+  },
   banner: {
-    width: Dimensions.get("window").width,
+    width: viewportWidth,
     justifyContent: "flex-end",
-    flex: 2,
   },
   info: {
     paddingLeft: 20,
     paddingBottom: 10,
   },
+  icon: {
+    width: Dimensions.get("screen").width / 15,
+    height: Dimensions.get("screen").width / 15,
+    resizeMode: "contain",
+  },
   info__title: {
-    fontSize: 20,
+    fontSize: normalize(17),
     maxWidth: 200,
-    textShadowColor: "#fff",
-    textShadowOffset: { width: -1, height: 1 },
+    textShadowColor: "rgb(255, 255, 255)",
+    textShadowOffset: { width: 3, height: 3 },
     textShadowRadius: 10,
   },
   actions: {
@@ -219,36 +229,37 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   image: {
-    flex: 2.8,
+    flex: 1,
     resizeMode: "cover",
-    justifyContent: "center",
-    marginBottom: Dimensions.get("window").height / 30,
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
   },
   menu: {
-    flex: 3,
-    width: Dimensions.get("window").width,
-    marginBottom: Dimensions.get("window").height / 10,
+    flex: 2.2,
+    width: viewportWidth,
+    marginTop: viewportHeight / 40,
   },
   carousel: {
-    flex: 2.5,
+    flex: 1.35,
+    marginTop: 20,
     padding: 20,
   },
   slider__image: {
     width: "100%",
-    height: "100%",
+    height: viewportHeight / 6,
     resizeMode: "cover",
     justifyContent: "center",
-    borderRadius: 30,
+    borderRadius: 20,
     overflow: "hidden",
   },
   slide: {
-    padding: 30,
+    paddingHorizontal: viewportHeight / 40,
   },
   slide__text: {
-    fontSize: 18,
-    maxWidth: 200,
-    textShadowColor: "#fff",
-    textShadowOffset: { width: -10, height: 13 },
-    textShadowRadius: 20,
+    fontSize: normalize(14),
+    maxWidth: 150,
+    textShadowColor: "rgb(255, 255, 255)",
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 10,
   },
 });

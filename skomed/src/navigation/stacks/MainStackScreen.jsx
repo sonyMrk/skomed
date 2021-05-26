@@ -1,6 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View, Dimensions, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { HospitalSelectionScreen } from "../../screens/HospitalSelectionScreen/HospitalSelectionScreen";
@@ -15,12 +15,11 @@ import { RegistrationForVaccination } from "../../screens/RegistrationForVaccina
 import { ConfirtmRegForVaccination } from "../../screens/RegistrationForVaccination/ConfirtmRegForVaccination";
 import { WorkEvaluation } from "../../screens/WorkEvaluation";
 
-import { THEME } from "../../theme";
 import { MainScreen } from "./../../screens/MainScreen";
-import AlarmIcon from "../../../assets/icons/alarm.svg";
 import { useSelector } from "react-redux";
 import { NotificationScreen } from "../../screens/NotificationScreen";
 import { getNewNotificationsCountState } from "../../store/selectors/app";
+import { normalize } from "../../utils/normalizeFontSize";
 
 const getDefaultScreenOptions = (title) => ({ navigation }) => ({
   headerTitle: title,
@@ -56,7 +55,7 @@ export const MainStackScreen = ({ navigation }) => {
         options={{
           headerTitle: "SKOmed",
           headerStyle: {
-            height: 120,
+            height: Dimensions.get("window").width / 4.4,
           },
           headerTitleStyle: {
             marginBottom: 5,
@@ -81,7 +80,14 @@ export const MainStackScreen = ({ navigation }) => {
                     position: "relative",
                   }}
                 >
-                  <AlarmIcon width={27} height={27} />
+                  <Image
+                    style={{
+                      width: normalize(23),
+                      height: normalize(23),
+                      maxWidth: "100%",
+                    }}
+                    source={require("../../../assets/icons/alarm.png")}
+                  />
                   {newNotificationsCount > 0 && (
                     <View
                       style={{

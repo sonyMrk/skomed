@@ -5,7 +5,7 @@ import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
-import { Platform } from "react-native";
+import { Platform, Dimensions } from "react-native";
 
 import { NotificationStackScreen } from "./stacks/NotificationStackScreen";
 import { ProfileStackScreen } from "./stacks/ProfileStackScreen";
@@ -30,6 +30,7 @@ import {
 import { HistoryStackScreen } from "./stacks/HistoryStackScreen";
 import { getHistoryAppointments } from "../store/actions/appointment";
 import { getUserProfileState } from "../store/selectors/user";
+import { normalize } from "../utils/normalizeFontSize";
 
 // нижняя навигация
 
@@ -109,7 +110,7 @@ const AppNavigation = () => {
           activeTintColor: "#c7eaea",
           inactiveTintColor: "#8E8E93",
           style: {
-            height: 70,
+            height: Dimensions.get("window").height / 12,
             paddingBottom: 10,
           },
         }}
@@ -120,7 +121,11 @@ const AppNavigation = () => {
           options={{
             tabBarLabel: "Сервисы",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="ios-home-outline" size={32} color={color} />
+              <Ionicons
+                name="ios-home-outline"
+                size={normalize(24)}
+                color={color}
+              />
             ),
           }}
         />
@@ -131,7 +136,11 @@ const AppNavigation = () => {
           options={{
             tabBarLabel: "Профиль",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="md-people-outline" size={32} color={color} />
+              <Ionicons
+                name="md-people-outline"
+                size={normalize(24)}
+                color={color}
+              />
             ),
           }}
         />
@@ -143,28 +152,12 @@ const AppNavigation = () => {
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="file-tray-stacked-outline"
-                size={32}
+                size={normalize(24)}
                 color={color}
               />
             ),
           }}
         />
-        {/* <BottonmTabNavigation.Screen
-          name="Notification"
-          component={NotificationStackScreen}
-          options={{
-            tabBarLabel: "Уведомления",
-            tabBarBadge:
-              newNotificationsCount > 0 ? newNotificationsCount : null,
-            tabBarIcon: ({ color }) => (
-              <Ionicons
-                name="notifications-circle-outline"
-                size={27}
-                color={color}
-              />
-            ),
-          }}
-        ></BottonmTabNavigation.Screen> */}
       </BottonmTabNavigation.Navigator>
     </NavigationContainer>
   );
