@@ -1,57 +1,15 @@
 import React, { useRef, useEffect, useState } from "react";
 import { StyleSheet, View, Dimensions, Platform } from "react-native";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
-import * as Location from "expo-location";
 
 import newId from "../utils/newId";
 import { InfoItem } from "../components/ui/InfoItem";
 
-export const MedicationsMap = ({ medicationsList }) => {
+export const MedicationsMap = ({ medicationsList, region }) => {
   const mapRef = useRef(null);
-  const [permissionState, setPermissionState] = useState(null);
-  const [location, setLocation] = useState(null);
   const [margin, setMargin] = useState({
     bottom: 1,
   });
-
-  useEffect(() => {
-    askPermissions();
-  }, []);
-
-  useEffect(() => {
-    if (location) {
-      console.log("IF");
-      setTimeout(() => {
-        mapRef.current.fitToCoordinates(
-          [
-            {
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            },
-          ],
-          {
-            animated: true,
-          }
-        );
-      }, 500);
-    } else {
-      console.log("ELSE");
-      setTimeout(() => {
-        mapRef.current.fitToElements(Platform.OS === "android");
-      }, 500);
-    }
-  }, [location]);
-
-  const askPermissions = async () => {
-    try {
-      let location = await Location.getCurrentPositionAsync({});
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      setPermissionState(status);
-      setLocation(location);
-    } catch (error) {
-      console.log("Нет разрешения");
-    }
-  };
 
   const onMapReady = () => {
     if (Platform.OS === "android") {
@@ -71,6 +29,7 @@ export const MedicationsMap = ({ medicationsList }) => {
         showsMyLocationButton={true}
         mapPadding={{ bottom: 50 }}
         onMapReady={onMapReady}
+        initialRegion={region}
       >
         {medicationsList.map((item) => {
           return (
