@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -10,22 +10,26 @@ import {
 import Carousel from "react-native-snap-carousel";
 import { Asset } from "expo-asset";
 
-import { MenuItem } from "../components/MenuItem";
-import { AppText } from "../components/ui/AppText";
+import { MenuItem } from "../../components/MenuItem";
+import { AppText } from "../../components/ui/AppText";
 
-import { AppBoldText } from "../components/ui/AppBoldText";
-import { normalize } from "../utils/normalizeFontSize";
+import { AppBoldText } from "../../components/ui/AppBoldText";
+import { normalize } from "../../utils/normalizeFontSize";
+import { CarouselItem } from "./components/CarouselItem";
+import { ModalRecordsType } from "./components/ModalRecordTypes";
 
 const carouselItems = [
   {
     title: "Поиск лекарств в аптеках",
-    imageURI: Asset.fromModule(require("../../assets/images/search_farm.jpg"))
-      .uri,
+    imageURI: Asset.fromModule(
+      require("../../../assets/images/search_farm.jpg")
+    ).uri,
     navigateTo: "DrugSearchScreen",
   },
   {
     title: "Справочник медицинских организаций СКО",
-    imageURI: Asset.fromModule(require("../../assets/images/med_dir.jpg")).uri,
+    imageURI: Asset.fromModule(require("../../../assets/images/med_dir.jpg"))
+      .uri,
     navigateTo: "HospitalDirectoryScreen",
   },
 ];
@@ -42,38 +46,21 @@ const SLIDER_WIDTH = viewportWidth * 0.93;
 export const MainScreen = ({ navigation }) => {
   const carouselRef = useRef(null);
 
+  const [modalVisible, setModalVisible] = useState(false);
+
   const onMenuItemPress = (navigateTo) => {
     navigation.navigate(navigateTo);
   };
 
-  const renderCarouselItem = ({ item, index }) => {
-    return (
-      <View style={{ marginRight: 20 }}>
-        <ImageBackground
-          source={{
-            uri: item.imageURI,
-          }}
-          style={styles.slider__image}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate(item.navigateTo);
-            }}
-          >
-            <View style={styles.slide}>
-              <AppBoldText style={styles.slide__text}>{item.title}</AppBoldText>
-            </View>
-          </TouchableOpacity>
-        </ImageBackground>
-      </View>
-    );
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.banner__wrapper}>
         <ImageBackground
-          source={require("../../assets/images/banner.jpg")}
+          source={require("../../../assets/images/banner.jpg")}
           style={styles.image}
         >
           <TouchableOpacity
@@ -111,11 +98,10 @@ export const MainScreen = ({ navigation }) => {
         <MenuItem
           title="Запись на прием"
           key="1"
-          onPress={onMenuItemPress}
-          navigateTo="Appointment"
+          onPress={() => setModalVisible(true)}
         >
           <Image
-            source={require("../../assets/icons/appointment.png")}
+            source={require("../../../assets/icons/appointment.png")}
             style={styles.icon}
           />
         </MenuItem>
@@ -127,7 +113,7 @@ export const MainScreen = ({ navigation }) => {
           navigateTo="HouseCallScreen"
         >
           <Image
-            source={require("../../assets/icons/house_call.png")}
+            source={require("../../../assets/icons/house_call.png")}
             style={styles.icon}
           />
         </MenuItem>
@@ -139,7 +125,7 @@ export const MainScreen = ({ navigation }) => {
           navigateTo="ScheduleScreen"
         >
           <Image
-            source={require("../../assets/icons/shedule.png")}
+            source={require("../../../assets/icons/shedule.png")}
             style={styles.icon}
           />
         </MenuItem>
@@ -151,7 +137,7 @@ export const MainScreen = ({ navigation }) => {
           navigateTo="WorkEvaluation"
         >
           <Image
-            source={require("../../assets/icons/work_ev.png")}
+            source={require("../../../assets/icons/work_ev.png")}
             style={styles.icon}
           />
         </MenuItem>
@@ -163,7 +149,7 @@ export const MainScreen = ({ navigation }) => {
           navigateTo="DocumentScannedScreen"
         >
           <Image
-            source={require("../../assets/icons/doc_scan.png")}
+            source={require("../../../assets/icons/doc_scan.png")}
             style={styles.icon}
           />
         </MenuItem>
@@ -179,10 +165,17 @@ export const MainScreen = ({ navigation }) => {
           inactiveSlideOpacity={1}
           ref={carouselRef}
           data={carouselItems}
-          renderItem={renderCarouselItem}
+          renderItem={(props) => (
+            <CarouselItem {...props} onPress={onMenuItemPress} />
+          )}
           layout={"default"}
         />
       </View>
+      <ModalRecordsType
+        modalVisible={modalVisible}
+        closeModal={closeModal}
+        onMenuItemPress={onMenuItemPress}
+      />
     </View>
   );
 };
@@ -191,6 +184,12 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     flex: 1,
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
   },
   banner__wrapper: {
     flex: 1.5,
@@ -228,12 +227,6 @@ const styles = StyleSheet.create({
   action__text: {
     color: "#fff",
   },
-  image: {
-    flex: 1,
-    resizeMode: "cover",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-  },
   menu: {
     flex: 2.2,
     width: viewportWidth,
@@ -243,23 +236,5 @@ const styles = StyleSheet.create({
     flex: 1.35,
     marginTop: 20,
     padding: 20,
-  },
-  slider__image: {
-    width: "100%",
-    height: viewportHeight / 6,
-    resizeMode: "cover",
-    justifyContent: "center",
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  slide: {
-    paddingHorizontal: viewportHeight / 40,
-  },
-  slide__text: {
-    fontSize: normalize(14),
-    maxWidth: 150,
-    textShadowColor: "rgb(255, 255, 255)",
-    textShadowOffset: { width: 3, height: 3 },
-    textShadowRadius: 10,
   },
 });

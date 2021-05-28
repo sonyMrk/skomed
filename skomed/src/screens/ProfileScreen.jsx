@@ -35,6 +35,7 @@ import {
   getUserErrorMessageState,
   getIsVisibleConfirmCodeState,
   getUserDataState,
+  getUserFamilyState,
 } from "../store/selectors/user";
 import { AppText } from "../components/ui/AppText";
 // import { getFarm } from "../api/axios";
@@ -53,6 +54,7 @@ export const ProfileScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false); // открыто ли модальное окно
 
   const userProfile = useSelector(getUserProfileState);
+  const userFamily = useSelector(getUserFamilyState);
   const isLoading = useSelector(getUserLoadingState);
   const info = useSelector(getUserDataState);
   const profileLoadError = useSelector(getUserErrorMessageState);
@@ -60,20 +62,12 @@ export const ProfileScreen = ({ navigation }) => {
 
   const dispatch = useDispatch();
 
-  // const getFarmData = async () => {
-  //   const data = await getFarm()
-  //   console.log(data)
-  // }
-
   useEffect(() => {
-    // getFarmData()
     return () => {
       dispatch(clearUserError());
       dispatch(setIsVisibleConfirmCode(false));
     };
   }, []);
-
-  useEffect(() => {}, [userProfile]);
 
   const checkFormData = () => {
     dispatch(clearUserError());
@@ -92,7 +86,7 @@ export const ProfileScreen = ({ navigation }) => {
   };
 
   const createProfile = () => {
-    dispatch(clearUserError())
+    dispatch(clearUserError());
     dispatch(
       createUserProfile({ iin, phone: phoneValue.slice(-10), confirmCode })
     );
@@ -123,7 +117,7 @@ export const ProfileScreen = ({ navigation }) => {
 
   // открыть модальное окно в режиме редактирования
   const openModalForEdit = (id) => {
-    const person = userProfile.family.find((item) => item.id === id);
+    const person = userFamily.find((item) => item.id === id);
     if (person) {
       setEditMode(true);
       setFamilyPersonData(person);
@@ -189,9 +183,7 @@ export const ProfileScreen = ({ navigation }) => {
           <View style={styles.container}>
             <AppBoldText style={styles.title}>Данные пользователя</AppBoldText>
             {profileLoadError && (
-              <AppBoldText style={styles.error}>
-                {profileLoadError}
-              </AppBoldText>
+              <AppBoldText style={styles.error}>{profileLoadError}</AppBoldText>
             )}
             {!info ? (
               <Preloader />
@@ -222,8 +214,8 @@ export const ProfileScreen = ({ navigation }) => {
                 </View>
               </View>
 
-              {userProfile &&
-                userProfile.family.map((item) => (
+              {userFamily &&
+                userFamily.map((item) => (
                   <FamilyItem
                     {...item}
                     key={item.id}
@@ -255,7 +247,9 @@ export const ProfileScreen = ({ navigation }) => {
               value={iin}
               onChange={setIin}
               type="numeric"
-              style={{ marginBottom: 20 }}
+              style={{
+                marginBottom: 20,
+              }}
               maxLength={12}
             />
             <AppTextInput
@@ -273,12 +267,12 @@ export const ProfileScreen = ({ navigation }) => {
                   onPress={() => setHasConfirmCode(!hasConfirmCode)}
                   activeOpacity={0.5}
                 >
-                  <Checkbox
+                  {/* <Checkbox
                     style={styles.checkbox}
                     value={hasConfirmCode}
                     onValueChange={setHasConfirmCode}
                     color={hasConfirmCode ? THEME.MAIN_COLOR : undefined}
-                  />
+                  /> */}
                   <AppText>У меня уже есть код авторизации</AppText>
                 </TouchableOpacity>
                 <AppButton

@@ -1,5 +1,8 @@
 export const THEME = {
-  MAIN_COLOR: "#37a0a1",
-  GRAY_COLOR: "#b3b3b3",
-  DANGER_COLOR: "#ff4d4d"
+  MAIN_COLOR: "#1EC8C8",
+  GREEN_COLOR: "#1EC8C8",
+  BLUE_COLOR: "#007AFF",
+  GRAY_COLOR: "#A6A6A6",
+  OPACITY_GRAY_COLOR: "rgba(52, 52, 52, 0.8)",
+  DANGER_COLOR: "#ff4d4d",
 };

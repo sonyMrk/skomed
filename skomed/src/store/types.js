@@ -9,6 +9,7 @@ export const SET_NEW_NOTIFICATIONS_COUNT = "app/SET_NEW_NOTIFICATIONS_COUNT";
 
 export const SET_USER_DATA = "user/SET_USER_DATA";
 export const SET_USER_PROFILE = "user/SET_USER_PROFILE";
+export const SET_USER_FAMILY = "user/SET_USER_FAMILY";
 export const SET_USER_ERROR = "user/SET_ERROR";
 export const SET_USER_LOADING = "user/SET_USER_LOADING";
 export const SET_SICK_LIST_INFO = "user/SET_SICK_LIST_INFO";

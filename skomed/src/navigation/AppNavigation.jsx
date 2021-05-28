@@ -19,7 +19,7 @@ import {
   getSubscriberIdState,
   getDeviceIdState,
 } from "../store/selectors/app";
-import { loadUserProfile } from "../store/actions/user";
+import { loadUserProfile, loadUserFamily } from "../store/actions/user";
 import {
   getSubscriberID,
   setExpoPushToken,
@@ -81,6 +81,7 @@ const AppNavigation = () => {
 
   useEffect(() => {
     dispatch(loadUserProfile());
+    dispatch(loadUserFamily());
     dispatch(getSubscriberID());
     dispatch(getHistoryAppointments());
   }, []);

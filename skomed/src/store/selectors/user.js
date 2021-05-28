@@ -13,6 +13,7 @@ export const getUserSickListErrorMessageState = (state) =>
 export const getMedicalDoctypesState = (state) => getUserState(state).doctypes;
 
 export const getUserProfileState = (state) => getUserState(state).profile;
+export const getUserFamilyState = (state) => getUserState(state).family;
 
 export const getUserDataState = (state) => getUserState(state).userData;
 
@@ -23,5 +24,4 @@ export const getIsVisibleConfirmCodeState = (state) =>
   getUserState(state).isVisibleConfirmCodeField;
 
 export const getUserIINState = (state) => getUserProfileState(state)?.iin;
-export const getUserFamilyState = (state) => getUserProfileState(state)?.family;
 export const getUserPhoneState = (state) => getUserProfileState(state)?.phone;

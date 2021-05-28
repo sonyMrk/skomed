@@ -12,11 +12,13 @@ import {
   SET_VISIBLE_CONFIRM_CODE_FIELD,
   CLEAR_SICK_LIST_ERROR,
   SET_SICK_LIST_ERROR,
+  SET_USER_FAMILY,
 } from "../types";
 
 const initialState = {
   userData: null,
   profile: null,
+  family: null,
   isLoading: false,
   errorMessage: null,
   sickListError: null,
@@ -60,6 +62,13 @@ export const userReducer = (state = initialState, action) => {
       return {
         ...state,
         profile: action.payload,
+      };
+    }
+
+    case SET_USER_FAMILY: {
+      return {
+        ...state,
+        family: action.payload,
       };
     }
 
@@ -108,15 +117,15 @@ export const userReducer = (state = initialState, action) => {
     case CLEAR_SICK_LIST_ERROR: {
       return {
         ...state,
-        sickListError: null
-      }
+        sickListError: null,
+      };
     }
 
     case SET_SICK_LIST_ERROR: {
       return {
         ...state,
-        sickListError: action.payload
-      }
+        sickListError: action.payload,
+      };
     }
 
     default:

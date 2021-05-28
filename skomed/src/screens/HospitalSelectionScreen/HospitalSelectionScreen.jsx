@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, View, Alert, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Alert,
+  ScrollView,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -36,8 +44,25 @@ import {
   getUserFamilyState,
   getUserPhoneState,
 } from "../../store/selectors/user";
+import { AppText } from "../../components/ui/AppText";
+import { Stepper } from "./components/Stepper";
+import { normalize } from "../../utils/normalizeFontSize";
+import { PeopleItem } from "./components/PeopleItem";
+import { ModalAddPerson } from "./components/ModalAddPerson";
+import { createFamilyPerson } from "../../store/actions/user";
 
-export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
+const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
+  "window"
+);
+
+const titles = {
+  1: "Кого записываем?",
+  2: "Куда записываем?",
+  3: "Выберите время",
+  4: "",
+};
+
+export const HospitalSelectionScreen = ({ navigation, navigateTo, route }) => {
   const isHouseCall = navigateTo === "ConfirmHouseCallScreen"; // запись на прием или вызов врача на дом
 
   const [access, setAccess] = useState(false);
@@ -59,243 +84,122 @@ export const HospitalSelectionScreen = ({ navigation, navigateTo }) => {
   const appointmentError = useSelector(getAppointmentErrorMessageState);
   const isLoadingUserData = useSelector(getAppointmentUserDataLoadingState);
 
-  // действия при первом рэндеринге
-  useEffect(() => {
-    if (userIin) {
-      setIinInputValue(userIin);
-      fetchData(userIin);
-    }
-    dispatch(getHospitalsForAppointment()); // получаем список организаций где разрешена запись
-    return () => {
-      // действия при анмаунте
-      dispatch(clearUserData());
-      dispatch(clearHospitalsError());
-      dispatch(clearHospitalsForAppointment());
-      setAccess(false);
-    };
-  }, []);
-  // устанавливаем первую организацию в селект после загрузки орагнизаций
-  useEffect(() => {
-    if (hospitalsForAppointment) {
-      setOrganization(hospitalsForAppointment.Orgs[0].value);
-    }
-  }, [hospitalsForAppointment]);
+  const [step, setStep] = useState(1);
+  const [visibleAddModal, setVisibleAddModal] = useState(false);
+  const [selectedIIN, setSelectedIIN] = useState(null);
 
-  useEffect(() => {
-    // если выбрана организация и получены данные о пациенте:
-    if (organization && appointmentUserData) {
-      // Проверяем, если запись в поликлинику прикрепления:
-      if (organization.OrgID === "0") {
-        if (appointmentUserData.ErrorCode !== 0) {
-          // выводим еще раз ошибку если в начале не была выбрана поликлиника
-          showError(
-            // выводим ошибку
-            "Запись недоступна",
-            appointmentUserData.ErrorDesc
-          );
-        } else if (
-          // если запрещен вызов врача на дом и запись на прием
-          appointmentUserData.RegAvailable !== 1 ||
-          appointmentUserData.HomeCallAvailable !== 1
-        ) {
-          setShowSupportedHospitals(true);
-          showError(
-            //  выводим ошибку
-            "Запись недоступна",
-            "В настоящий момент запись в МО прикрепления пациента не возможна!"
-          );
-        } else {
-          setAccess(true); // иначе устанавливаем флаг
-        }
-      } else {
-        if (organization.ShowMessage) {
-          showError("Кабинет пациента", organization.MessageText);
-        }
-        // Проверяем, если ли запреты на запись
-        const errorUser = appointmentUserData?.OrgErrors?.find(
-          (orgError) => orgError.OrgID === organization.OrgID
-        );
-        // БАГ, ЕСЛИ НЕ ЗАГРУЗИЛИСЬ ДАННЫЕ, ТО МОЖНО ПЕРЕЙТИ ДАЛЬШЕ
-        if (errorUser) {
-          showError(
-            "Запись недоступна по следующим причинам:",
-            errorUser.ErrorText
-          );
-        } else {
-          setAccess(true);
-        }
-      }
-    }
-  }, [appointmentUserData, organization]);
-
-  const showError = (title, errorMessage) => {
-    return Alert.alert(title, errorMessage);
+  const fetchData = (IIN) => {
+    dispatch(getAppointmentUserData(IIN));
   };
 
-  const fetchData = (iin) => {
-    if (iin) {
-      if (iin.trim().length !== 12 || isNaN(iin)) {
-        Alert.alert("Не корректный ИИН", "Значение ИИН должно быть 12 цифр");
-      } else {
-        dispatch(getAppointmentUserData(iin));
-        setShowSupportedHospitals(false);
-      }
-    }
-  };
+  const appointmentType = route.params.type;
 
   // обработчик выбора ИИН из членов семьи
-  const handleFamilyChangeIin = (value) => {
-    dispatch(clearUserData());
-    setIinInputValue(value);
-    setAccess(false);
-    fetchData(value);
-  };
-  // обработчик выбора организации
-  const handleChangeOrganization = (org) => {
-    setOrganization(org);
-    setAccess(false);
-  };
-
-  const handleEndEditInn = () => {
+  const selectIIN = (IIN) => {
     dispatch(clearUserData());
     setAccess(false);
-    fetchData(iinInputValue);
+    setSelectedIIN(IIN);
+    setStep(2);
+    if (
+      appointmentType === "familyDoctor" ||
+      appointmentType === "profileSpecialists"
+    ) {
+      fetchData(IIN);
+    }
   };
 
-  if (isHospitalLoading) {
+  const handleOpenModal = () => {
+    setVisibleAddModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setVisibleAddModal(false);
+  };
+
+  const addFamilyPerson = (newMan) => {
+    dispatch(createFamilyPerson(newMan));
+  };
+
+  if (isHospitalLoading || isLoadingUserData) {
     return <Preloader />;
   }
 
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          {isHouseCall ? null : (
-            <AppBoldText style={styles.title}>
-              Выбор мед организации
-            </AppBoldText>
-          )}
-          {/* Выводим ошибки */}
-          {hospitalsLoadError ? (
-            <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-          ) : hospitalsForAppointment?.ErrorDesc !== 0 ? (
-            <AppBoldText style={styles.error}>
-              {hospitalsForAppointment?.ErrorDesc}
-            </AppBoldText>
-          ) : appointmentError ? (
-            <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
-          ) : null}
-        </View>
-        {!isHouseCall && hospitalsForAppointment && (
-          <View style={styles.select}>
-            <RNPickerSelect
-              placeholder={{}}
-              value={organization}
-              onValueChange={handleChangeOrganization}
-              items={hospitalsForAppointment.Orgs}
-              useNativeAndroidPickerStyle={false}
-              fixAndroidTouchableBug={true}
-              style={{
-                ...pickerSelectStyles,
-              }}
-              // Icon={() => (
-              //   <AntDesign name="medicinebox" size={20} color="white" />
-              // )}
-            />
-          </View>
-        )}
-        <View style={styles.input}>
-          <AppTextInput
-            placeholder="Введите ИИН"
-            value={iinInputValue}
-            onChange={setIinInputValue}
-            type="numeric"
-            onEndEditing={handleEndEditInn}
-            maxLength={12}
-          />
-        </View>
-        {profileFamily && profileFamily.length > 0 && (
-          <View style={styles.select}>
-            <RNPickerSelect
-              placeholder={{
-                label: "Выбрать из членов семьи",
-                value: null,
-                color: THEME.MAIN_COLOR,
-              }}
-              onValueChange={handleFamilyChangeIin}
-              items={[{ label: "Вы", value: userIin }, ...profileFamily]}
-              fixAndroidTouchableBug={true}
-              useNativeAndroidPickerStyle={false}
-              style={{
-                ...pickerSelectStyles,
-              }}
-              // Icon={() => <Ionicons name="people" size={20} color="white" />}
-            />
-          </View>
-        )}
-        {isLoadingUserData ? (
-          <Preloader />
-        ) : (
-          appointmentUserData && <InfoBlock infoData={appointmentUserData} />
-        )}
-        <View style={styles.footer}>
-          <AppButton
-            onPress={() => {
-              navigation.navigate(navigateTo, {
-                iin: iinInputValue,
-                organization,
-                profilePhone,
-                appointmentUserData,
-              });
-            }}
-            disabled={!access}
-          >
-            Далее
-          </AppButton>
-        </View>
-        <View style={styles.footer}>
-          {showSupportedHospitals && (
-            <AppButton
-              wrapperStyle={{ width: "100%" }}
-              onPress={() => navigation.navigate("SupportedHospitals")}
-            >
-              Посмотреть список доступных организаций
-            </AppButton>
-          )}
-        </View>
+    <View style={styles.container}>
+      <Stepper step={step} />
+      <View style={styles.title}>
+        <AppBoldText style={styles.title__text}>{titles[step]}</AppBoldText>
       </View>
-    </ScrollView>
+      {userIin && step === 1 && (
+        <>
+          <ScrollView>
+            <View style={styles.peoples}>
+              {[{ label: "Вы", value: userIin }, ...profileFamily].map(
+                (people) => {
+                  return (
+                    <PeopleItem
+                      item={people}
+                      key={people.value}
+                      onPress={selectIIN}
+                    />
+                  );
+                }
+              )}
+            </View>
+          </ScrollView>
+          <TouchableOpacity style={styles.add} onPress={handleOpenModal}>
+            <View>
+              <Image
+                source={require("../../../assets/icons/add_btn.png")}
+                style={styles.add_icon}
+              />
+            </View>
+          </TouchableOpacity>
+        </>
+      )}
+
+      <ModalAddPerson
+        modalVisible={visibleAddModal}
+        closeModal={handleCloseModal}
+        addPerson={addFamilyPerson}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: "relative",
     padding: 15,
   },
-  header: {
-    paddingVertical: 5,
-  },
   title: {
+    paddingVertical: 10,
+  },
+  title__text: {
     textAlign: "center",
-    fontSize: 18,
+    fontSize: normalize(23),
   },
-  error: {
-    color: THEME.DANGER_COLOR,
-    fontSize: 18,
-    textAlign: "center",
+  peoples: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: normalize(12),
   },
-  select: {
-    marginBottom: 15,
-  },
-  input: {
-    marginBottom: 15,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
+  add: {
+    position: "absolute",
     alignItems: "center",
-    marginTop: 20,
+    justifyContent: "center",
+    right: 15,
+    bottom: 15,
+    width: viewportWidth / 7,
+    height: viewportWidth / 7,
+    borderRadius: viewportWidth / 14,
+    backgroundColor: THEME.MAIN_COLOR,
+  },
+  add_icon: {
+    resizeMode: "contain",
+    width: viewportWidth / 20,
+    height: viewportWidth / 20,
   },
 });
 

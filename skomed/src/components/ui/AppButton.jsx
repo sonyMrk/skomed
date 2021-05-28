@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { THEME } from "../../theme";
 
 import { AppText } from "./AppText";
@@ -11,17 +7,22 @@ import { AppText } from "./AppText";
 export const AppButton = ({
   children,
   onPress,
-  color = THEME.MAIN_COLOR,
+  color = THEME.BLUE_COLOR,
   style,
-  wrapperStyle={},
+  wrapperStyle = {},
   disabled = false,
 }) => {
   return (
-    <TouchableOpacity onPress={onPress} disabled={disabled} activeOpacity={0.5} style={{...wrapperStyle}}>
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled}
+      activeOpacity={0.5}
+      style={{ ...wrapperStyle }}
+    >
       <View
         style={{
           ...styles.button,
-          backgroundColor: disabled ? "#b3e4e5" : color,
+          backgroundColor: disabled ? "#80bdff" : color,
           ...style,
         }}
       >

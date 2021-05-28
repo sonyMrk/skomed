@@ -1,13 +1,14 @@
-import React from "react"
-import {Text, StyleSheet} from "react-native"
+import React from "react";
+import { Text, StyleSheet } from "react-native";
 
-
-export const AppBoldText = ({children, style}) => (
-    <Text style={{ ...styles.text, ...style }}>{children}</Text>
-)
+export const AppBoldText = ({ children, style, numberOfLines }) => (
+  <Text style={{ ...styles.text, ...style }} numberOfLines={numberOfLines}>
+    {children}
+  </Text>
+);
 
 const styles = StyleSheet.create({
-    text: {
-        fontFamily: 'roboto-bold'
-    }
-})
+  text: {
+    fontFamily: "roboto-bold",
+  },
+});

@@ -4,7 +4,7 @@ import { TouchableOpacity, View, Dimensions, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { HospitalSelectionScreen } from "../../screens/HospitalSelectionScreen/HospitalSelectionScreen";
-import { DrugSearchScreen } from "../../screens/DrugSearchScreen";
+import { DrugSearchScreen } from "../../screens/DrugSearchScreen/DrugSearchScreen";
 import { HospitalDirectoryScreen } from "../../screens/HospitalDirectoryScreen";
 import { ScheduleScreen } from "../../screens/ScheduleScreen";
 import { DocumentScannedScreen } from "../../screens/DocumentScannedScreen";
@@ -15,16 +15,36 @@ import { RegistrationForVaccination } from "../../screens/RegistrationForVaccina
 import { ConfirtmRegForVaccination } from "../../screens/RegistrationForVaccination/ConfirtmRegForVaccination";
 import { WorkEvaluation } from "../../screens/WorkEvaluation";
 
-import { MainScreen } from "./../../screens/MainScreen";
+import { MainScreen } from "../../screens/MainScreen/MainScreen";
 import { useSelector } from "react-redux";
 import { NotificationScreen } from "../../screens/NotificationScreen";
 import { getNewNotificationsCountState } from "../../store/selectors/app";
 import { normalize } from "../../utils/normalizeFontSize";
+import { AppointmentFamilyDoctorScreen } from "../../screens/HospitalSelectionScreen/AppointmentFamilyDoctorScreen";
+import { AppText } from "../../components/ui/AppText";
+import { AppBoldText } from "../../components/ui/AppBoldText";
 
 const getDefaultScreenOptions = (title) => ({ navigation }) => ({
-  headerTitle: title,
+  headerTitle: () => (
+    <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <Image
+        source={require("../../../assets/icons/title__icon.png")}
+        style={{
+          resizeMode: "contain",
+          width: Dimensions.get("window").width / 15,
+          height: Dimensions.get("window").width / 15,
+        }}
+      />
+      <AppBoldText
+        style={{ fontSize: normalize(16), marginLeft: 5 }}
+        numberOfLines={1}
+      >
+        {title}
+      </AppBoldText>
+    </View>
+  ),
   headerTitleStyle: {
-    fontSize: 20,
+    fontSize: normalize(15),
   },
   headerStyle: {
     backgroundColor: "#fff",
@@ -194,6 +214,11 @@ export const MainStackScreen = ({ navigation }) => {
         name="Notification"
         component={NotificationScreen}
         options={getDefaultScreenOptions("Уведомления")}
+      />
+      <MainStack.Screen
+        name="AppointmentFamilyDoctor"
+        component={AppointmentFamilyDoctorScreen}
+        options={getDefaultScreenOptions("Запись к участковому врачу")}
       />
     </MainStack.Navigator>
   );

@@ -15,6 +15,7 @@ import {
   SET_VISIBLE_CONFIRM_CODE_FIELD,
   SET_SICK_LIST_ERROR,
   CLEAR_SICK_LIST_ERROR,
+  SET_USER_FAMILY,
 } from "../types";
 
 import { userApi } from "../../services/userApi";
@@ -27,6 +28,11 @@ export const setUserData = (payload) => ({
 
 export const setUserProfile = (payload) => ({
   type: SET_USER_PROFILE,
+  payload,
+});
+
+export const setUserFamily = (payload) => ({
+  type: SET_USER_FAMILY,
   payload,
 });
 
@@ -74,12 +80,12 @@ export const setIsVisibleConfirmCode = (payload) => ({
 
 export const setSickListError = (payload) => ({
   type: SET_SICK_LIST_ERROR,
-  payload
-})
+  payload,
+});
 
 export const clearSickListError = () => ({
-  type: CLEAR_SICK_LIST_ERROR
-})
+  type: CLEAR_SICK_LIST_ERROR,
+});
 
 export const GetMedicalDocInfo = (orgId, listNumber, docType = 1) => async (
   dispatch
@@ -133,6 +139,10 @@ const setProfile = async (profile, dispatch) => {
   await AsyncStorage.setItem("profile", JSON.stringify(profile));
   dispatch(setUserProfile(profile));
 };
+const setFamily = async (family, dispatch) => {
+  await AsyncStorage.setItem("family", JSON.stringify(family));
+  dispatch(setUserFamily(family));
+};
 
 // проверка введенных данных пользователя
 export const checkAuthFormData = (formData) => async (dispatch) => {
@@ -144,7 +154,7 @@ export const checkAuthFormData = (formData) => async (dispatch) => {
       formData.phone,
       formData.hasConfirmCode
     );
-     
+
     if (authRequest.ErrorCode !== 0) {
       dispatch(setUserError(authRequest.ErrorDesc));
     } else {
@@ -175,7 +185,6 @@ export const createUserProfile = (formData) => async (dispatch) => {
         ...userData,
         phone: formData.phone,
         iin: formData.iin,
-        family: [],
       };
       setProfile(profile, dispatch);
       dispatch(loadUserProfile());
@@ -189,7 +198,7 @@ export const createUserProfile = (formData) => async (dispatch) => {
   }
 };
 
-// загрузка ВСЕГО ПРОФИЛЯ
+// загрузка ПРОФИЛЯ при первой загрузке приложения
 export const loadUserProfile = () => async (dispatch) => {
   try {
     dispatch(setUserLoading(true));
@@ -207,13 +216,32 @@ export const loadUserProfile = () => async (dispatch) => {
   }
 };
 
-// загрузка данных с сервера
+// Загрузка СЕМЬИ при первой загрузке приложения
+export const loadUserFamily = () => async (dispatch) => {
+  try {
+    dispatch(setUserLoading(true));
+    const userFamily = await AsyncStorage.getItem("family");
+    if (userFamily) {
+      setFamily(JSON.parse(userFamily), dispatch);
+    } else {
+      setFamily([], dispatch);
+    }
+  } catch (error) {
+    dispatch(setUserError("Ошибка загрузки данных"));
+    console.log(error);
+  } finally {
+    dispatch(setUserLoading(false));
+    dispatch(setInitApp());
+  }
+};
+
+// загрузка данных с сервера по ИИН
 export const loadUserData = (iin) => async (dispatch) => {
   try {
     const userData = await userApi.GetPatientByIIN(iin);
     if (userData.ErrorCode !== 0) {
       dispatch(setUserError(userData.ErrorDesc));
-      dispatch(setUserData(userData));               // ДЛЯ ТЕСТОВОГО СЕРВАКА
+      dispatch(setUserData(userData)); // ДЛЯ ТЕСТОВОГО СЕРВАКА
     } else {
       dispatch(setUserData(userData));
     }
@@ -227,12 +255,13 @@ export const loadUserData = (iin) => async (dispatch) => {
 export const createFamilyPerson = (personData) => async (dispatch) => {
   try {
     dispatch(setUserLoading(true));
-    const userProfile = await getProfile();
-    const updateProfile = {
-      ...userProfile,
-      family: [...userProfile.family, { ...personData, id: newId() }],
-    };
-    await setProfile(updateProfile, dispatch);
+    const family = await AsyncStorage.getItem("family");
+    const updateFamily = [
+      ...JSON.parse(family),
+      { ...personData, id: newId() },
+    ];
+
+    setFamily(updateFamily, dispatch);
   } catch (error) {
     dispatch(setUserError("Ошибка при создании члена семьи"));
     console.log(error);
@@ -245,17 +274,14 @@ export const createFamilyPerson = (personData) => async (dispatch) => {
 export const editFamilyPerson = (personData) => async (dispatch) => {
   try {
     dispatch(setUserLoading(true));
-    const userProfile = await getProfile();
-    const updateProfile = {
-      ...userProfile,
-      family: userProfile.family.map((person) => {
-        if (person.id === personData.id) {
-          return personData;
-        }
-        return person;
-      }),
-    };
-    await setProfile(updateProfile, dispatch);
+    const family = await AsyncStorage.getItem("family");
+    const updateFamily = JSON.parse(family).map((person) => {
+      if (person.id === personData.id) {
+        return personData;
+      }
+      return person;
+    });
+    setFamily(updateFamily, dispatch);
   } catch (error) {
     dispatch(setUserError("Ошибка при редактировании члена семьи"));
     console.log(error);
@@ -269,12 +295,11 @@ export const editFamilyPerson = (personData) => async (dispatch) => {
 export const removeFamilyPerson = (id) => async (dispatch) => {
   try {
     dispatch(setUserLoading(true));
-    const userProfile = await getProfile();
-    const updateProfile = {
-      ...userProfile,
-      family: userProfile.family.filter((person) => person.id !== id),
-    };
-    await setProfile(updateProfile, dispatch);
+    const family = await AsyncStorage.getItem("family");
+    const updateFamily = JSON.parse(family).filter(
+      (person) => person.id !== id
+    );
+    setFamily(updateFamily, dispatch);
   } catch (error) {
     dispatch(setUserError("Ошибка при удалении члена семьи"));
     console.log(error);
