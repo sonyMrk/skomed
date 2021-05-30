@@ -1,10 +1,10 @@
-import React, { memo } from "react";
+import React from "react";
 import { View, StyleSheet } from "react-native";
 
 import { InfoItem } from "../../../components/ui/InfoItem";
 import { THEME } from "../../../theme";
 
-const Item = ({ item }) => {
+export const MedicationItem = ({ item }) => {
   return (
     <View style={styles.result__item}>
       <InfoItem title="Адрес" value={item.address} />
@@ -28,5 +28,3 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 });
-
-export default MedicationItem = memo(Item);

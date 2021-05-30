@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Alert, ScrollView } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 import { Table, Row, Rows } from "react-native-table-component";
-import { AntDesign } from "@expo/vector-icons";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -131,9 +130,6 @@ export const ScheduleScreen = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              // Icon={() => (
-              //   <AntDesign name="medicinebox" size={20} color="white" />
-              // )}
             />
           </View>
         )}
@@ -157,9 +153,6 @@ export const ScheduleScreen = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              // Icon={() => (
-              //   <AntDesign name="medicinebox" size={20} color="white" />
-              // )}
             />
           </View>
         )}

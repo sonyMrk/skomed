@@ -10,21 +10,19 @@ import {
   getMedicationsListState,
 } from "../../store/selectors/medications";
 import {
-  getMedicationsList,
   clearMedicationsError,
   clearMedicationsList,
-  setMedicationsLoading,
 } from "../../store/actions/medications";
 import { Preloader } from "../../components/ui/Preloader";
 import { THEME } from "../../theme";
 import { AppBoldText } from "../../components/ui/AppBoldText";
 import { MedicationsMap } from "./components/MedicationsMap";
 import { MedicationFilters } from "./components/MedicationFilters";
-import { MedicationResulList } from "./components/MedicationResulList";
+import MedicationResulList from "./components/MedicationResulList";
+import { AppText } from "../../components/ui/AppText";
 
 export const DrugSearchScreen = ({ navigation }) => {
   const [mapScreen, setMapScreen] = useState(false);
-  const [permissionState, setPermissionState] = useState(null);
   const [region, setInitRegion] = useState(null);
   const [mapLoading, setMapLoading] = useState(false);
 
@@ -36,9 +34,8 @@ export const DrugSearchScreen = ({ navigation }) => {
 
   const askPermissions = async () => {
     try {
-      let location = await Location.getCurrentPositionAsync({});
       let { status } = await Location.requestForegroundPermissionsAsync();
-      setPermissionState(status);
+      let location = await Location.getCurrentPositionAsync({});
       setInitRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -66,6 +63,14 @@ export const DrugSearchScreen = ({ navigation }) => {
     setMapScreen(false);
   };
 
+  const handleReset = () => {
+    dispatch(clearMedicationsError());
+    dispatch(clearMedicationsList());
+    // setMedicationName("");
+    // setPharmacy(null);
+    // setDistrict(null);
+  };
+
   useEffect(() => {
     return () => {
       dispatch(clearMedicationsError());
@@ -83,19 +88,34 @@ export const DrugSearchScreen = ({ navigation }) => {
                 <AppButton onPress={handleWatchOnList}>
                   Посмотреть список
                 </AppButton>
-                {medicationsList && (
-                  <MedicationsMap
-                    medicationsList={medicationsList}
-                    region={region}
-                  />
-                )}
+                <MedicationsMap region={region} />
               </View>
             ) : (
-              <MedicationResulList
-                medicationsList={medicationsList}
-                mapLoading={mapLoading}
-                onSelectMap={handleWatchOnMap}
-              />
+              <>
+                <AppButton onPress={handleReset}>
+                  Удалить результат поиска
+                </AppButton>
+                {medicationsList.length == 0 ? (
+                  <AppText style={styles.result__text}>
+                    По вашему запросу результатов не найдено
+                  </AppText>
+                ) : (
+                  <AppText
+                    style={{
+                      ...styles.result__text,
+                      color: THEME.DANGER_COLOR,
+                    }}
+                  >
+                    Пожалуйста, уточняйте цену и наличие лекарств в аптеках!
+                  </AppText>
+                )}
+                <AppButton onPress={handleWatchOnMap} disabled={mapLoading}>
+                  {mapLoading
+                    ? "Идет загрузка карты..."
+                    : "Посмотреть на карте"}
+                </AppButton>
+                <MedicationResulList medicationsList={medicationsList} />
+              </>
             )}
           </View>
         </View>
@@ -147,6 +167,10 @@ const styles = StyleSheet.create({
 
   result: {
     flex: 1,
+  },
+  result__text: {
+    textAlign: "center",
+    marginVertical: 20,
   },
   map__tooltip: {
     borderRadius: 10,

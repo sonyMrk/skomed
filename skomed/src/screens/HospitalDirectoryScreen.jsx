@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { StyleSheet, ScrollView, View, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import RNPickerSelect from "react-native-picker-select";
-import { AntDesign } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 
 import {
@@ -174,7 +166,6 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              // Icon={() => <FontAwesome5 name="city" size={20} color="white" />}
             />
           </View>
         )}
@@ -199,9 +190,6 @@ export const HospitalDirectoryScreen = ({ navigation }) => {
               style={{
                 ...pickerSelectStyles,
               }}
-              // Icon={() => (
-              //   <AntDesign name="medicinebox" size={20} color="white" />
-              // )}
             />
           </View>
         )}

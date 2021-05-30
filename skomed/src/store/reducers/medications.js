@@ -4,10 +4,13 @@ import {
   SET_MEDICATIONS_LIST_LOADING,
   CLEAR_MEDICATIONS_ERROR,
   CLEAR_MEDICATIONS_LIST,
+  SET_MEDICATIONS_MAP_MARKERS,
+  CLEAR_MEDICATIONS_MAP_MARKERS,
 } from "../types";
 
 const initialState = {
   medicationsList: null,
+  medicationsMapMarkers: null,
   medicationsListLoading: false,
   medicationsError: null,
 };
@@ -18,6 +21,19 @@ export const medicationsReducer = (state = initialState, action) => {
       return {
         ...state,
         medicationsList: action.payload,
+      };
+    }
+    case SET_MEDICATIONS_MAP_MARKERS: {
+      return {
+        ...state,
+        medicationsMapMarkers: action.payload,
+      };
+    }
+
+    case CLEAR_MEDICATIONS_MAP_MARKERS: {
+      return {
+        ...state,
+        medicationsMapMarkers: null,
       };
     }
 
