@@ -4,8 +4,10 @@ import { NavigationContainer } from "@react-navigation/native";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { useSelector, useDispatch } from "react-redux";
-import { Ionicons } from "@expo/vector-icons";
 import { Platform, Dimensions } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 import { NotificationStackScreen } from "./stacks/NotificationStackScreen";
 import { ProfileStackScreen } from "./stacks/ProfileStackScreen";
@@ -108,8 +110,8 @@ const AppNavigation = () => {
       <BottonmTabNavigation.Navigator
         tabBarOptions={{
           inactiveBackgroundColor: "#fff",
-          activeTintColor: "#c7eaea",
-          inactiveTintColor: "#8E8E93",
+          activeTintColor: THEME.BLUE_COLOR,
+          inactiveTintColor: THEME.GRAY_COLOR,
           style: {
             height: Dimensions.get("window").height / 12,
             paddingBottom: 10,
@@ -122,11 +124,7 @@ const AppNavigation = () => {
           options={{
             tabBarLabel: "Сервисы",
             tabBarIcon: ({ color }) => (
-              <Ionicons
-                name="ios-home-outline"
-                size={normalize(24)}
-                color={color}
-              />
+              <MaterialIcons name="house" size={normalize(24)} color={color} />
             ),
           }}
         />
@@ -137,8 +135,8 @@ const AppNavigation = () => {
           options={{
             tabBarLabel: "Профиль",
             tabBarIcon: ({ color }) => (
-              <Ionicons
-                name="md-people-outline"
+              <FontAwesome
+                name="user-circle-o"
                 size={normalize(24)}
                 color={color}
               />
@@ -151,11 +149,7 @@ const AppNavigation = () => {
           options={{
             tabBarLabel: "Мои записи",
             tabBarIcon: ({ color }) => (
-              <Ionicons
-                name="file-tray-stacked-outline"
-                size={normalize(24)}
-                color={color}
-              />
+              <FontAwesome5 name="archive" size={normalize(24)} color={color} />
             ),
           }}
         />

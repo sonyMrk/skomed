@@ -131,14 +131,6 @@ export const PaidDoctorAppointment = ({ navigation }) => {
     }
   }, [organization]);
 
-  //   useEffect(() => {
-  //     if ((!hospitalsLoadError || !appointmentError) && step === 3) {
-  //       const doctorId = appointmentUserData.DoctorID;
-  //       const orgId = appointmentUserData.AttachmentID;
-  //       dispatch(getShedule(orgId, doctorId));
-  //     }
-  //   }, [step]);
-
   // Получить данные о пациенте с базы
   const fetchData = (IIN) => {
     dispatch(getAppointmentUserData(IIN));
