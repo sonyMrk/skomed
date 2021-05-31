@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   stepper: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
+    padding: 10,
   },
   stepper__item: {
     flex: 1,

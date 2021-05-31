@@ -21,8 +21,10 @@ import { NotificationScreen } from "../../screens/NotificationScreen";
 import { getNewNotificationsCountState } from "../../store/selectors/app";
 import { normalize } from "../../utils/normalizeFontSize";
 import { AppointmentFamilyDoctorScreen } from "../../screens/HospitalSelectionScreen/AppointmentFamilyDoctorScreen";
+import { AppointmentProfileSpecialists } from "../../screens/HospitalSelectionScreen/AppointmentProfileSpecialists";
 import { AppText } from "../../components/ui/AppText";
 import { AppBoldText } from "../../components/ui/AppBoldText";
+import { PaidDoctorAppointment } from "../../screens/HospitalSelectionScreen/PaidDoctorAppointment";
 
 const getDefaultScreenOptions = (title) => ({ navigation }) => ({
   headerTitle: () => (
@@ -45,6 +47,7 @@ const getDefaultScreenOptions = (title) => ({ navigation }) => ({
   ),
   headerTitleStyle: {
     fontSize: normalize(15),
+    alignSelf: "center",
   },
   headerStyle: {
     backgroundColor: "#fff",
@@ -68,7 +71,7 @@ export const MainStackScreen = ({ navigation }) => {
   const newNotificationsCount = useSelector(getNewNotificationsCountState);
 
   return (
-    <MainStack.Navigator>
+    <MainStack.Navigator screenOptions={{ headerTitleAlign: "center" }}>
       <MainStack.Screen
         name="Main"
         component={MainScreen}
@@ -218,7 +221,17 @@ export const MainStackScreen = ({ navigation }) => {
       <MainStack.Screen
         name="AppointmentFamilyDoctor"
         component={AppointmentFamilyDoctorScreen}
-        options={getDefaultScreenOptions("Запись к участковому врачу")}
+        options={getDefaultScreenOptions("Запись на прием")}
+      />
+      <MainStack.Screen
+        name="AppointmentProfileSpecialists"
+        component={AppointmentProfileSpecialists}
+        options={getDefaultScreenOptions("Запись на прием")}
+      />
+      <MainStack.Screen
+        name="PaidDoctorAppointment"
+        component={PaidDoctorAppointment}
+        options={getDefaultScreenOptions("Запись на прием")}
       />
     </MainStack.Navigator>
   );

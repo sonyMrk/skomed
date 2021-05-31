@@ -7,7 +7,7 @@ export const getListOfMedications = async (name, pharmacy, district) => {
     const verifiedName = name.split(" ").join("+");
     console.log("CLIENT FETCH START....");
     const { data } = await axios.get(
-      `http://192.168.1.200:3030/farm?name=${verifiedName}&pharmacy=${verifiedPharmacy}&district=${verifiedDistrict}`
+      `http://192.168.10.49:3030/farm?name=${verifiedName}&pharmacy=${verifiedPharmacy}&district=${verifiedDistrict}`
     );
     console.log("CLIENT FETCH end....");
     return data;

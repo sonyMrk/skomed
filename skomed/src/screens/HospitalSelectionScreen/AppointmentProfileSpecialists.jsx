@@ -24,6 +24,8 @@ import {
   clearShedule,
   clearAppointmentSaveResult,
   saveAppointment,
+  getProfileSpecsData,
+  clearProfileSpecs,
 } from "../../store/actions/appointment";
 import {
   getHospitalsLoadingState,
@@ -38,6 +40,8 @@ import {
   getAppointmentSheduleLoadingState,
   getSaveAppointmentResultState,
   getSaveAppointmentLoadingState,
+  getAppointmentProfileSpecDataState,
+  getAppointmentProfileSpecLoadingState,
 } from "../../store/selectors/appointment";
 import { getUserFamilyState } from "../../store/selectors/user";
 import { AppText } from "../../components/ui/AppText";
@@ -48,6 +52,7 @@ import { ModalAddPerson } from "./components/ModalAddPerson";
 import { createFamilyPerson } from "../../store/actions/user";
 import { FullOrganizationCard } from "./components/FullOrganizationCard";
 import { AppButton } from "../../components/ui/AppButton";
+import { formatServerDate } from "../../utils/formatDate";
 import { SaveAppointmentResult } from "./components/SaveAppointmentResult";
 import { AppSelect } from "../../components/ui/AppSelect";
 
@@ -64,7 +69,7 @@ const titles = {
 
 //  TODO: Последний экран с результатом записи,  СКРОЛЛЫ,
 
-export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
+export const AppointmentProfileSpecialists = ({ navigation }) => {
   const [organization, setOrganization] = useState(null); // выбранная мед. организация
   const [step, setStep] = useState(1); // шаг записи
   const [visibleAddModal, setVisibleAddModal] = useState(false); // видимость модального окна для добавления нового пациента
@@ -72,6 +77,8 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
   const [appointmentTime, setAppointmentTime] = useState(null); // время приема
   const [appointmentData, setAppointmentData] = useState(null); // данные (id кабинета, массив свободныч часов, даты и т.д)
   const [reason, setReason] = useState(""); // причина визита
+  const [specialization, setSpecialization] = useState(null); // специализация обьект с массивом врачей, id, name, коды ошибок
+  const [doctor, setDoctor] = useState(null); // обьект с доктором {"Doctor" : "", "DoctorID"}
 
   const dispatch = useDispatch();
 
@@ -88,6 +95,12 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
   const saveAppointmentResult = useSelector(getSaveAppointmentResultState);
   const saveAppointmentLoading = useSelector(getSaveAppointmentLoadingState);
 
+  const profileSpecsData = useSelector(getAppointmentProfileSpecDataState);
+
+  const isLoadingProfileSpecs = useSelector(
+    getAppointmentProfileSpecLoadingState
+  );
+
   const shedule = useSelector(getAppointmentSheduleState);
   const isLoadingShedule = useSelector(getAppointmentSheduleLoadingState);
 
@@ -95,6 +108,7 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
     dispatch(getHospitalsForAppointment());
     return () => {
       // действия при анмаунте
+      clearState();
     };
   }, []);
 
@@ -118,6 +132,7 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
         showAlert();
       } else {
         setStep(2);
+        dispatch(getProfileSpecsData(appointmentUserData.AttachmentID));
       }
     }
   }, [appointmentUserData, organization, appointmentError]);
@@ -217,12 +232,20 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
       }
     );
 
-  const onPressOne = () => {
-    setStep(1);
+  const clearState = () => {
+    setDoctor(null);
     setAppointmentData(null);
     setAppointmentTime(null);
+    setSpecialization(null);
     dispatch(clearShedule());
+    dispatch(clearProfileSpecs());
   };
+
+  const onPressOne = () => {
+    setStep(1);
+    clearState();
+  };
+
   const onPressTwo = () => {
     if (step < 2) {
       return;
@@ -232,6 +255,7 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
     setAppointmentTime(null);
     dispatch(clearShedule());
   };
+
   const onPressThree = () => {
     if (step < 2) {
       return;
@@ -245,8 +269,25 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
     dispatch(clearAppointmentSaveResult());
   };
 
-  const handlePressOnCard = () => {
-    setStep(3);
+  const handleChangeDoctor = (value) => {
+    setDoctor(value);
+  };
+
+  const goToSelectDate = () => {
+    const orgId = appointmentUserData.AttachmentID;
+    const doctorId = doctor?.DoctorID;
+    const profileId = specialization?.GUID;
+    if (doctorId) {
+      dispatch(getShedule(orgId, doctorId, profileId));
+      setStep(3);
+    }
+  };
+
+  const handleChangeSpecialization = (value) => {
+    if (!value) {
+      setDoctor(null);
+    }
+    setSpecialization(value);
   };
 
   if (isHospitalLoading || isLoadingUserData || saveAppointmentLoading) {
@@ -285,121 +326,163 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Stepper
-        step={step}
-        onPressOne={onPressOne}
-        onPressTwo={onPressTwo}
-        onPressThree={onPressThree}
-      />
-      <View style={styles.title}>
-        <AppBoldText style={styles.title__text}>{titles[step]}</AppBoldText>
-      </View>
-      {step === 1 && (
-        <>
+    <ScrollView contentContainerStyle={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Stepper
+          step={step}
+          onPressOne={onPressOne}
+          onPressTwo={onPressTwo}
+          onPressThree={onPressThree}
+        />
+        <View style={styles.title}>
+          <AppBoldText style={styles.title__text}>{titles[step]}</AppBoldText>
+        </View>
+        {step === 1 && (
+          <>
+            <ScrollView style={{ padding: 10, marginBottom: 20 }}>
+              <View style={styles.peoples}>
+                {[...family].map((people) => {
+                  return (
+                    <PeopleItem
+                      item={people}
+                      key={people.value}
+                      onPress={selectIIN}
+                    />
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </>
+        )}
+
+        {step === 2 && appointmentUserData && (
           <ScrollView>
-            <View style={styles.peoples}>
-              {[...family].map((people) => {
-                return (
-                  <PeopleItem
-                    item={people}
-                    key={people.value}
-                    onPress={selectIIN}
-                  />
-                );
-              })}
+            <View style={styles.organizationList}>
+              <FullOrganizationCard appointmentUserData={appointmentUserData} />
+              {/* Если загружается профили специализаций показываем прелоадер */}
+              {isLoadingProfileSpecs ? (
+                <View style={{ marginTop: normalize(10) }}>
+                  <Preloader />
+                </View>
+              ) : (
+                // иначе, если данные специализаций загружены то показываем селекты с выбором специализаций и врача
+                profileSpecsData && (
+                  <View style={styles.profileActions}>
+                    <AppSelect
+                      placeholder="Выберите специализацию:"
+                      value={specialization}
+                      onValueChange={handleChangeSpecialization}
+                      data={
+                        profileSpecsData?.Profiles
+                          ? profileSpecsData?.Profiles
+                          : []
+                      }
+                    />
+                    <AppSelect
+                      placeholder="Выберите врача:"
+                      value={doctor}
+                      onValueChange={handleChangeDoctor}
+                      data={
+                        specialization?.Specialists
+                          ? specialization?.Specialists
+                          : []
+                      }
+                    />
+                    <AppButton
+                      style={{ marginTop: normalize(10) }}
+                      onPress={goToSelectDate}
+                      disabled={!doctor}
+                    >
+                      Далее
+                    </AppButton>
+                  </View>
+                )
+              )}
             </View>
           </ScrollView>
-        </>
-      )}
+        )}
 
-      {step === 2 && appointmentUserData && (
-        <View style={styles.organizationList}>
-          <FullOrganizationCard
-            appointmentUserData={appointmentUserData}
-            onPress={handlePressOnCard}
-          />
-        </View>
-      )}
+        {isLoadingShedule && step === 3 ? (
+          <Preloader />
+        ) : (
+          shedule &&
+          step === 3 && (
+            <View style={styles.selectDate}>
+              <View style={styles.select}>
+                <AppSelect
+                  placeholder="Выберите дату:"
+                  value={appointmentData}
+                  onValueChange={handleChangeDate}
+                  data={shedule?.Dates ? shedule.Dates : []}
+                />
+              </View>
+              <View style={styles.times}>
+                <View>
+                  <AppText style={styles.times__title}>
+                    Доступное время:
+                  </AppText>
+                </View>
+                <ScrollView style={styles.time_scroll}>
+                  <View style={styles.times__list}>
+                    {appointmentData &&
+                      appointmentData.Times.map((time) => {
+                        return (
+                          <TouchableOpacity
+                            style={{
+                              ...styles.times__item,
+                              backgroundColor:
+                                time.value.TimeStart ===
+                                appointmentTime?.TimeStart
+                                  ? "#66b0ff"
+                                  : THEME.BLUE_COLOR,
+                            }}
+                            onPress={() => {
+                              setAppointmentTime(time.value);
+                            }}
+                            key={time.label}
+                            activeOpacity={0.9}
+                          >
+                            <AppText style={styles.item__text}>
+                              {time.label}
+                            </AppText>
+                          </TouchableOpacity>
+                        );
+                      })}
+                  </View>
+                </ScrollView>
+              </View>
+              <AppButton
+                style={{
+                  marginTop: normalize(20),
+                  marginHorizontal: normalize(15),
+                }}
+                disabled={!appointmentTime}
+                onPress={handleSaveAppointment}
+              >
+                Далее
+              </AppButton>
+            </View>
+          )
+        )}
 
-      {isLoadingShedule ? (
-        <Preloader />
-      ) : (
-        shedule &&
-        step === 3 && (
-          <View>
-            <View style={styles.select}>
-              <AppSelect
-                placeholder="Выберите дату"
-                onValueChange={handleChangeDate}
-                data={shedule?.Dates ? shedule.Dates : []}
-                value={appointmentData}
+        {step === 1 && (
+          <TouchableOpacity style={styles.add} onPress={handleOpenModal}>
+            <View>
+              <Image
+                source={require("../../../assets/icons/add_btn.png")}
+                style={styles.add_icon}
               />
             </View>
-            <View style={styles.times}>
-              <View>
-                <AppText style={styles.times__title}>Доступное время: </AppText>
-              </View>
-              <ScrollView style={styles.time_scroll}>
-                <View style={styles.times__list}>
-                  {appointmentData &&
-                    appointmentData.Times.map((time) => {
-                      return (
-                        <TouchableOpacity
-                          style={{
-                            ...styles.times__item,
-                            backgroundColor:
-                              time.value.TimeStart ===
-                              appointmentTime?.TimeStart
-                                ? "#66b0ff"
-                                : THEME.BLUE_COLOR,
-                          }}
-                          onPress={() => {
-                            setAppointmentTime(time.value);
-                          }}
-                          key={time.label}
-                          activeOpacity={0.9}
-                        >
-                          <AppText style={styles.item__text}>
-                            {time.label}
-                          </AppText>
-                        </TouchableOpacity>
-                      );
-                    })}
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        )
-      )}
+          </TouchableOpacity>
+        )}
 
-      {step === 3 && (
-        <AppButton
-          style={{ marginTop: normalize(20) }}
-          disabled={!appointmentTime}
-          onPress={handleSaveAppointment}
-        >
-          Далее
-        </AppButton>
-      )}
-
-      {step === 1 && (
-        <TouchableOpacity style={styles.add} onPress={handleOpenModal}>
-          <View>
-            <Image
-              source={require("../../../assets/icons/add_btn.png")}
-              style={styles.add_icon}
-            />
-          </View>
-        </TouchableOpacity>
-      )}
-
-      <ModalAddPerson
-        modalVisible={visibleAddModal && step === 1}
-        closeModal={handleCloseModal}
-        addPerson={addFamilyPerson}
-      />
-    </View>
+        <ModalAddPerson
+          modalVisible={visibleAddModal && step === 1}
+          closeModal={handleCloseModal}
+          addPerson={addFamilyPerson}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
@@ -407,6 +490,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: "relative",
+    justifyContent: "space-between",
+  },
+  organizationList: {
     padding: 15,
   },
   error__container: {
@@ -419,9 +505,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: "center",
   },
-  title: {
-    paddingVertical: 10,
-  },
+  title: {},
   subtitle: {
     textAlign: "center",
     color: THEME.GRAY_COLOR,
@@ -431,10 +515,11 @@ const styles = StyleSheet.create({
   },
   select: {
     marginVertical: 10,
+    marginHorizontal: normalize(15),
   },
   title__text: {
     textAlign: "center",
-    fontSize: normalize(23),
+    fontSize: normalize(20),
   },
   peoples: {
     backgroundColor: "#fff",
@@ -466,7 +551,7 @@ const styles = StyleSheet.create({
     marginTop: normalize(20),
   },
   time_scroll: {
-    height: viewportWidth / 2,
+    height: viewportWidth / 1.7,
     marginVertical: 15,
   },
   times__list: {
@@ -477,6 +562,7 @@ const styles = StyleSheet.create({
   },
   times__title: {
     fontSize: normalize(20),
+    marginHorizontal: normalize(15),
   },
   times__item: {
     flexBasis: (viewportWidth / 6) * 0.9,
@@ -501,5 +587,13 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingVertical: 10,
+  },
+  profileActions: {
+    marginTop: normalize(20),
+  },
+  selectDate: {
+    // paddingVertical: normalize(25),
+    flex: 1,
+    // justifyContent: "space-between",
   },
 });

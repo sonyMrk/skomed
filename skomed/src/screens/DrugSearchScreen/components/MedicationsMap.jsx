@@ -2,9 +2,10 @@ import React, { useRef, useState } from "react";
 import { StyleSheet, View, Platform } from "react-native";
 import { PROVIDER_GOOGLE } from "react-native-maps";
 import MapView from "react-native-map-clustering";
+import { Marker, Callout } from "react-native-maps";
 
+import { InfoItem } from "../../../components/ui/InfoItem";
 import newId from "../../../utils/newId";
-import { AppMapMarker } from "./AppMapMarker";
 import { useSelector } from "react-redux";
 import { getMedicationsMarkerListState } from "../../../store/selectors/medications";
 
@@ -26,37 +27,65 @@ export const MedicationsMap = ({ region }) => {
     }
     mapRef.current.animateToRegion(region, 1000);
   };
-
   return (
-    <View style={styles.map__wrapper}>
-      <MapView
-        style={{ ...styles.map, marginBottom: margin.bottom }}
-        ref={mapRef}
-        // provider={PROVIDER_GOOGLE}
-        showsUserLocation={true}
-        showsMyLocationButton={true}
-        mapPadding={{ bottom: 50 }}
-        onMapReady={onMapReady}
-        initialRegion={region}
-        clusteringEnabled={true}
-      >
-        {medicationsMarkers &&
-          Object.keys(medicationsMarkers).map((key) => {
-            return (
-              <AppMapMarker item={medicationsMarkers[key]} key={newId()} />
-            );
-          })}
-      </MapView>
-    </View>
+    <MapView
+      style={{ flex: 1, marginBottom: margin.bottom }}
+      ref={mapRef}
+      provider={PROVIDER_GOOGLE}
+      showsUserLocation={true}
+      showsMyLocationButton={true}
+      mapPadding={{ bottom: 50 }}
+      onMapReady={onMapReady}
+      initialRegion={region}
+      clusteringEnabled={true}
+      clusterColor="#c68c53"
+    >
+      {medicationsMarkers &&
+        Object.keys(medicationsMarkers).map((key) => {
+          return (
+            <Marker
+              coordinate={medicationsMarkers[key].coordinate}
+              pinColor={"#c68c53"}
+              title={"Заголовок"}
+              description={`Описание`}
+              key={newId()}
+              tracksViewChanges={false}
+            >
+              <Callout tooltip={true}>
+                <View style={styles.map__tooltip}>
+                  <InfoItem
+                    title="Адрес"
+                    value={medicationsMarkers[key].address}
+                    style={styles.tooltip__row}
+                  />
+                  <InfoItem
+                    title="Аптека"
+                    value={medicationsMarkers[key].apteka}
+                    style={styles.tooltip__row}
+                  />
+                  <InfoItem
+                    title="Телефон"
+                    value={medicationsMarkers[key].phone}
+                    style={styles.tooltip__row}
+                  />
+                  <InfoItem
+                    title="График работы"
+                    value={medicationsMarkers[key].workTime}
+                  />
+                </View>
+              </Callout>
+            </Marker>
+          );
+        })}
+    </MapView>
   );
 };
 
 const styles = StyleSheet.create({
-  map: {
-    width: "100%",
-    height: "100%",
+  map__tooltip: {
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    padding: 10,
   },
-  map__wrapper: {
-    width: "100%",
-  },
+  tooltip__row: {},
 });

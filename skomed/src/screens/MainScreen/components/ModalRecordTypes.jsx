@@ -26,7 +26,7 @@ export const ModalRecordsType = ({
           <TouchableOpacity
             style={styles.ref}
             onPress={() => {
-              onMenuItemPress("AppointmentFamilyDoctor");
+              onMenuItemPress("PaidDoctorAppointment");
               closeModal();
             }}
           >
@@ -35,7 +35,7 @@ export const ModalRecordsType = ({
           <TouchableOpacity
             style={styles.ref}
             onPress={() => {
-              onMenuItemPress("AppointmentFamilyDoctor");
+              onMenuItemPress("AppointmentProfileSpecialists");
               closeModal();
             }}
           >

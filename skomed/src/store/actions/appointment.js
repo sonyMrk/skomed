@@ -301,14 +301,15 @@ export const cancelReception = (orgId, regType, id) => async (dispatch) => {
       1: "appointments",
       2: "houseCalls",
     };
-    console.log("ACTION id", id);
+
     const currentType = types[regType];
 
     dispatch(setAppointmentSaveLoading(true));
 
     const respData = await hospitalApi.СancelReception(orgId, regType, id);
 
-    console.log("cancelReception respData", respData);
+    console.log("orgId, regType, id", orgId, regType, id);
+    console.log(respData);
 
     if (respData.ErrorCode !== 0) {
       dispatch(setAppointmentError(respData.ErrorDesc));
@@ -318,7 +319,7 @@ export const cancelReception = (orgId, regType, id) => async (dispatch) => {
         setAppointmentError(
           respData.ErrorDesc
             ? respData.ErrorDesc
-            : "ошибка отмены регистрации - отмена визита возможна не менее чем за 1 час до начала приема!"
+            : "Ошибка отмены регистрации - отмена визита возможна не менее чем за 1 час до начала приема!"
         )
       );
     } else {

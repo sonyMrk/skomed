@@ -7,9 +7,6 @@ import {
   Alert,
 } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
-import { Ionicons } from "@expo/vector-icons";
-import { EvilIcons } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 
 import { AppBoldText } from "../../components/ui/AppBoldText";
@@ -187,7 +184,7 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     return () => {
-      dispatch(clearHouseCallResult);
+      dispatch(clearHouseCallResult());
       dispatch(clearAppointmentSaveResult());
     };
   }, []);
@@ -213,9 +210,9 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
         </AppText>
         <AppButton
           onPress={() => {
-            dispatch(clearAppointmentError())
+            dispatch(clearAppointmentError());
             navigation.navigate("History");
-            dispatch(clearAppointmentSaveResult())
+            dispatch(clearAppointmentSaveResult());
           }}
         >
           Перейти к истории записей
@@ -356,13 +353,6 @@ export const ConfirmAppointmentScreen = ({ navigation, route }) => {
                 style={{
                   ...pickerSelectStyles,
                 }}
-                // Icon={() => (
-                //   <MaterialCommunityIcons
-                //     name="doctor"
-                //     size={20}
-                //     color="white"
-                //   />
-                // )}
               />
             </View>
           )

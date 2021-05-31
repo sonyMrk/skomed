@@ -35,9 +35,9 @@ const hospitalIcons = {
     .uri,
 };
 
-export const FullOrganizationCard = ({ appointmentUserData, setStep }) => {
+export const FullOrganizationCard = ({ appointmentUserData, onPress }) => {
   return (
-    <TouchableOpacity activeOpacity={0.3} onPress={() => setStep(3)}>
+    <TouchableOpacity activeOpacity={0.3} onPress={onPress}>
       <View style={styles.organization}>
         {appointmentUserData?.Attachment ? (
           <View style={styles.organization__header}>
@@ -53,11 +53,11 @@ export const FullOrganizationCard = ({ appointmentUserData, setStep }) => {
               <AppText style={{ fontSize: normalize(13), marginBottom: 5 }}>
                 {appointmentUserData?.AttachmentAddress}
               </AppText>
-              {appointmentUserData?.AttachmentID === "867" && (
+              {appointmentUserData?.AttachmentID === "867" ? (
                 <AppText style={{ fontSize: normalize(13) }}>
                   Т.Мухамед-Рахимова 27 - " Центр семейного здоровья"
                 </AppText>
-              )}
+              ) : null}
             </View>
             <View style={styles.orgHeader_right}>
               <Image

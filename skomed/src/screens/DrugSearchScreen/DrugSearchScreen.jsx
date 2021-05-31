@@ -16,10 +16,10 @@ import {
 import { Preloader } from "../../components/ui/Preloader";
 import { THEME } from "../../theme";
 import { AppBoldText } from "../../components/ui/AppBoldText";
-import { MedicationsMap } from "./components/MedicationsMap";
 import { MedicationFilters } from "./components/MedicationFilters";
 import MedicationResulList from "./components/MedicationResulList";
 import { AppText } from "../../components/ui/AppText";
+import { MedicationsMap } from "./components/MedicationsMap";
 
 export const DrugSearchScreen = ({ navigation }) => {
   const [mapScreen, setMapScreen] = useState(false);
