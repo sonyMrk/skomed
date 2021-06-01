@@ -10,11 +10,11 @@ export const MedicationItem = ({ item }) => {
     <View style={styles.result__item}>
       <InfoItem title="Адрес" value={item.address} />
       <InfoItem title="Аптека" value={item.apteka} />
-      {/* <InfoItem title="Телефон" value={item.phone} />
+      <InfoItem title="Телефон" value={item.phone} />
       <InfoItem title="График работы" value={item.workTime} />
       <InfoItem title="Название лекарства" value={item.name} />
       <InfoItem title="Цена" value={`${item.price} тг`} />
-      <InfoItem title="Последнее обновление данных" value={item.updateTime} /> */}
+      <InfoItem title="Последнее обновление данных" value={item.updateTime} />
     </View>
   );
 };

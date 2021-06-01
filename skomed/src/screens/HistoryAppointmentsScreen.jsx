@@ -16,6 +16,7 @@ import {
   cancelReception,
   clearAppointmentError,
   getHistoryAppointments,
+  removeItemFromHistoryAppointments,
 } from "../store/actions/appointment";
 import { getHistoryAppointmentsState } from "../store/selectors/app";
 import { THEME } from "../theme";
@@ -29,7 +30,6 @@ import { useState } from "react";
 import { AppButton } from "../components/ui/AppButton";
 import { getAppointmentErrorMessageState } from "../store/selectors/appointment";
 import { useEffect } from "react";
-import { removeItemFromHistoryAppointments } from "../store/actions/app";
 
 export const HistoryAppointmentsScreen = () => {
   const [isHouseCallScreen, setIsHouseCallScreen] = useState(false);

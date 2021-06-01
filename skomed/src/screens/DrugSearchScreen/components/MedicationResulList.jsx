@@ -39,4 +39,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default memo(renderResultList);
+// export default memo(renderResultList);
+
+export default renderResultList;

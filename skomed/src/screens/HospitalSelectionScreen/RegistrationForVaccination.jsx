@@ -27,6 +27,8 @@ import {
   clearShedule,
   clearAppointmentSaveResult,
   saveAppointment,
+  getProfileSpecsData,
+  clearProfileSpecs,
 } from "../../store/actions/appointment";
 import {
   getHospitalsLoadingState,
@@ -41,6 +43,8 @@ import {
   getAppointmentSheduleLoadingState,
   getSaveAppointmentResultState,
   getSaveAppointmentLoadingState,
+  getAppointmentProfileSpecDataState,
+  getAppointmentProfileSpecLoadingState,
 } from "../../store/selectors/appointment";
 import { getUserFamilyState } from "../../store/selectors/user";
 import { Stepper } from "./components/Stepper";
@@ -50,6 +54,7 @@ import { ModalAddPerson } from "./components/ModalAddPerson";
 import { createFamilyPerson } from "../../store/actions/user";
 import { FullOrganizationCard } from "./components/FullOrganizationCard";
 import { SaveAppointmentResult } from "./components/SaveAppointmentResult";
+import { SelectSpecialization } from "./components/SelectSpecialization";
 import { SelectDate } from "./components/SelectDate";
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
@@ -65,7 +70,7 @@ const titles = {
 
 //  TODO: Последний экран с результатом записи,  СКРОЛЛЫ,
 
-export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
+export const RegistrationForVaccination = ({ navigation }) => {
   const [organization, setOrganization] = useState(null); // выбранная мед. организация
   const [step, setStep] = useState(1); // шаг записи
   const [visibleAddModal, setVisibleAddModal] = useState(false); // видимость модального окна для добавления нового пациента
@@ -73,6 +78,8 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
   const [appointmentTime, setAppointmentTime] = useState(null); // время приема
   const [appointmentData, setAppointmentData] = useState(null); // данные (id кабинета, массив свободныч часов, даты и т.д)
   const [reason, setReason] = useState(""); // причина визита
+  const [specialization, setSpecialization] = useState(null); // специализация обьект с массивом врачей, id, name, коды ошибок
+  const [doctor, setDoctor] = useState(null); // обьект с доктором {"Doctor" : "", "DoctorID"}
 
   const dispatch = useDispatch();
 
@@ -88,6 +95,12 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
 
   const saveAppointmentResult = useSelector(getSaveAppointmentResultState);
   const saveAppointmentLoading = useSelector(getSaveAppointmentLoadingState);
+
+  const profileSpecsData = useSelector(getAppointmentProfileSpecDataState);
+
+  const isLoadingProfileSpecs = useSelector(
+    getAppointmentProfileSpecLoadingState
+  );
 
   const shedule = useSelector(getAppointmentSheduleState);
   const isLoadingShedule = useSelector(getAppointmentSheduleLoadingState);
@@ -112,25 +125,21 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
     if (organization && appointmentUserData && selectedIIN) {
       if (appointmentUserData.ErrorCode !== 0) {
         dispatch(setAppointmentError(appointmentUserData.ErrorDesc));
+        showAlert(appointmentUserData.ErrorDesc);
       } else if (
         // если запрещена запись на прием
         appointmentUserData.RegAvailable !== 1 ||
         appointmentUserData.HomeCallAvailable !== 1
       ) {
         showAlert();
+      } else if (appointmentError) {
+        showAlert(appointmentError);
       } else {
         setStep(2);
+        dispatch(getProfileSpecsData(appointmentUserData.AttachmentID));
       }
     }
   }, [appointmentUserData, organization, appointmentError]);
-
-  useEffect(() => {
-    if (!hospitalsLoadError && !appointmentError && step === 3) {
-      const doctorId = appointmentUserData.DoctorID;
-      const orgId = appointmentUserData.AttachmentID;
-      dispatch(getShedule(orgId, doctorId));
-    }
-  }, [step]);
 
   // Получить данные о пациенте с базы
   const fetchData = (IIN) => {
@@ -199,10 +208,12 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
     );
   };
 
-  const showAlert = () =>
+  const showAlert = (title) =>
     Alert.alert(
       "Запись недоступна",
-      "В настоящий момент запись в МО прикрепления пациента не возможна!",
+      title
+        ? title
+        : "В настоящий момент запись в МО прикрепления пациента не возможна!",
       [
         {
           text: "Ок",
@@ -220,18 +231,18 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
 
   const clearState = () => {
     setStep(1);
+    setDoctor(null);
     setAppointmentData(null);
     setAppointmentTime(null);
-    setOrganization(null);
+    setSpecialization(null);
+    setSelectedIIN(null);
     dispatch(clearShedule());
-    dispatch(clearAppointmentSaveResult());
+    dispatch(clearProfileSpecs());
     dispatch(clearAppointmentError());
     dispatch(clearHospitalsError());
+    dispatch(clearAppointmentSaveResult());
   };
 
-  const onPressOne = () => {
-    clearState();
-  };
   const onPressTwo = () => {
     if (step < 2) {
       return;
@@ -241,21 +252,39 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
     setAppointmentTime(null);
     dispatch(clearShedule());
   };
+
   const onPressThree = () => {
-    if (step < 2) {
+    if (step < 2 || !doctor) {
       return;
     }
+    goToSelectDate();
     setStep(3);
   };
 
   const goToHistory = () => {
-    dispatch(clearAppointmentError());
     navigation.navigate("History");
-    dispatch(clearAppointmentSaveResult());
+    clearState();
   };
 
-  const handlePressOnCard = () => {
-    setStep(3);
+  const handleChangeDoctor = (value) => {
+    setDoctor(value);
+  };
+
+  const goToSelectDate = () => {
+    const orgId = appointmentUserData.AttachmentID;
+    const doctorId = doctor?.DoctorID;
+    const profileId = specialization?.GUID;
+    if (doctorId) {
+      dispatch(getShedule(orgId, doctorId, profileId));
+      setStep(3);
+    }
+  };
+
+  const handleChangeSpecialization = (value) => {
+    if (!value) {
+      setDoctor(null);
+    }
+    setSpecialization(value);
   };
 
   if (isHospitalLoading || isLoadingUserData || saveAppointmentLoading) {
@@ -264,18 +293,26 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
 
   if ((hospitalsLoadError || appointmentError) && step === 3) {
     return (
-      <View style={styles.error__container}>
-        {hospitalsForAppointment?.ErrorDesc !== 0 ? (
-          <AppBoldText style={styles.error}>
-            {hospitalsForAppointment?.ErrorDesc}
-          </AppBoldText>
-        ) : null}
-        {hospitalsLoadError && (
-          <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-        )}
-        {appointmentError && (
-          <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
-        )}
+      <View style={{ flex: 1 }}>
+        <Stepper
+          step={step}
+          onPressOne={clearState}
+          onPressTwo={onPressTwo}
+          onPressThree={onPressThree}
+        />
+        <View style={styles.error__container}>
+          {hospitalsForAppointment?.ErrorDesc !== 0 ? (
+            <AppBoldText style={styles.error}>
+              {hospitalsForAppointment?.ErrorDesc}
+            </AppBoldText>
+          ) : null}
+          {hospitalsLoadError && (
+            <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
+          )}
+          {appointmentError && (
+            <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
+          )}
+        </View>
       </View>
     );
   }
@@ -283,7 +320,6 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
   if (saveAppointmentResult) {
     return (
       <SaveAppointmentResult
-        result={saveAppointmentResult}
         result={saveAppointmentResult}
         doctorName={appointmentUserData?.Doctor}
         hospitalName={appointmentUserData?.Attachment}
@@ -294,80 +330,97 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Stepper
-        step={step}
-        onPressOne={onPressOne}
-        onPressTwo={onPressTwo}
-        onPressThree={onPressThree}
-      />
-      <View style={styles.title}>
-        <AppBoldText style={styles.title__text}>{titles[step]}</AppBoldText>
-      </View>
-      {step === 1 && (
-        <>
-          <ScrollView
-            style={{
-              padding: 15,
-            }}
-          >
-            <View style={styles.peoples}>
-              {[...family].map((people) => {
-                return (
-                  <PeopleItem
-                    item={people}
-                    key={people.value}
-                    onPress={selectIIN}
+    <ScrollView contentContainerStyle={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Stepper
+          step={step}
+          onPressOne={clearState}
+          onPressTwo={onPressTwo}
+          onPressThree={onPressThree}
+        />
+        <View style={styles.title}>
+          <AppBoldText style={styles.title__text}>{titles[step]}</AppBoldText>
+        </View>
+        {step === 1 && (
+          <>
+            <ScrollView style={{ padding: 10 }}>
+              <View style={styles.peoples}>
+                {[...family].map((people) => {
+                  return (
+                    <PeopleItem
+                      item={people}
+                      key={people.value}
+                      onPress={selectIIN}
+                    />
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </>
+        )}
+
+        {step === 2 && appointmentUserData?.ErrorCode === 0 && (
+          <ScrollView>
+            <View style={styles.organizationList}>
+              <FullOrganizationCard appointmentUserData={appointmentUserData} />
+              {/* Если загружается профили специализаций показываем прелоадер */}
+              {isLoadingProfileSpecs ? (
+                <View style={{ marginTop: normalize(10) }}>
+                  <Preloader />
+                </View>
+              ) : (
+                // иначе, если данные специализаций загружены то показываем селекты с выбором специализаций и врача
+                profileSpecsData && (
+                  <SelectSpecialization
+                    specialization={specialization}
+                    handleChangeSpecialization={handleChangeSpecialization}
+                    profileData={profileSpecsData?.Profiles}
+                    doctor={doctor}
+                    handleChangeDoctor={handleChangeDoctor}
+                    specializationData={specialization?.Specialists}
+                    goToSelectDate={goToSelectDate}
+                    disabled={!doctor}
                   />
-                );
-              })}
+                )
+              )}
             </View>
           </ScrollView>
-        </>
-      )}
+        )}
 
-      {step === 2 && appointmentUserData && (
-        <View style={styles.organizationList}>
-          <FullOrganizationCard
-            appointmentUserData={appointmentUserData}
-            onPress={handlePressOnCard}
-          />
-        </View>
-      )}
-
-      {isLoadingShedule ? (
-        <Preloader />
-      ) : (
-        shedule &&
-        step === 3 && (
-          <SelectDate
-            appointmentData={appointmentData}
-            handleChangeDate={handleChangeDate}
-            sheduleData={shedule?.Dates}
-            setAppointmentTime={setAppointmentTime}
-            handleSaveAppointment={handleSaveAppointment}
-            appointmentTime={appointmentTime}
-          />
-        )
-      )}
-
-      {step === 1 && (
-        <TouchableOpacity style={styles.add} onPress={handleOpenModal}>
-          <View>
-            <Image
-              source={require("../../../assets/icons/add_btn.png")}
-              style={styles.add_icon}
+        {isLoadingShedule && step === 3 ? (
+          <Preloader />
+        ) : (
+          shedule &&
+          step === 3 && (
+            <SelectDate
+              appointmentData={appointmentData}
+              handleChangeDate={handleChangeDate}
+              sheduleData={shedule?.Dates}
+              setAppointmentTime={setAppointmentTime}
+              handleSaveAppointment={handleSaveAppointment}
+              appointmentTime={appointmentTime}
             />
-          </View>
-        </TouchableOpacity>
-      )}
+          )
+        )}
 
-      <ModalAddPerson
-        modalVisible={visibleAddModal && step === 1}
-        closeModal={handleCloseModal}
-        addPerson={addFamilyPerson}
-      />
-    </View>
+        {step === 1 && (
+          <TouchableOpacity style={styles.add} onPress={handleOpenModal}>
+            <View>
+              <Image
+                source={require("../../../assets/icons/add_btn.png")}
+                style={styles.add_icon}
+              />
+            </View>
+          </TouchableOpacity>
+        )}
+
+        <ModalAddPerson
+          modalVisible={visibleAddModal && step === 1}
+          closeModal={handleCloseModal}
+          addPerson={addFamilyPerson}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
@@ -375,6 +428,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: "relative",
+    // justifyContent: "space-between",
   },
   organizationList: {
     padding: 15,
@@ -419,11 +473,6 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.MAIN_COLOR,
   },
   add_icon: {
-    resizeMode: "contain",
-    width: viewportWidth / 20,
-    height: viewportWidth / 20,
-  },
-  arrow: {
     resizeMode: "contain",
     width: viewportWidth / 20,
     height: viewportWidth / 20,

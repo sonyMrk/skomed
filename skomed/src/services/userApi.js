@@ -19,8 +19,6 @@ export const userApi = {
 
     params.append("Token", token);
 
-    console.log("GetPatientByIIN token === ", token);
-
     const { data } = await axios.post("GetPatientByIIN", params);
     return data;
   },
@@ -40,8 +38,6 @@ export const userApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetMedicalDocInfo token === ", token);
-
     const { data } = await axios.post("GetMedicalDocInfo", params);
     return data;
   },
@@ -58,8 +54,6 @@ export const userApi = {
 
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
-
-    console.log("GetMedicalDocTypes token === ", token);
 
     const { data } = await axios.post("GetMedicalDocTypes", params);
 
@@ -85,8 +79,6 @@ export const userApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("AuthorizationRequest token === ", token);
-
     const { data } = await axios.post("AuthorizationRequest", params);
 
     return data;
@@ -108,8 +100,6 @@ export const userApi = {
     params.append("AppVer", "2.0.0");
 
     params.append("Token", token);
-
-    console.log("UserLogin token === ", token);
 
     const { data } = await axios.post("UserLogin", params);
 

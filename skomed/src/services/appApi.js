@@ -13,8 +13,6 @@ export const appApi = {
     const paramsString = `SubscriberID=${SubscriberID}&AuthToken=${AuthToken}&DeviceGUID=${DeviceGUID}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
 
-    console.log("UPDATE API SUBSCRIBER RESP", paramsString);
-
     const dataString64 = formatter.toBase64(dataString);
     const token = await formatter.toSHA256(dataString64);
 
@@ -38,16 +36,12 @@ export const appApi = {
     const dataString64 = formatter.toBase64(dataString);
     const token = await formatter.toSHA256(dataString64);
 
-    console.log("paramsString", paramsString);
-
     const params = new URLSearchParams();
 
     params.append("DeviceGUID", DeviceGUID);
     params.append("AuthToken", AuthToken);
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
-
-    console.log("GetNewMessagesCount token === ", token);
 
     const { data } = await axios.post("GetNewMessagesCount", params);
     return data;
@@ -68,8 +62,6 @@ export const appApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetMessagesForUser token === ", token);
-
     const { data } = await axios.post("GetMessagesForUser", params);
     return data;
   },
@@ -88,8 +80,6 @@ export const appApi = {
     params.append("MessageGUID", MessageGUID);
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
-
-    console.log("ConfirmMessageViewingOnDevice token === ", token);
 
     const { data } = await axios.post("ConfirmMessageViewingOnDevice", params);
     return data;

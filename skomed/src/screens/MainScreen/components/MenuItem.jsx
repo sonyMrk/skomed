@@ -7,8 +7,8 @@ import {
   Image,
 } from "react-native";
 
-import { AppText } from "./ui/AppText";
-import { normalize } from "../utils/normalizeFontSize";
+import { AppText } from "../../../components/ui/AppText";
+import { normalize } from "../../../utils/normalizeFontSize";
 
 export const MenuItem = ({ title, navigateTo, style, onPress, children }) => {
   const handlePress = () => {
@@ -27,7 +27,7 @@ export const MenuItem = ({ title, navigateTo, style, onPress, children }) => {
           </View>
           <View>
             <Image
-              source={require("../../assets/icons/arrow.png")}
+              source={require("../../../../assets/icons/arrow.png")}
               style={styles.arrow}
             />
           </View>

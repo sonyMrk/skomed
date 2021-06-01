@@ -17,8 +17,6 @@ export const hospitalApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetOrgListForAppointment token === ", token);
-
     const { data } = await axios.post("GetOrgListForAppointment", params);
     return data;
   },
@@ -35,8 +33,6 @@ export const hospitalApi = {
 
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
-
-    console.log("GetOrgListForTimetable token === ", token);
 
     const { data } = await axios.post("GetOrgListForTimetable", params);
     return data;
@@ -58,8 +54,6 @@ export const hospitalApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetShedule token === ", token);
-
     const { data } = await axios.post("GetShedule", params);
     return data;
   },
@@ -71,8 +65,6 @@ export const hospitalApi = {
 
     const dataString64 = formatter.toBase64(dataString);
     const token = await formatter.toSHA256(dataString64);
-
-    console.log("GetProfileSpecsData token === ", token);
 
     const params = new URLSearchParams();
 
@@ -96,8 +88,6 @@ export const hospitalApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetMOList token === ", token);
-
     const { data } = await axios.post("GetMOList", params);
     return data;
   },
@@ -115,8 +105,6 @@ export const hospitalApi = {
     params.append("OrgID", orgId);
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
-
-    console.log("GetDataListsForTimetable token === ", token);
 
     const { data } = await axios.post("GetDataListsForTimetable", params);
     return data;
@@ -139,8 +127,6 @@ export const hospitalApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetDoctorsTimetable token === ", token);
-
     const { data } = await axios.post("GetDoctorsTimetable", params);
 
     return data;
@@ -159,8 +145,6 @@ export const hospitalApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetOrgListForRaitings token === ", token);
-
     const { data } = await axios.post("GetOrgListForRaitings", params);
     return data;
   },
@@ -178,8 +162,6 @@ export const hospitalApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("GetDataListsForRatings token === ", token);
-
     const { data } = await axios.post("GetDataListsForRatings", params);
     return data;
   },
@@ -196,8 +178,6 @@ export const hospitalApi = {
     params.append("OrgGUID", orgId);
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
-
-    console.log("GetListOfWorkIndicators token === ", token);
 
     const { data } = await axios.post("GetListOfWorkIndicators", params);
 
@@ -232,8 +212,6 @@ export const hospitalApi = {
     params.append("Comment", comment);
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
-
-    console.log("SaveWorkIndicatorsByUser token === ", token);
 
     const { data } = await axios.post("SaveWorkIndicatorsByUser", params);
 
@@ -274,8 +252,6 @@ export const hospitalApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("SaveAppointment token === ", token);
-
     const { data } = await axios.post("SaveAppointment", params);
 
     return data;
@@ -307,8 +283,6 @@ export const hospitalApi = {
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
 
-    console.log("SaveDoctorCall token === ", token);
-
     const { data } = await axios.post("SaveDoctorCall", params);
 
     return data;
@@ -317,8 +291,6 @@ export const hospitalApi = {
     const dataTime = await GetServerTime();
     const paramsString = `OrgID=${orgId}&RegType=${regType}&GUID=${id}&AppVer=2.0.0`;
     const dataString = `${SECRET_KEY}${SEPARATOR}${dataTime.ServerTime}${SEPARATOR}${paramsString}`;
-
-    console.log("paramsString API", paramsString);
 
     const dataString64 = formatter.toBase64(dataString);
     const token = await formatter.toSHA256(dataString64);
@@ -330,8 +302,6 @@ export const hospitalApi = {
     params.append("GUID", id);
     params.append("AppVer", "2.0.0");
     params.append("Token", token);
-
-    console.log("СancelReception token === ", token);
 
     const { data } = await axios.post("СancelReception", params);
 

@@ -6,20 +6,20 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
-  Alert,
 } from "react-native";
-import RNPickerSelect from "react-native-picker-select";
 
 import { useDispatch, useSelector } from "react-redux";
 
 import { AppBoldText } from "../../components/ui/AppBoldText";
 import { THEME } from "../../theme";
 import { Preloader } from "../../components/ui/Preloader";
-import { getHospitalsForAppointment } from "../../store/actions/hospitals";
+import {
+  getHospitalsForAppointment,
+  clearHospitalsError,
+} from "../../store/actions/hospitals";
 import {
   getAppointmentUserData,
   clearUserData,
-  setAppointmentError,
   clearAppointmentError,
   getShedule,
   clearShedule,
@@ -45,18 +45,15 @@ import {
   getAppointmentProfileSpecLoadingState,
 } from "../../store/selectors/appointment";
 import { getUserFamilyState } from "../../store/selectors/user";
-import { AppText } from "../../components/ui/AppText";
 import { Stepper } from "./components/Stepper";
 import { normalize } from "../../utils/normalizeFontSize";
 import { PeopleItem } from "./components/PeopleItem";
 import { ModalAddPerson } from "./components/ModalAddPerson";
 import { createFamilyPerson } from "../../store/actions/user";
-import { FullOrganizationCard } from "./components/FullOrganizationCard";
-import { AppButton } from "../../components/ui/AppButton";
-import { formatServerDate } from "../../utils/formatDate";
 import { SaveAppointmentResult } from "./components/SaveAppointmentResult";
 import { MinOrganizationCard } from "./components/MinOrganizationCard";
-import { AppSelect } from "../../components/ui/AppSelect";
+import { SelectSpecialization } from "./components/SelectSpecialization";
+import { SelectDate } from "./components/SelectDate";
 
 const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
   "window"
@@ -178,8 +175,6 @@ export const PaidDoctorAppointment = ({ navigation }) => {
       data: appointmentData.Date,
       patientName: appointmentUserData.FIO,
     };
-
-    dispatch(clearAppointmentError());
     clearState();
     dispatch(
       saveAppointment(
@@ -209,6 +204,9 @@ export const PaidDoctorAppointment = ({ navigation }) => {
     setOrganization(null);
     dispatch(clearShedule());
     dispatch(clearProfileSpecs());
+    dispatch(clearHospitalsError());
+    dispatch(clearAppointmentError());
+    dispatch(clearAppointmentSaveResult());
   };
 
   const onPressTwo = () => {
@@ -217,15 +215,20 @@ export const PaidDoctorAppointment = ({ navigation }) => {
     }
     setStep(2);
     setAppointmentData(null);
-    setAppointmentTime(null);
+    setSpecialization(null);
+    setActiveIndex(null);
+    setDoctor(null);
+    setOrganization(null);
     dispatch(clearShedule());
+    dispatch(clearProfileSpecs());
   };
 
   const onPressThree = () => {
-    if (step < 2) {
+    if (step < 2 || !doctor) {
       return;
     }
     setStep(3);
+    goToSelectDate();
   };
 
   const goToHistory = () => {
@@ -267,18 +270,26 @@ export const PaidDoctorAppointment = ({ navigation }) => {
 
   if ((hospitalsLoadError || appointmentError) && step === 3) {
     return (
-      <View style={styles.error__container}>
-        {hospitalsForAppointment?.ErrorDesc !== 0 ? (
-          <AppBoldText style={styles.error}>
-            {hospitalsForAppointment?.ErrorDesc}
-          </AppBoldText>
-        ) : null}
-        {hospitalsLoadError && (
-          <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-        )}
-        {appointmentError && (
-          <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
-        )}
+      <View style={{ flex: 1 }}>
+        <Stepper
+          step={step}
+          onPressOne={clearState}
+          onPressTwo={onPressTwo}
+          onPressThree={onPressThree}
+        />
+        <View style={styles.error__container}>
+          {hospitalsForAppointment?.ErrorDesc !== 0 ? (
+            <AppBoldText style={styles.error}>
+              {hospitalsForAppointment?.ErrorDesc}
+            </AppBoldText>
+          ) : null}
+          {hospitalsLoadError && (
+            <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
+          )}
+          {appointmentError && (
+            <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
+          )}
+        </View>
       </View>
     );
   }
@@ -288,6 +299,7 @@ export const PaidDoctorAppointment = ({ navigation }) => {
       <SaveAppointmentResult
         result={saveAppointmentResult}
         goToHistory={goToHistory}
+        appointmentError={appointmentError}
         // specialization={"specialization.Name"}
       />
     );
@@ -307,7 +319,7 @@ export const PaidDoctorAppointment = ({ navigation }) => {
         </View>
         {step === 1 && (
           <>
-            <ScrollView style={{ padding: 10, marginBottom: 20 }}>
+            <ScrollView style={{ padding: 10 }}>
               <View style={styles.peoples}>
                 {[...family].map((people) => {
                   return (
@@ -344,35 +356,16 @@ export const PaidDoctorAppointment = ({ navigation }) => {
               ) : (
                 // иначе, если данные специализаций загружены то показываем селекты с выбором специализаций и врача
                 profileSpecsData && (
-                  <View style={styles.profileActions}>
-                    <AppSelect
-                      placeholder="Выберите специализацию:"
-                      value={specialization}
-                      onValueChange={handleChangeSpecialization}
-                      data={
-                        profileSpecsData?.Profiles
-                          ? profileSpecsData?.Profiles
-                          : []
-                      }
-                    />
-                    <AppSelect
-                      placeholder="Выберите врача:"
-                      value={doctor}
-                      onValueChange={handleChangeDoctor}
-                      data={
-                        specialization?.Specialists
-                          ? specialization?.Specialists
-                          : []
-                      }
-                    />
-                    <AppButton
-                      style={{ marginTop: normalize(10) }}
-                      onPress={goToSelectDate}
-                      disabled={!doctor}
-                    >
-                      Далее
-                    </AppButton>
-                  </View>
+                  <SelectSpecialization
+                    specialization={specialization}
+                    handleChangeSpecialization={handleChangeSpecialization}
+                    profileData={profileSpecsData?.Profiles}
+                    doctor={doctor}
+                    handleChangeDoctor={handleChangeDoctor}
+                    specializationData={specialization?.Specialists}
+                    goToSelectDate={goToSelectDate}
+                    disabled={!doctor}
+                  />
                 )
               )}
             </View>
@@ -384,61 +377,14 @@ export const PaidDoctorAppointment = ({ navigation }) => {
         ) : (
           shedule &&
           step === 3 && (
-            <View style={styles.selectDate}>
-              <View style={styles.select}>
-                <AppSelect
-                  placeholder="Выберите дату"
-                  value={appointmentData}
-                  onValueChange={handleChangeDate}
-                  data={shedule?.Dates ? shedule?.Dates : []}
-                />
-              </View>
-              <View style={styles.times}>
-                <View>
-                  <AppText style={styles.times__title}>
-                    Доступное время:
-                  </AppText>
-                </View>
-                <ScrollView style={styles.time_scroll}>
-                  <View style={styles.times__list}>
-                    {appointmentData &&
-                      appointmentData.Times.map((time) => {
-                        return (
-                          <TouchableOpacity
-                            style={{
-                              ...styles.times__item,
-                              backgroundColor:
-                                time.value.TimeStart ===
-                                appointmentTime?.TimeStart
-                                  ? "#66b0ff"
-                                  : THEME.BLUE_COLOR,
-                            }}
-                            onPress={() => {
-                              setAppointmentTime(time.value);
-                            }}
-                            key={time.label}
-                            activeOpacity={0.9}
-                          >
-                            <AppText style={styles.item__text}>
-                              {time.label}
-                            </AppText>
-                          </TouchableOpacity>
-                        );
-                      })}
-                  </View>
-                </ScrollView>
-              </View>
-              <AppButton
-                style={{
-                  marginTop: normalize(20),
-                  marginHorizontal: normalize(15),
-                }}
-                disabled={!appointmentTime}
-                onPress={handleSaveAppointment}
-              >
-                Далее
-              </AppButton>
-            </View>
+            <SelectDate
+              appointmentData={appointmentData}
+              handleChangeDate={handleChangeDate}
+              sheduleData={shedule?.Dates}
+              setAppointmentTime={setAppointmentTime}
+              handleSaveAppointment={handleSaveAppointment}
+              appointmentTime={appointmentTime}
+            />
           )
         )}
 
@@ -467,7 +413,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: "relative",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
   },
   organizationList: {
     padding: 15,
@@ -490,10 +436,7 @@ const styles = StyleSheet.create({
   header: {
     paddingVertical: 10,
   },
-  select: {
-    marginVertical: 10,
-    marginHorizontal: normalize(15),
-  },
+
   title__text: {
     textAlign: "center",
     fontSize: normalize(20),
@@ -502,6 +445,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: normalize(12),
+    marginBottom: normalize(20),
   },
   add: {
     position: "absolute",
@@ -519,53 +463,7 @@ const styles = StyleSheet.create({
     width: viewportWidth / 20,
     height: viewportWidth / 20,
   },
-  times: {
-    marginTop: normalize(20),
-  },
-  time_scroll: {
-    height: viewportWidth / 1.7,
-    marginVertical: 15,
-  },
-  times__list: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-    flexWrap: "wrap",
-  },
-  times__title: {
-    fontSize: normalize(20),
-    marginHorizontal: normalize(15),
-  },
-  times__item: {
-    flexBasis: (viewportWidth / 6) * 0.9,
-    marginRight: 8,
-    marginTop: 15,
-    backgroundColor: THEME.BLUE_COLOR,
-    padding: 8,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  item__text: { color: "#fff", fontSize: normalize(12) },
-  result: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 15,
-  },
-  result__text: {
-    textAlign: "center",
-    marginBottom: 10,
-  },
   header: {
     paddingVertical: 10,
-  },
-  profileActions: {
-    marginTop: normalize(20),
-  },
-  selectDate: {
-    paddingBottom: normalize(25),
-    flex: 1,
-    justifyContent: "space-between",
   },
 });

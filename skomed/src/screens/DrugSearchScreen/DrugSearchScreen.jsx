@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import { StyleSheet, View, Dimensions, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import * as Location from "expo-location";
 
@@ -8,6 +8,7 @@ import {
   getMedicationsLoadingState,
   getMedicationsErrorState,
   getMedicationsListState,
+  getMedicationsListSortState,
 } from "../../store/selectors/medications";
 import {
   clearMedicationsError,
@@ -20,13 +21,15 @@ import { MedicationFilters } from "./components/MedicationFilters";
 import MedicationResulList from "./components/MedicationResulList";
 import { AppText } from "../../components/ui/AppText";
 import { MedicationsMap } from "./components/MedicationsMap";
+import { normalize } from "../../utils/normalizeFontSize";
 
 export const DrugSearchScreen = ({ navigation }) => {
+  const [sortBy, setSortBy] = useState("apteka");
   const [mapScreen, setMapScreen] = useState(false);
   const [region, setInitRegion] = useState(null);
   const [mapLoading, setMapLoading] = useState(false);
 
-  const medicationsList = useSelector(getMedicationsListState);
+  const medicationsList = useSelector(getMedicationsListSortState(sortBy));
   const medicationsLoading = useSelector(getMedicationsLoadingState);
   const medicationsError = useSelector(getMedicationsErrorState);
 
@@ -95,7 +98,7 @@ export const DrugSearchScreen = ({ navigation }) => {
                 <AppButton onPress={handleReset}>
                   Удалить результат поиска
                 </AppButton>
-                {medicationsList.length == 0 ? (
+                {medicationsList?.length == 0 ? (
                   <AppText style={styles.result__text}>
                     По вашему запросу результатов не найдено
                   </AppText>
@@ -114,6 +117,61 @@ export const DrugSearchScreen = ({ navigation }) => {
                     ? "Идет загрузка карты..."
                     : "Посмотреть на карте"}
                 </AppButton>
+                <View style={styles.sorting}>
+                  <AppText>Фильтровать по:</AppText>
+                  <View style={styles.sorting__items}>
+                    <TouchableOpacity
+                      style={{
+                        ...styles.sorting__item,
+                        backgroundColor:
+                          sortBy === "name" ? THEME.MAIN_COLOR : "transparent",
+                      }}
+                      onPress={() => {
+                        setSortBy("name");
+                      }}
+                    >
+                      <AppText
+                        style={{ color: sortBy === "name" ? "#fff" : "#000" }}
+                      >
+                        названию
+                      </AppText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        ...styles.sorting__item,
+                        backgroundColor:
+                          sortBy === "price" ? THEME.MAIN_COLOR : "transparent",
+                      }}
+                      onPress={() => {
+                        setSortBy("price");
+                      }}
+                    >
+                      <AppText
+                        style={{ color: sortBy === "price" ? "#fff" : "#000" }}
+                      >
+                        цене
+                      </AppText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={{
+                        ...styles.sorting__item,
+                        backgroundColor:
+                          sortBy === "apteka"
+                            ? THEME.MAIN_COLOR
+                            : "transparent",
+                      }}
+                      onPress={() => {
+                        setSortBy("apteka");
+                      }}
+                    >
+                      <AppText
+                        style={{ color: sortBy === "apteka" ? "#fff" : "#000" }}
+                      >
+                        аптекам
+                      </AppText>
+                    </TouchableOpacity>
+                  </View>
+                </View>
                 <MedicationResulList medicationsList={medicationsList} />
               </>
             )}
@@ -186,5 +244,25 @@ const styles = StyleSheet.create({
     padding: 10,
     height: Dimensions.get("window").height * 0.9,
     width: "100%",
+  },
+  sorting: {
+    paddingVertical: normalize(15),
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  sorting__items: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: normalize(5),
+  },
+  sorting__item: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: normalize(10),
+    padding: normalize(10),
+    borderWidth: 1,
+    borderColor: THEME.MAIN_COLOR,
+    borderRadius: 10,
   },
 });

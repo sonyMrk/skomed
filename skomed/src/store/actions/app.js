@@ -106,9 +106,7 @@ export const getNewNotificationsCount = (deviceGUID) => async (dispatch) => {
     const respData = await appApi.GetNewMessagesCount(deviceGUID, authToken);
 
     if (respData.ErrorCode !== 0) {
-      dispatch(
-        setNotificationsError(respData.ErrorDesc + "getNewNotificationsCount")
-      );
+      dispatch(setNotificationsError(respData.ErrorDesc));
     } else {
       dispatch(setNewNotificationsCount(respData.MessagesCount));
     }
@@ -127,7 +125,7 @@ export const getMessageForUser = (deviceGUID) => async (dispatch) => {
     const respData = await appApi.GetMessagesForUser(deviceGUID, authToken);
 
     if (respData.ErrorCode !== 0) {
-      dispatch(setNotificationsError(respData.ErrorDesc + "getMessageForUser"));
+      dispatch(setNotificationsError(respData.ErrorDesc));
     } else {
       dispatch(setNotifications(respData.Messages));
     }
@@ -159,6 +157,7 @@ export const updateSubscriberData = (SubscriberID) => async (dispatch) => {
       dispatch(saveDeviceID(DeviceID));
     }
   } catch (error) {
+    dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
     console.log("updateSubscriberData", error);
   }
 };
@@ -183,6 +182,7 @@ export const confirmMessageViewingOnDevice = (
       dispatch(getNewNotificationsCount(deviceId, AuthToken));
     }
   } catch (error) {
+    dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
     console.log("confirmMessageViewingOnDevice", error);
   }
 };

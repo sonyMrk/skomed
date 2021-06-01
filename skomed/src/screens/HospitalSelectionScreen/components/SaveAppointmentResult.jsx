@@ -21,6 +21,14 @@ export const SaveAppointmentResult = ({
   specialization,
   goToHistory,
 }) => {
+  if (result.ErrorCode !== 0) {
+    return (
+      <View style={styles.error__container}>
+        <AppBoldText style={styles.error}>{result.ErrorDesc}</AppBoldText>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.result}>
       <View style={styles.result__check}>
@@ -115,5 +123,16 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     fontSize: normalize(17),
+  },
+
+  error__container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  error: {
+    color: THEME.DANGER_COLOR,
+    fontSize: 18,
+    textAlign: "center",
   },
 });

@@ -114,7 +114,7 @@ const AppNavigation = () => {
           inactiveTintColor: THEME.GRAY_COLOR,
           style: {
             height: Dimensions.get("window").height / 12,
-            paddingBottom: 10,
+            paddingBottom: normalize(5),
           },
         }}
       >
@@ -124,7 +124,7 @@ const AppNavigation = () => {
           options={{
             tabBarLabel: "Сервисы",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="house" size={normalize(24)} color={color} />
+              <MaterialIcons name="house" size={normalize(22)} color={color} />
             ),
           }}
         />
@@ -137,7 +137,7 @@ const AppNavigation = () => {
             tabBarIcon: ({ color }) => (
               <FontAwesome
                 name="user-circle-o"
-                size={normalize(24)}
+                size={normalize(22)}
                 color={color}
               />
             ),
@@ -149,7 +149,7 @@ const AppNavigation = () => {
           options={{
             tabBarLabel: "Мои записи",
             tabBarIcon: ({ color }) => (
-              <FontAwesome5 name="archive" size={normalize(24)} color={color} />
+              <FontAwesome5 name="archive" size={normalize(22)} color={color} />
             ),
           }}
         />

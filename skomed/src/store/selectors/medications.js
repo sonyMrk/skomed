@@ -12,8 +12,16 @@ export const getMedicationsLoadingState = (state) =>
 export const getMedicationsErrorState = (state) =>
   getMedicationsState(state).medicationsError;
 
-export const getMedicationsListPageState = (page) => (state) => {
-  return getMedicationsListState(state)?.slice(page, 10);
+export const getMedicationsListSortState = (sortBy) => (state) => {
+  if (sortBy === "price") {
+    return getMedicationsListState(state)?.sort(
+      (a, b) => a[sortBy] - b[sortBy]
+    );
+  } else {
+    return getMedicationsListState(state)?.sort((a, b) =>
+      a[sortBy].localeCompare(b[sortBy])
+    );
+  }
 };
 
 export const getMedicationsListLengthState = (state) =>

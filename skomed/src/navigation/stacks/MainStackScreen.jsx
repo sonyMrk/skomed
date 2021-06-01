@@ -3,15 +3,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { TouchableOpacity, View, Dimensions, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { HospitalSelectionScreen } from "../../screens/HospitalSelectionScreen/HospitalSelectionScreen";
 import { DrugSearchScreen } from "../../screens/DrugSearchScreen/DrugSearchScreen";
 import { HospitalDirectoryScreen } from "../../screens/HospitalDirectoryScreen";
 import { ScheduleScreen } from "../../screens/ScheduleScreen";
 import { DocumentScannedScreen } from "../../screens/DocumentScannedScreen";
-import { ConfirmHouseCallScreen } from "../../screens/HospitalSelectionScreen/ConfirmHouseCallScreen";
-import { ConfirmAppointmentScreen } from "../../screens/HospitalSelectionScreen/ConfirmAppointmentScreen";
 import { SupportedHospitals } from "../../screens/SupportedHospitals";
-import { RegistrationForVaccination } from "../../screens/RegistrationForVaccination/RegistrationForVaccination";
 import { ConfirtmRegForVaccination } from "../../screens/RegistrationForVaccination/ConfirtmRegForVaccination";
 import { WorkEvaluation } from "../../screens/WorkEvaluation";
 
@@ -22,9 +18,9 @@ import { getNewNotificationsCountState } from "../../store/selectors/app";
 import { normalize } from "../../utils/normalizeFontSize";
 import { AppointmentFamilyDoctorScreen } from "../../screens/HospitalSelectionScreen/AppointmentFamilyDoctorScreen";
 import { AppointmentProfileSpecialists } from "../../screens/HospitalSelectionScreen/AppointmentProfileSpecialists";
-import { AppText } from "../../components/ui/AppText";
 import { AppBoldText } from "../../components/ui/AppBoldText";
 import { PaidDoctorAppointment } from "../../screens/HospitalSelectionScreen/PaidDoctorAppointment";
+import { RegistrationForVaccination } from "../../screens/HospitalSelectionScreen/RegistrationForVaccination";
 
 const getDefaultScreenOptions = (title) => ({ navigation }) => ({
   headerTitle: () => (
@@ -71,19 +67,41 @@ export const MainStackScreen = ({ navigation }) => {
   const newNotificationsCount = useSelector(getNewNotificationsCountState);
 
   return (
-    <MainStack.Navigator screenOptions={{ headerTitleAlign: "center" }}>
+    <MainStack.Navigator
+      screenOptions={{ headerTitleAlign: "center", gestureEnabled: false }}
+    >
       <MainStack.Screen
         name="Main"
         component={MainScreen}
         options={{
-          headerTitle: "SKOmed",
+          headerTitleAlign: "left",
+          headerTitle: () => (
+            <View
+              style={{
+                flexDirection: "row",
+              }}
+            >
+              <Image
+                source={require("../../../assets/icons/title__icon.png")}
+                style={{
+                  resizeMode: "contain",
+                  width: Dimensions.get("window").width / 10,
+                  height: Dimensions.get("window").width / 10,
+                }}
+              />
+              <AppBoldText
+                style={{ fontSize: normalize(27), marginLeft: 5 }}
+                numberOfLines={1}
+              >
+                SKOmed
+              </AppBoldText>
+            </View>
+          ),
           headerStyle: {
             height: Dimensions.get("window").width / 4.4,
           },
           headerTitleStyle: {
-            marginBottom: 5,
             fontWeight: "bold",
-            fontSize: 27,
           },
           headerRight: () => {
             return (
@@ -131,42 +149,6 @@ export const MainStackScreen = ({ navigation }) => {
       />
 
       <MainStack.Screen
-        name="Appointment"
-        options={getDefaultScreenOptions("Запись на прием")}
-      >
-        {(props) => (
-          <HospitalSelectionScreen
-            navigateTo="ConfirmAppointmentScreen"
-            {...props}
-          />
-        )}
-      </MainStack.Screen>
-
-      <MainStack.Screen
-        name="HouseCallScreen"
-        options={getDefaultScreenOptions("Вызов врача на дом")}
-      >
-        {(props) => (
-          <HospitalSelectionScreen
-            navigateTo="ConfirmHouseCallScreen"
-            {...props}
-          />
-        )}
-      </MainStack.Screen>
-
-      <MainStack.Screen
-        name="ConfirmHouseCallScreen"
-        component={ConfirmHouseCallScreen}
-        options={getDefaultScreenOptions("Вызов врача на дом")}
-      />
-
-      <MainStack.Screen
-        name="ConfirmAppointmentScreen"
-        component={ConfirmAppointmentScreen}
-        options={getDefaultScreenOptions("Запись на прием")}
-      />
-
-      <MainStack.Screen
         name="SupportedHospitals"
         component={SupportedHospitals}
         options={getDefaultScreenOptions("Список доступных организций")}
@@ -199,12 +181,6 @@ export const MainStackScreen = ({ navigation }) => {
       <MainStack.Screen
         name="RegistrationForVaccination"
         component={RegistrationForVaccination}
-        options={getDefaultScreenOptions("Записаться на вакцинацую")}
-      />
-
-      <MainStack.Screen
-        name="ConfirtmRegForVaccination"
-        component={ConfirtmRegForVaccination}
         options={getDefaultScreenOptions("Записаться на вакцинацую")}
       />
 

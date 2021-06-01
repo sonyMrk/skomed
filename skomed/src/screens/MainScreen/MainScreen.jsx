@@ -10,7 +10,7 @@ import {
 import Carousel from "react-native-snap-carousel";
 import { Asset } from "expo-asset";
 
-import { MenuItem } from "../../components/MenuItem";
+import { MenuItem } from "./components/MenuItem";
 import { AppText } from "../../components/ui/AppText";
 
 import { AppBoldText } from "../../components/ui/AppBoldText";

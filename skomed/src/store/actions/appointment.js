@@ -126,25 +126,32 @@ export const getShedule = (orgId, doctorId, profileId) => async (dispatch) => {
     dispatch(setAppointmentLoadingShedule(true));
     const shedule = await hospitalApi.GetShedule(orgId, doctorId, profileId);
 
-    const dates = shedule.Dates?.reduce((prev, date) => {
-      return [
-        ...prev, // форматируем для селекта выбора даты
-        {
-          label: date.DateView,
-          value: {
-            ...date,
-            Times: date.Times.reduce(
-              // форматируем для селекта выбора времени
-              (prev, time) => [...prev, { label: time.TimeStart, value: time }],
-              []
-            ),
+    if (shedule.ErrorCode !== 0) {
+      dispatch(setAppointmentError(shedule.ErrorDesc));
+    } else {
+      const dates = shedule?.Dates?.reduce((prev, date) => {
+        return [
+          ...prev, // форматируем для селекта выбора даты
+          {
+            label: date.DateView,
+            value: {
+              ...date,
+              Times: date.Times.reduce(
+                // форматируем для селекта выбора времени
+                (prev, time) => [
+                  ...prev,
+                  { label: time.TimeStart, value: time },
+                ],
+                []
+              ),
+            },
           },
-        },
-      ];
-    }, []);
+        ];
+      }, []);
 
-    shedule.Dates = dates;
-    dispatch(setAppointmentShedule(shedule));
+      shedule.Dates = dates;
+      dispatch(setAppointmentShedule(shedule));
+    }
   } catch (error) {
     dispatch(setAppointmentError("Ошибка при получении данных о расписании!"));
     console.log(error);
@@ -158,23 +165,27 @@ export const getProfileSpecsData = (orgId) => async (dispatch) => {
     dispatch(setAppointmentLoadingProfileSpecs(true));
     const profileSpecs = await hospitalApi.GetProfileSpecsData(orgId);
 
-    const profiles = profileSpecs.Profiles.reduce((prev, profile) => {
-      return [
-        ...prev, // форматируем для выбора специализации
-        {
-          label: profile.Name,
-          value: {
-            ...profile,
-            Specialists: profile.Specialists.reduce((prev, spec) => {
-              return [...prev, { label: spec.Doctor, value: spec }]; // форматируем для выбора врача
-            }, []),
+    if (profileSpecs.ErrorCode !== 0) {
+      dispatch(setAppointmentError(profileSpecs.ErrorDesc));
+    } else {
+      const profiles = profileSpecs?.Profiles?.reduce((prev, profile) => {
+        return [
+          ...prev, // форматируем для выбора специализации
+          {
+            label: profile.Name,
+            value: {
+              ...profile,
+              Specialists: profile.Specialists.reduce((prev, spec) => {
+                return [...prev, { label: spec.Doctor, value: spec }]; // форматируем для выбора врача
+              }, []),
+            },
           },
-        },
-      ];
-    }, []);
+        ];
+      }, []);
 
-    profileSpecs.Profiles = profiles;
-    dispatch(setAppointmentProfileSpecs(profileSpecs));
+      profileSpecs.Profiles = profiles;
+      dispatch(setAppointmentProfileSpecs(profileSpecs));
+    }
   } catch (error) {
     dispatch(
       setAppointmentError("Ошибка при получении данных о специалистах!")
@@ -216,6 +227,7 @@ export const saveAppointment = (
 
     if (respData.ErrorCode !== 0) {
       dispatch(setAppointmentError(respData.ErrorDesc));
+      dispatch(setAppointmentSaveResult(respData));
     } else {
       const history = await AsyncStorage.getItem("history");
       const updateHistory = JSON.parse(history);
@@ -270,6 +282,7 @@ export const saveHouseCall = (
 
     if (respData.ErrorCode !== 0) {
       dispatch(setAppointmentError(respData.ErrorDesc));
+      dispatch(setHouseCallResult(respData));
     } else {
       const history = await AsyncStorage.getItem("history");
 
@@ -307,9 +320,6 @@ export const cancelReception = (orgId, regType, id) => async (dispatch) => {
     dispatch(setAppointmentSaveLoading(true));
 
     const respData = await hospitalApi.СancelReception(orgId, regType, id);
-
-    console.log("orgId, regType, id", orgId, regType, id);
-    console.log(respData);
 
     if (respData.ErrorCode !== 0) {
       dispatch(setAppointmentError(respData.ErrorDesc));
