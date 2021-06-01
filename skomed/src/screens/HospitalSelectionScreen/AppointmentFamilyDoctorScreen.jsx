@@ -52,9 +52,8 @@ import { FullOrganizationCard } from "./components/FullOrganizationCard";
 import { SaveAppointmentResult } from "./components/SaveAppointmentResult";
 import { SelectDate } from "./components/SelectDate";
 
-const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
-  "window"
-);
+const { width: viewportWidth, height: viewportHeight } =
+  Dimensions.get("window");
 
 const titles = {
   1: "Кого записываем?",
@@ -62,8 +61,6 @@ const titles = {
   3: "Выберите время",
   4: "",
 };
-
-//  TODO: Последний экран с результатом записи,  СКРОЛЛЫ,
 
 export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
   const [organization, setOrganization] = useState(null); // выбранная мед. организация
@@ -264,18 +261,26 @@ export const AppointmentFamilyDoctorScreen = ({ navigation }) => {
 
   if ((hospitalsLoadError || appointmentError) && step === 3) {
     return (
-      <View style={styles.error__container}>
-        {hospitalsForAppointment?.ErrorDesc !== 0 ? (
-          <AppBoldText style={styles.error}>
-            {hospitalsForAppointment?.ErrorDesc}
-          </AppBoldText>
-        ) : null}
-        {hospitalsLoadError && (
-          <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
-        )}
-        {appointmentError && (
-          <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
-        )}
+      <View style={{ flex: 1 }}>
+        <Stepper
+          step={step}
+          onPressOne={clearState}
+          onPressTwo={onPressTwo}
+          onPressThree={onPressThree}
+        />
+        <View style={styles.error__container}>
+          {hospitalsForAppointment?.ErrorDesc !== 0 ? (
+            <AppBoldText style={styles.error}>
+              {hospitalsForAppointment?.ErrorDesc}
+            </AppBoldText>
+          ) : null}
+          {hospitalsLoadError && (
+            <AppBoldText style={styles.error}>{hospitalsLoadError}</AppBoldText>
+          )}
+          {appointmentError && (
+            <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
+          )}
+        </View>
       </View>
     );
   }

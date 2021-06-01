@@ -1,14 +1,16 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 import { NotificationScreen } from "../../screens/NotificationScreen";
-import { THEME } from "../../theme";
+import { HeaderGoBackIcon } from "../../components/HeaderGoBackIcon";
 
 const NotificationStack = createStackNavigator();
 
 export const NotificationStackScreen = ({ navigation }) => {
+  const handlePressGoBack = () => {
+    navigation.navigate("Main");
+  };
+
   return (
     <NotificationStack.Navigator
       screenOptions={{
@@ -24,16 +26,7 @@ export const NotificationStackScreen = ({ navigation }) => {
         component={NotificationScreen}
         options={({ navigation }) => ({
           headerTitle: "Уведомления",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.navigate("Main");
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="black" />
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <HeaderGoBackIcon onPress={handlePressGoBack} />,
         })}
       />
     </NotificationStack.Navigator>

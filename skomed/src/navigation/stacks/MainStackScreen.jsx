@@ -1,6 +1,7 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { TouchableOpacity, View, Dimensions, Image } from "react-native";
+import { useSelector } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 
 import { DrugSearchScreen } from "../../screens/DrugSearchScreen/DrugSearchScreen";
@@ -8,11 +9,8 @@ import { HospitalDirectoryScreen } from "../../screens/HospitalDirectoryScreen";
 import { ScheduleScreen } from "../../screens/ScheduleScreen";
 import { DocumentScannedScreen } from "../../screens/DocumentScannedScreen";
 import { SupportedHospitals } from "../../screens/SupportedHospitals";
-import { ConfirtmRegForVaccination } from "../../screens/RegistrationForVaccination/ConfirtmRegForVaccination";
 import { WorkEvaluation } from "../../screens/WorkEvaluation";
-
 import { MainScreen } from "../../screens/MainScreen/MainScreen";
-import { useSelector } from "react-redux";
 import { NotificationScreen } from "../../screens/NotificationScreen";
 import { getNewNotificationsCountState } from "../../store/selectors/app";
 import { normalize } from "../../utils/normalizeFontSize";
@@ -21,50 +19,40 @@ import { AppointmentProfileSpecialists } from "../../screens/HospitalSelectionSc
 import { AppBoldText } from "../../components/ui/AppBoldText";
 import { PaidDoctorAppointment } from "../../screens/HospitalSelectionScreen/PaidDoctorAppointment";
 import { RegistrationForVaccination } from "../../screens/HospitalSelectionScreen/RegistrationForVaccination";
+import { RightHeaderIcon } from "../../components/RightHeaderIcon";
+import { MainHeaderTitle } from "../../components/MainHeaderTitle";
+import { SimpleHeaderTitle } from "../../components/SimpleHeaderTitle";
+import { HeaderGoBackIcon } from "../../components/HeaderGoBackIcon";
 
-const getDefaultScreenOptions = (title) => ({ navigation }) => ({
-  headerTitle: () => (
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <Image
-        source={require("../../../assets/icons/title__icon.png")}
-        style={{
-          resizeMode: "contain",
-          width: Dimensions.get("window").width / 15,
-          height: Dimensions.get("window").width / 15,
+const getDefaultScreenOptions =
+  (title) =>
+  ({ navigation }) => ({
+    headerTitle: () => <SimpleHeaderTitle title={title} />,
+    headerTitleStyle: {
+      fontSize: normalize(15),
+      alignSelf: "center",
+    },
+    headerStyle: {
+      backgroundColor: "#fff",
+    },
+    headerTintColor: "#000",
+    headerLeft: () => (
+      <HeaderGoBackIcon
+        onPress={() => {
+          navigation.goBack();
         }}
       />
-      <AppBoldText
-        style={{ fontSize: normalize(16), marginLeft: 5 }}
-        numberOfLines={1}
-      >
-        {title}
-      </AppBoldText>
-    </View>
-  ),
-  headerTitleStyle: {
-    fontSize: normalize(15),
-    alignSelf: "center",
-  },
-  headerStyle: {
-    backgroundColor: "#fff",
-  },
-  headerTintColor: "#000",
-  headerLeft: () => (
-    <TouchableOpacity
-      style={{ padding: 10 }}
-      onPress={() => {
-        navigation.goBack();
-      }}
-    >
-      <Ionicons name="ios-arrow-back-outline" size={24} color="#000" />
-    </TouchableOpacity>
-  ),
-});
+    ),
+  });
 
 const MainStack = createStackNavigator();
 
 export const MainStackScreen = ({ navigation }) => {
   const newNotificationsCount = useSelector(getNewNotificationsCountState);
+
+  const handlePressNotificationIcon = () => {
+    navigation.navigate("Notification");
+  };
 
   return (
     <MainStack.Navigator
@@ -75,28 +63,7 @@ export const MainStackScreen = ({ navigation }) => {
         component={MainScreen}
         options={{
           headerTitleAlign: "left",
-          headerTitle: () => (
-            <View
-              style={{
-                flexDirection: "row",
-              }}
-            >
-              <Image
-                source={require("../../../assets/icons/title__icon.png")}
-                style={{
-                  resizeMode: "contain",
-                  width: Dimensions.get("window").width / 10,
-                  height: Dimensions.get("window").width / 10,
-                }}
-              />
-              <AppBoldText
-                style={{ fontSize: normalize(27), marginLeft: 5 }}
-                numberOfLines={1}
-              >
-                SKOmed
-              </AppBoldText>
-            </View>
-          ),
+          headerTitle: () => <MainHeaderTitle />,
           headerStyle: {
             height: Dimensions.get("window").width / 4.4,
           },
@@ -105,44 +72,10 @@ export const MainStackScreen = ({ navigation }) => {
           },
           headerRight: () => {
             return (
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("Notification");
-                  }}
-                  style={{
-                    marginRight: 10,
-                    marginLeft: 15,
-                    position: "relative",
-                  }}
-                >
-                  <Image
-                    style={{
-                      width: normalize(23),
-                      height: normalize(23),
-                      maxWidth: "100%",
-                    }}
-                    source={require("../../../assets/icons/alarm.png")}
-                  />
-                  {newNotificationsCount > 0 && (
-                    <View
-                      style={{
-                        backgroundColor: "#FF0000",
-                        width: 10,
-                        height: 10,
-                        borderRadius: 5,
-                        position: "absolute",
-                        right: 0,
-                      }}
-                    />
-                  )}
-                </TouchableOpacity>
-              </View>
+              <RightHeaderIcon
+                onPress={handlePressNotificationIcon}
+                newNotificationsCount={newNotificationsCount}
+              />
             );
           },
         }}

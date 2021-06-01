@@ -7,7 +7,6 @@ import { AppButton } from "../../components/ui/AppButton";
 import {
   getMedicationsLoadingState,
   getMedicationsErrorState,
-  getMedicationsListState,
   getMedicationsListSortState,
 } from "../../store/selectors/medications";
 import {

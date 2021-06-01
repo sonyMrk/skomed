@@ -57,9 +57,8 @@ import { SaveAppointmentResult } from "./components/SaveAppointmentResult";
 import { SelectSpecialization } from "./components/SelectSpecialization";
 import { SelectDate } from "./components/SelectDate";
 
-const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
-  "window"
-);
+const { width: viewportWidth, height: viewportHeight } =
+  Dimensions.get("window");
 
 const titles = {
   1: "Кого записываем?",
@@ -67,8 +66,6 @@ const titles = {
   3: "Выберите время",
   4: "",
 };
-
-//  TODO: Последний экран с результатом записи,  СКРОЛЛЫ,
 
 export const RegistrationForVaccination = ({ navigation }) => {
   const [organization, setOrganization] = useState(null); // выбранная мед. организация
@@ -324,7 +321,7 @@ export const RegistrationForVaccination = ({ navigation }) => {
         doctorName={appointmentUserData?.Doctor}
         hospitalName={appointmentUserData?.Attachment}
         goToHistory={goToHistory}
-        specialization="Участковый врач"
+        specialization="Вакцинация COVID 19"
       />
     );
   }

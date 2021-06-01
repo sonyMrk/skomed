@@ -1,6 +1,6 @@
-import "react-native-gesture-handler";
 import React, { useState } from "react";
 import { Provider } from "react-redux";
+import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import AppLoading from "expo-app-loading";
 import store from "./src/store/store";

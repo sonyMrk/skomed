@@ -1,15 +1,15 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-
-import { THEME } from "../../theme";
 
 import { ProfileScreen } from "../../screens/ProfileScreen";
+import { HeaderGoBackIcon } from "../../components/HeaderGoBackIcon";
 
 const ProfileStack = createStackNavigator();
 
 export const ProfileStackScreen = ({ navigation }) => {
+  const handlePressGoBack = () => {
+    navigation.navigate("Main");
+  };
   return (
     <ProfileStack.Navigator
       screenOptions={{
@@ -25,16 +25,7 @@ export const ProfileStackScreen = ({ navigation }) => {
         component={ProfileScreen}
         options={({ navigation }) => ({
           headerTitle: "Профиль",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.navigate("Main");
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="black" />
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <HeaderGoBackIcon onPress={handlePressGoBack} />,
         })}
       />
     </ProfileStack.Navigator>

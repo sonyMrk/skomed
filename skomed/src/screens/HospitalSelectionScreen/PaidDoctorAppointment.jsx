@@ -55,9 +55,8 @@ import { MinOrganizationCard } from "./components/MinOrganizationCard";
 import { SelectSpecialization } from "./components/SelectSpecialization";
 import { SelectDate } from "./components/SelectDate";
 
-const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
-  "window"
-);
+const { width: viewportWidth, height: viewportHeight } =
+  Dimensions.get("window");
 
 const titles = {
   1: "Кого записываем?",
@@ -65,8 +64,6 @@ const titles = {
   3: "Выберите время",
   4: "",
 };
-
-//  TODO: Последний экран с результатом записи,  СКРОЛЛЫ,
 
 export const PaidDoctorAppointment = ({ navigation }) => {
   const [organization, setOrganization] = useState(null); // выбранная мед. организация

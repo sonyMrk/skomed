@@ -3,16 +3,17 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { THEME } from "../../theme";
-
-import { ProfileScreen } from "../../screens/ProfileScreen";
 import { HistoryAppointmentsScreen } from "../../screens/HistoryAppointmentsScreen";
+import { HeaderGoBackIcon } from "../../components/HeaderGoBackIcon";
 
-const ProfileStack = createStackNavigator();
+const HistoryStack = createStackNavigator();
 
 export const HistoryStackScreen = ({ navigation }) => {
+  const handlePressGoBack = () => {
+    navigation.navigate("Main");
+  };
   return (
-    <ProfileStack.Navigator
+    <HistoryStack.Navigator
       screenOptions={{
         headerStyle: {
           backgroundColor: "#fff",
@@ -21,23 +22,14 @@ export const HistoryStackScreen = ({ navigation }) => {
         headerTintColor: "#000",
       }}
     >
-      <ProfileStack.Screen
+      <HistoryStack.Screen
         name="HistoryAppointments"
         component={HistoryAppointmentsScreen}
         options={({ navigation }) => ({
           headerTitle: "История записей",
-          headerLeft: () => (
-            <TouchableOpacity
-              style={{ padding: 10 }}
-              onPress={() => {
-                navigation.navigate("Main");
-              }}
-            >
-              <Ionicons name="ios-arrow-back-outline" size={24} color="black" />
-            </TouchableOpacity>
-          ),
+          headerLeft: () => <HeaderGoBackIcon onPress={handlePressGoBack} />,
         })}
       />
-    </ProfileStack.Navigator>
+    </HistoryStack.Navigator>
   );
 };

@@ -7,9 +7,8 @@ import { AppText } from "../../../components/ui/AppText";
 import { AppButton } from "../../../components/ui/AppButton";
 import { AppBoldText } from "../../../components/ui/AppBoldText";
 
-const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
-  "window"
-);
+const { width: viewportWidth, height: viewportHeight } =
+  Dimensions.get("window");
 
 export const SelectDate = ({
   appointmentData,
@@ -89,8 +88,9 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   times__title: {
-    fontSize: normalize(20),
+    fontSize: normalize(15),
     marginHorizontal: normalize(15),
+    textAlign: "center",
   },
   select: {
     marginVertical: 10,

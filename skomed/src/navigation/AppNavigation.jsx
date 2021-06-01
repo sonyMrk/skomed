@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import Constants from "expo-constants";
@@ -9,9 +9,9 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 
-import { NotificationStackScreen } from "./stacks/NotificationStackScreen";
 import { ProfileStackScreen } from "./stacks/ProfileStackScreen";
 import { MainStackScreen } from "./stacks/MainStackScreen";
+import { HistoryStackScreen } from "./stacks/HistoryStackScreen";
 
 import { THEME } from "../theme";
 import { Preloader } from "../components/ui/Preloader";
@@ -29,9 +29,7 @@ import {
   getMessageForUser,
   getNewNotificationsCount,
 } from "../store/actions/app";
-import { HistoryStackScreen } from "./stacks/HistoryStackScreen";
 import { getHistoryAppointments } from "../store/actions/appointment";
-import { getUserProfileState } from "../store/selectors/user";
 import { normalize } from "../utils/normalizeFontSize";
 
 // нижняя навигация
@@ -44,7 +42,6 @@ const AppNavigation = () => {
   const pushToken = useSelector(getExpoPushTokenState);
   const subscriberId = useSelector(getSubscriberIdState);
   const deviceId = useSelector(getDeviceIdState);
-  const profileData = useSelector(getUserProfileState);
 
   console.log("PUSH_TOKEN", pushToken);
   console.log("isInit", isInit);
@@ -60,18 +57,16 @@ const AppNavigation = () => {
       .catch((error) => console.log(error));
 
     // Этот слушатель запускается всякий раз, когда приходит уведомление, когда приложение находится на переднем плане
-    notificationListener.current = Notifications.addNotificationReceivedListener(
-      (notification) => {
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
         // console.log(notification);
-      }
-    );
+      });
 
     // Этот слушатель запускается всякий раз, когда пользователь нажимает на уведомление или взаимодействует с ним (работает, когда приложение находится на переднем плане, в фоновом режиме или убито)
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
         // console.log(response);
-      }
-    );
+      });
 
     return () => {
       Notifications.removeNotificationSubscription(
@@ -169,9 +164,8 @@ Notifications.setNotificationHandler({
 const registerForPushNotificationsAsync = async () => {
   let token;
   if (Constants.isDevice) {
-    const {
-      status: existingStatus,
-    } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
