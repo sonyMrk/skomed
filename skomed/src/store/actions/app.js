@@ -8,6 +8,9 @@ import {
   SET_NOTIFICATIONS_ERROR,
   SET_NOTIFICATIONS_LOADING,
   SET_DEVICE_ID,
+  CLEAR_HISTOTRY_APPOINTMENTS_ERROR,
+  SET_HISTOTRY_APPOINTMENTS_ERROR,
+  SET_HISTOTRY_APPOINTMENTS,
 } from "../types";
 import newId from "../../utils/newId";
 import { SET_SUBSCRIBER_ID } from "./../types";
@@ -52,15 +55,19 @@ export const setDeviceId = (payload) => ({
   payload,
 });
 
-// export const setHistoryAppointmentsError = (payload) => ({
-//   type: SET_HISTOTRY_APPOINTMENTS_ERROR,
-//   payload
-// })
+export const setHistoryAppointmentsError = (payload) => ({
+  type: SET_HISTOTRY_APPOINTMENTS_ERROR,
+  payload,
+});
 
-// export const setHistoryAppointmentsLoading = (payload) => ({
-//   type: SET_HISTOTRY_APPOINTMENTS_LOADING,
-//   payload
-// })
+export const clearHistoryAppointmentsLoading = () => ({
+  type: CLEAR_HISTOTRY_APPOINTMENTS_ERROR,
+});
+
+export const setHistoryAppointments = (payload) => ({
+  type: SET_HISTOTRY_APPOINTMENTS,
+  payload,
+});
 
 export const saveDeviceID = (deviceID) => async (dispatch) => {
   try {
@@ -184,5 +191,61 @@ export const confirmMessageViewingOnDevice = (
   } catch (error) {
     dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
     console.log("confirmMessageViewingOnDevice", error);
+  }
+};
+
+export const getHistoryAppointments = () => async (dispatch) => {
+  try {
+    let history = await AsyncStorage.getItem("history");
+
+    if (history) {
+      const parsedHistory = JSON.parse(history);
+
+      dispatch(setHistoryAppointments(parsedHistory));
+    } else {
+      await AsyncStorage.setItem(
+        "history",
+        JSON.stringify({
+          appointments: [],
+          houseCalls: [],
+        })
+      );
+      dispatch(setHistoryAppointments([]));
+    }
+  } catch (error) {
+    dispatch(setHistoryAppointmentsError("Ошибка, попробуйте еще раз"));
+    console.log("getHistoryAppointments", error);
+  }
+};
+
+export const removeItemFromHistoryAppointments = (id, regType) => async (
+  dispatch
+) => {
+  try {
+    const types = {
+      1: "appointments",
+      2: "houseCalls",
+    };
+
+    const currentType = types[regType];
+
+    dispatch(setAppointmentSaveLoading(true));
+
+    const history = await AsyncStorage.getItem("history");
+
+    const updateHistory = JSON.parse(history);
+
+    const filteredHistory = updateHistory[currentType].filter(
+      (rec) => rec.GUID !== id
+    );
+
+    updateHistory[currentType] = filteredHistory;
+
+    await AsyncStorage.setItem("history", JSON.stringify(updateHistory));
+
+    dispatch(getHistoryAppointments());
+  } catch (error) {
+    dispatch(setHistoryAppointmentsError("Ошибка, попробуйте еще раз"));
+    console.log("getHistoryAppointments", error);
   }
 };

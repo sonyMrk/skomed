@@ -16,12 +16,11 @@ import {
   CLEAR_HOUSE_CALL_RESULT,
   CLEAR_SAVE_APPOINTMENT_RESULT,
   SET_HISTOTRY_APPOINTMENTS,
-  SET_HISTOTRY_APPOINTMENTS_ERROR,
-  SET_HISTOTRY_APPOINTMENTS_LOADING,
 } from "../types";
 import { userApi } from "../../services/userApi";
 import { hospitalApi } from "../../services/hospitalApi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setHistoryAppointmentsError, getHistoryAppointments } from "./app";
 
 export const setAppointmentUserData = (payload) => ({
   type: SET_APPOINTMENT_USER_DATA,
@@ -97,11 +96,6 @@ export const setAppointmentSaveLoading = (payload) => ({
   payload,
 });
 
-export const setHistoryAppointments = (payload) => ({
-  type: SET_HISTOTRY_APPOINTMENTS,
-  payload,
-});
-
 export const getAppointmentUserData = (iin) => async (dispatch) => {
   try {
     dispatch(clearAppointmentError());
@@ -153,7 +147,17 @@ export const getShedule = (orgId, doctorId, profileId) => async (dispatch) => {
       dispatch(setAppointmentShedule(shedule));
     }
   } catch (error) {
-    dispatch(setAppointmentError("Ошибка при получении данных о расписании!"));
+    dispatch(
+      setAppointmentError(
+        "Ошибка сети! Не удалось получить данные о расписании!"
+      )
+    );
+    dispatch(
+      setAppointmentSaveResult({
+        ErrorCode: 2,
+        ErrorDesc: "Ошибка сети! Не удалось получить данные о расписании!",
+      })
+    );
     console.log(error);
   } finally {
     dispatch(setAppointmentLoadingShedule(false));
@@ -188,7 +192,15 @@ export const getProfileSpecsData = (orgId) => async (dispatch) => {
     }
   } catch (error) {
     dispatch(
-      setAppointmentError("Ошибка при получении данных о специалистах!")
+      setAppointmentError(
+        "Ошибка сети! Не удалось получить данные о специалистах!"
+      )
+    );
+    dispatch(
+      setAppointmentSaveResult({
+        ErrorCode: 2,
+        ErrorDesc: "Ошибка сети! Не удалось получить данные о специалистах!",
+      })
     );
     console.log(error);
   } finally {
@@ -252,7 +264,15 @@ export const saveAppointment = (
       dispatch(getHistoryAppointments());
     }
   } catch (error) {
-    dispatch(setAppointmentError("Ошибка при сохранении записи на прием!"));
+    dispatch(
+      setAppointmentError("Ошибка сети! Не удалось сохранить запись на прием!")
+    );
+    dispatch(
+      setAppointmentSaveResult({
+        ErrorCode: 2,
+        ErrorDesc: "Ошибка сети! Не удалось сохранить запись на прием!",
+      })
+    );
     console.log(error);
   } finally {
     dispatch(setAppointmentSaveLoading(false));
@@ -301,7 +321,18 @@ export const saveHouseCall = (
       dispatch(getHistoryAppointments());
     }
   } catch (error) {
-    dispatch(setAppointmentError("Ошибка при сохранении вызова врача на дом!"));
+    dispatch(
+      setAppointmentError(
+        "Ошибка сети! Не удалось сохранить заявку на вызов врача на дом!"
+      )
+    );
+    dispatch(
+      setHouseCallResult({
+        ErrorCode: 2,
+        ErrorDesc:
+          "Ошибка сети! Не удалось сохранить заявку на вызов врача на дом!",
+      })
+    );
     console.log(error);
   } finally {
     dispatch(setAppointmentSaveLoading(false));
@@ -322,7 +353,7 @@ export const cancelReception = (orgId, regType, id) => async (dispatch) => {
     const respData = await hospitalApi.СancelReception(orgId, regType, id);
 
     if (respData.ErrorCode !== 0) {
-      dispatch(setAppointmentError(respData.ErrorDesc));
+      dispatch(setHistoryAppointmentsError(respData.ErrorDesc));
     }
     if (!respData.UnregDateTime) {
       dispatch(
@@ -348,65 +379,11 @@ export const cancelReception = (orgId, regType, id) => async (dispatch) => {
       dispatch(getHistoryAppointments());
     }
   } catch (error) {
-    dispatch(setAppointmentError("Ошибка при удалении записи"));
+    dispatch(
+      setHistoryAppointmentsError("Ошибка сети! Не удалось удалить запись!")
+    );
     console.log(error);
   } finally {
     dispatch(setAppointmentSaveLoading(false));
-  }
-};
-
-export const getHistoryAppointments = () => async (dispatch) => {
-  try {
-    let history = await AsyncStorage.getItem("history");
-
-    if (history) {
-      const parsedHistory = JSON.parse(history);
-
-      dispatch(setHistoryAppointments(parsedHistory));
-    } else {
-      await AsyncStorage.setItem(
-        "history",
-        JSON.stringify({
-          appointments: [],
-          houseCalls: [],
-        })
-      );
-      dispatch(setHistoryAppointments([]));
-    }
-  } catch (error) {
-    dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
-    console.log("getHistoryAppointments", error);
-  }
-};
-
-export const removeItemFromHistoryAppointments = (id, regType) => async (
-  dispatch
-) => {
-  try {
-    const types = {
-      1: "appointments",
-      2: "houseCalls",
-    };
-
-    const currentType = types[regType];
-
-    dispatch(setAppointmentSaveLoading(true));
-
-    const history = await AsyncStorage.getItem("history");
-
-    const updateHistory = JSON.parse(history);
-
-    const filteredHistory = updateHistory[currentType].filter(
-      (rec) => rec.GUID !== id
-    );
-
-    updateHistory[currentType] = filteredHistory;
-
-    await AsyncStorage.setItem("history", JSON.stringify(updateHistory));
-
-    dispatch(getHistoryAppointments());
-  } catch (error) {
-    dispatch(setNotificationsError("Ошибка сети, попробуйте еще раз"));
-    console.log("getHistoryAppointments", error);
   }
 };

@@ -29,7 +29,7 @@ import {
   getMessageForUser,
   getNewNotificationsCount,
 } from "../store/actions/app";
-import { getHistoryAppointments } from "../store/actions/appointment";
+import { getHistoryAppointments } from "../store/actions/app";
 import { normalize } from "../utils/normalizeFontSize";
 
 // нижняя навигация
@@ -57,16 +57,18 @@ const AppNavigation = () => {
       .catch((error) => console.log(error));
 
     // Этот слушатель запускается всякий раз, когда приходит уведомление, когда приложение находится на переднем плане
-    notificationListener.current =
-      Notifications.addNotificationReceivedListener((notification) => {
+    notificationListener.current = Notifications.addNotificationReceivedListener(
+      (notification) => {
         // console.log(notification);
-      });
+      }
+    );
 
     // Этот слушатель запускается всякий раз, когда пользователь нажимает на уведомление или взаимодействует с ним (работает, когда приложение находится на переднем плане, в фоновом режиме или убито)
-    responseListener.current =
-      Notifications.addNotificationResponseReceivedListener((response) => {
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
         // console.log(response);
-      });
+      }
+    );
 
     return () => {
       Notifications.removeNotificationSubscription(
@@ -164,8 +166,9 @@ Notifications.setNotificationHandler({
 const registerForPushNotificationsAsync = async () => {
   let token;
   if (Constants.isDevice) {
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
+    const {
+      status: existingStatus,
+    } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();

@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    padding: normalize(20),
   },
   error: {
     color: THEME.DANGER_COLOR,

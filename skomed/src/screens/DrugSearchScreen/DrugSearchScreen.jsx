@@ -8,6 +8,7 @@ import {
   getMedicationsLoadingState,
   getMedicationsErrorState,
   getMedicationsListSortState,
+  getMedicationsListState,
 } from "../../store/selectors/medications";
 import {
   clearMedicationsError,
@@ -23,12 +24,12 @@ import { MedicationsMap } from "./components/MedicationsMap";
 import { normalize } from "../../utils/normalizeFontSize";
 
 export const DrugSearchScreen = ({ navigation }) => {
-  const [sortBy, setSortBy] = useState("apteka");
   const [mapScreen, setMapScreen] = useState(false);
   const [region, setInitRegion] = useState(null);
   const [mapLoading, setMapLoading] = useState(false);
 
-  const medicationsList = useSelector(getMedicationsListSortState(sortBy));
+  // const medicationsList = useSelector(getMedicationsListSortState(sortBy));
+  const medicationsList = useSelector(getMedicationsListState);
   const medicationsLoading = useSelector(getMedicationsLoadingState);
   const medicationsError = useSelector(getMedicationsErrorState);
 
@@ -101,76 +102,13 @@ export const DrugSearchScreen = ({ navigation }) => {
                   <AppText style={styles.result__text}>
                     По вашему запросу результатов не найдено
                   </AppText>
-                ) : (
-                  <AppText
-                    style={{
-                      ...styles.result__text,
-                      color: THEME.DANGER_COLOR,
-                    }}
-                  >
-                    Пожалуйста, уточняйте цену и наличие лекарств в аптеках!
-                  </AppText>
-                )}
+                ) : null}
                 <AppButton onPress={handleWatchOnMap} disabled={mapLoading}>
                   {mapLoading
                     ? "Идет загрузка карты..."
                     : "Посмотреть на карте"}
                 </AppButton>
-                <View style={styles.sorting}>
-                  <AppText>Фильтровать по:</AppText>
-                  <View style={styles.sorting__items}>
-                    <TouchableOpacity
-                      style={{
-                        ...styles.sorting__item,
-                        backgroundColor:
-                          sortBy === "name" ? THEME.MAIN_COLOR : "transparent",
-                      }}
-                      onPress={() => {
-                        setSortBy("name");
-                      }}
-                    >
-                      <AppText
-                        style={{ color: sortBy === "name" ? "#fff" : "#000" }}
-                      >
-                        названию
-                      </AppText>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{
-                        ...styles.sorting__item,
-                        backgroundColor:
-                          sortBy === "price" ? THEME.MAIN_COLOR : "transparent",
-                      }}
-                      onPress={() => {
-                        setSortBy("price");
-                      }}
-                    >
-                      <AppText
-                        style={{ color: sortBy === "price" ? "#fff" : "#000" }}
-                      >
-                        цене
-                      </AppText>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{
-                        ...styles.sorting__item,
-                        backgroundColor:
-                          sortBy === "apteka"
-                            ? THEME.MAIN_COLOR
-                            : "transparent",
-                      }}
-                      onPress={() => {
-                        setSortBy("apteka");
-                      }}
-                    >
-                      <AppText
-                        style={{ color: sortBy === "apteka" ? "#fff" : "#000" }}
-                      >
-                        аптекам
-                      </AppText>
-                    </TouchableOpacity>
-                  </View>
-                </View>
+
                 <MedicationResulList medicationsList={medicationsList} />
               </>
             )}

@@ -23,3 +23,6 @@ export const getDeviceIdState = (state) => getAppState(state).deviceId;
 
 export const getHistoryAppointmentsState = (state) =>
   getAppState(state).historyAppointments;
+
+export const getHistoryAppointmentsErrorState = (state) =>
+  getAppState(state).historyAppointmentsError;

@@ -15,10 +15,11 @@ import { AppText } from "../components/ui/AppText";
 import {
   cancelReception,
   clearAppointmentError,
-  getHistoryAppointments,
-  removeItemFromHistoryAppointments,
 } from "../store/actions/appointment";
-import { getHistoryAppointmentsState } from "../store/selectors/app";
+import {
+  getHistoryAppointmentsState,
+  getHistoryAppointmentsErrorState,
+} from "../store/selectors/app";
 import { THEME } from "../theme";
 import {
   formatServerDate,
@@ -28,14 +29,18 @@ import {
 } from "../utils/formatDate";
 import { useState } from "react";
 import { AppButton } from "../components/ui/AppButton";
-import { getAppointmentErrorMessageState } from "../store/selectors/appointment";
 import { useEffect } from "react";
+import {
+  clearHistoryAppointmentsLoading,
+  getHistoryAppointments,
+  removeItemFromHistoryAppointments,
+} from "../store/actions/app";
 
 export const HistoryAppointmentsScreen = () => {
   const [isHouseCallScreen, setIsHouseCallScreen] = useState(false);
 
   const history = useSelector(getHistoryAppointmentsState);
-  const appointmentError = useSelector(getAppointmentErrorMessageState);
+  const historyError = useSelector(getHistoryAppointmentsErrorState);
 
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -82,7 +87,7 @@ export const HistoryAppointmentsScreen = () => {
 
   useEffect(() => {
     return () => {
-      dispatch(clearAppointmentError());
+      dispatch(clearHistoryAppointmentsLoading());
     };
   }, []);
 
@@ -97,8 +102,8 @@ export const HistoryAppointmentsScreen = () => {
           <AppBoldText style={styles.title}>
             История записей и вызовов врача
           </AppBoldText>
-          {appointmentError && (
-            <AppBoldText style={styles.error}>{appointmentError}</AppBoldText>
+          {historyError && (
+            <AppBoldText style={styles.error}>{historyError}</AppBoldText>
           )}
         </View>
         <View style={styles.toggleProfile}>

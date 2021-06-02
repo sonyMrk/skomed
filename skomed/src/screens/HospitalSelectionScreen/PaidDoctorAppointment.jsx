@@ -55,8 +55,9 @@ import { MinOrganizationCard } from "./components/MinOrganizationCard";
 import { SelectSpecialization } from "./components/SelectSpecialization";
 import { SelectDate } from "./components/SelectDate";
 
-const { width: viewportWidth, height: viewportHeight } =
-  Dimensions.get("window");
+const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
+  "window"
+);
 
 const titles = {
   1: "Кого записываем?",
@@ -256,9 +257,10 @@ export const PaidDoctorAppointment = ({ navigation }) => {
   };
 
   const handleSelectOrganization = (organization, activeIndex) => {
+    dispatch(clearProfileSpecs());
+    setDoctor(null);
     setOrganization(organization);
     setActiveIndex(activeIndex);
-    setDoctor(null);
   };
 
   if (isHospitalLoading || isLoadingUserData || saveAppointmentLoading) {
@@ -316,19 +318,21 @@ export const PaidDoctorAppointment = ({ navigation }) => {
         </View>
         {step === 1 && (
           <>
-            <ScrollView style={{ padding: 10 }}>
-              <View style={styles.peoples}>
-                {[...family].map((people) => {
-                  return (
-                    <PeopleItem
-                      item={people}
-                      key={people.value}
-                      onPress={selectIIN}
-                    />
-                  );
-                })}
-              </View>
-            </ScrollView>
+            {[...family].length > 0 && (
+              <ScrollView style={{ padding: 10, marginTop: normalize(15) }}>
+                <View style={styles.peoples}>
+                  {[...family].map((people) => {
+                    return (
+                      <PeopleItem
+                        item={people}
+                        key={people.value}
+                        onPress={selectIIN}
+                      />
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            )}
           </>
         )}
 
@@ -419,6 +423,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    padding: normalize(20),
   },
   error: {
     color: THEME.DANGER_COLOR,
@@ -442,7 +447,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: normalize(12),
-    marginBottom: normalize(20),
+    marginBottom: normalize(25),
   },
   add: {
     position: "absolute",

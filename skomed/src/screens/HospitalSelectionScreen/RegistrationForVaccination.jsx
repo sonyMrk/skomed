@@ -57,8 +57,9 @@ import { SaveAppointmentResult } from "./components/SaveAppointmentResult";
 import { SelectSpecialization } from "./components/SelectSpecialization";
 import { SelectDate } from "./components/SelectDate";
 
-const { width: viewportWidth, height: viewportHeight } =
-  Dimensions.get("window");
+const { width: viewportWidth, height: viewportHeight } = Dimensions.get(
+  "window"
+);
 
 const titles = {
   1: "Кого записываем?",
@@ -340,19 +341,21 @@ export const RegistrationForVaccination = ({ navigation }) => {
         </View>
         {step === 1 && (
           <>
-            <ScrollView style={{ padding: 10 }}>
-              <View style={styles.peoples}>
-                {[...family].map((people) => {
-                  return (
-                    <PeopleItem
-                      item={people}
-                      key={people.value}
-                      onPress={selectIIN}
-                    />
-                  );
-                })}
-              </View>
-            </ScrollView>
+            {[...family].length > 0 && (
+              <ScrollView style={{ padding: 10 }}>
+                <View style={styles.peoples}>
+                  {[...family].map((people) => {
+                    return (
+                      <PeopleItem
+                        item={people}
+                        key={people.value}
+                        onPress={selectIIN}
+                      />
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            )}
           </>
         )}
 

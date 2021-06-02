@@ -7,7 +7,10 @@ import { AppText } from "../../../components/ui/AppText";
 import { AppButton } from "../../../components/ui/AppButton";
 import { AppTextInput } from "../../../components/ui/AppTextInput";
 import { useDispatch } from "react-redux";
-import { getMedicationsList } from "../../../store/actions/medications";
+import {
+  getMedicationsList,
+  clearMedicationsError,
+} from "../../../store/actions/medications";
 
 const pharmacysList = [
   { value: "all", label: "Все аптеки" },
@@ -121,6 +124,7 @@ export const MedicationFilters = ({}) => {
   const dispatch = useDispatch();
 
   const handleSearch = () => {
+    dispatch(clearMedicationsError());
     dispatch(getMedicationsList(medicationName, pharmacy, district));
   };
 

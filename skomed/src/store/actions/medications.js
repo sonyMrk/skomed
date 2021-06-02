@@ -41,19 +41,20 @@ export const clearMedicationsList = () => ({
   type: CLEAR_MEDICATIONS_LIST,
 });
 
-export const getMedicationsList =
-  (name, pharmacy, district) => async (dispatch) => {
-    try {
-      dispatch(setMedicationsLoading(true));
-      const respData = await getListOfMedications(name, pharmacy, district);
-      if (respData) {
-        dispatch(setMedicationsList(respData.data.parsedMedications));
-        dispatch(setMedicationsMapMarkers(respData.data.parsedMapMarkers));
-      }
-    } catch (error) {
-      console.log("getMedicationsList", error);
-      dispatch(setMedicationsError("Ошибка при загрузке данных"));
-    } finally {
-      dispatch(setMedicationsLoading(false));
+export const getMedicationsList = (name, pharmacy, district) => async (
+  dispatch
+) => {
+  try {
+    dispatch(setMedicationsLoading(true));
+    const respData = await getListOfMedications(name, pharmacy, district);
+    if (respData) {
+      dispatch(setMedicationsList(respData.data.parsedMedications));
+      dispatch(setMedicationsMapMarkers(respData.data.parsedMapMarkers));
     }
-  };
+  } catch (error) {
+    console.log("getMedicationsList", error);
+    dispatch(setMedicationsError("Ошибка при загрузке данных"));
+  } finally {
+    dispatch(setMedicationsLoading(false));
+  }
+};

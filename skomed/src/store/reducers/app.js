@@ -9,7 +9,7 @@ import {
   SET_DEVICE_ID,
   SET_HISTOTRY_APPOINTMENTS,
   SET_HISTOTRY_APPOINTMENTS_ERROR,
-  SET_HISTOTRY_APPOINTMENTS_LOADING,
+  CLEAR_HISTOTRY_APPOINTMENTS_ERROR,
 } from "../types";
 
 const initialState = {
@@ -22,8 +22,7 @@ const initialState = {
   subscriberId: null,
   deviceId: null,
   historyAppointments: null,
-  historyAppointmentsLoading: false,
-  historyAppointmentsError: null
+  historyAppointmentsError: null,
 };
 
 export const appReducer = (state = initialState, action) => {
@@ -52,8 +51,8 @@ export const appReducer = (state = initialState, action) => {
     case SET_DEVICE_ID: {
       return {
         ...state,
-        deviceId: action.payload
-      }
+        deviceId: action.payload,
+      };
     }
 
     case SET_NOTIFICATIONS: {
@@ -66,15 +65,15 @@ export const appReducer = (state = initialState, action) => {
     case SET_NOTIFICATIONS_ERROR: {
       return {
         ...state,
-        notificationsError: action.payload
-      }
+        notificationsError: action.payload,
+      };
     }
 
     case SET_NOTIFICATIONS_LOADING: {
       return {
         ...state,
-        notificationsLoading: action.payload
-      }
+        notificationsLoading: action.payload,
+      };
     }
 
     case SET_NEW_NOTIFICATIONS_COUNT: {
@@ -87,23 +86,23 @@ export const appReducer = (state = initialState, action) => {
     case SET_HISTOTRY_APPOINTMENTS: {
       return {
         ...state,
-        historyAppointments: action.payload
-      }
+        historyAppointments: action.payload,
+      };
     }
 
-    // case SET_HISTOTRY_APPOINTMENTS_ERROR: {
-    //   return {
-    //     ...state,
-    //     historyAppointmentsError: action.payload
-    //   }
-    // }
+    case SET_HISTOTRY_APPOINTMENTS_ERROR: {
+      return {
+        ...state,
+        historyAppointmentsError: action.payload,
+      };
+    }
 
-    // case SET_HISTOTRY_APPOINTMENTS_LOADING: {
-    //   return {
-    //     ...state,
-    //     historyAppointmentsLoading: action.payload
-    //   }
-    // }
+    case CLEAR_HISTOTRY_APPOINTMENTS_ERROR: {
+      return {
+        ...state,
+        historyAppointmentsError: null,
+      };
+    }
 
     default:
       return state;
